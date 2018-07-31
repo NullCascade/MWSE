@@ -9,6 +9,7 @@
 
 #include "sol.hpp"
 #include "LuaEvents.h"
+#include "LuaExtendedInputConfig.h"
 
 namespace mwse {
 	namespace lua {
@@ -39,6 +40,9 @@ namespace mwse {
 
 			// Performs cleanup to safely detach the DLL.
 			void cleanup();
+
+			// Called when the game has finished initializing and data structures are safe to go diving into.
+			void gameInitialized();
 
 			// Set context for lua scripts.
 			TES3::Script* getCurrentScript();
@@ -101,6 +105,9 @@ namespace mwse {
 			std::shared_ptr<TimerController> gameTimers;
 			std::shared_ptr<TimerController> simulateTimers;
 			std::shared_ptr<TimerController> realTimers;
+
+			// Extended input handlers.
+			std::unordered_map<const std::string, ExtendedInputConfig> extendedInputHandlers;
 		};
 	}
 }

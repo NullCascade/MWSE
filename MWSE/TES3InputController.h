@@ -126,6 +126,7 @@ namespace TES3 {
 
 		void readKeyState();
 		int keybindTest(unsigned int, unsigned int);
+		const char* getKeyBindName(unsigned int keyBindIndex);
 
 		//
 		// Custom functions.

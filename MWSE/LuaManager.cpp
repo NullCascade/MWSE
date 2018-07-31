@@ -490,13 +490,7 @@ namespace mwse {
 		//
 
 		static void _stdcall FinishInitialization() {
-			// Hook up shorthand access to data handler, world controller, and game.
-			sol::state& state = LuaManager::getInstance().getState();
-			state["tes3"]["dataHandler"] = tes3::getDataHandler();
-			state["tes3"]["worldController"] = tes3::getWorldController();
-			state["tes3"]["game"] = tes3::getGame();
-
-			LuaManager::getInstance().triggerEvent(new event::GenericEvent("initialized"));
+			LuaManager::getInstance().gameInitialized();
 		}
 
 		static DWORD callbackFinishedInitialization = TES3_HOOK_FINISH_INITIALIZATION_RETURN;
@@ -1759,6 +1753,54 @@ namespace mwse {
 			userdataMapMutex.lock();
 			userdataCache.clear();
 			userdataMapMutex.unlock();
+		}
+
+		void LuaManager::gameInitialized() {
+			// Create shorthand access to our primary data types.
+			auto worldController = tes3::getWorldController();
+			luaState["tes3"]["dataHandler"] = tes3::getDataHandler();
+			luaState["tes3"]["worldController"] = worldController;
+			luaState["tes3"]["game"] = tes3::getGame();
+
+			// Setup input handlers for default keys.
+			auto inputController = worldController->inputController;
+			for (int i = TES3::KeyBind::FirstKey; i < TES3::KeyBind::LastBindableKey; i++) {
+				auto config = &inputController->inputMaps[i];
+				const char* name = inputController->getKeyBindName(i);
+				extendedInputHandlers[name] = ExtendedInputConfig(name, config->device, config->keyCode);
+			}
+
+			// Some other keys dangle, make sure to get them.
+			extendedInputHandlers["Escape"] = ExtendedInputConfig("Escape", TES3::InputDevice::Keyboard, DIK_ESCAPE);
+			extendedInputHandlers["Console"] = ExtendedInputConfig("Console", TES3::InputDevice::Keyboard, DIK_GRAVE);
+			extendedInputHandlers["Screenshot"] = ExtendedInputConfig("Screenshot", TES3::InputDevice::Keyboard, DIK_SYSRQ);
+
+			// Finally loop through anything in the config and add them.
+			sol::table inputMaps = luaState["mwse"]["inputMaps"];
+			if (inputMaps.valid()) {
+				for (int i = 1; i < inputMaps.size(); i++) {
+					sol::table inputMap = inputMaps[i];
+
+					sol::optional<std::string> name = inputMap["name"];
+					if (!name) {
+						continue;
+					}
+					sol::optional<short> device = inputMap["device"];
+					sol::optional<short> input = inputMap["input"];
+					sol::optional<short> type = inputMap["type"];
+
+					extendedInputHandlers[name.value()] = ExtendedInputConfig(
+						name.value().c_str(),
+						device.value_or(TES3::InputDevice::Keyboard),
+						input.value_or(0),
+						type.value_or(ExtendedInputConfig::ButtonKey)
+					);
+				}
+			}
+
+			// Fire off an event to let listeners know that we are initialized.
+			triggerEvent(new event::GenericEvent("initialized"));
+
 		}
 
 		TES3::Script* LuaManager::getCurrentScript() {

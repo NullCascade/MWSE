@@ -872,6 +872,43 @@ namespace mwse {
 				return true;
 			};
 
+			state["tes3"]["isKeyDown"] = [](unsigned char scanCode) {
+				TES3::WorldController * worldController = tes3::getWorldController();
+				if (worldController == nullptr) {
+					return false;
+				}
+
+				return worldController->inputController->isKeyDown(scanCode);
+			};
+
+			state["tes3"]["isMouseButtonDown"] = [](unsigned char scanCode) {
+				TES3::WorldController * worldController = tes3::getWorldController();
+				if (worldController == nullptr) {
+					return false;
+				}
+
+				return worldController->inputController->isMouseButtonDown(scanCode);
+			};
+
+			state["tes3"]["getKeyName"] = [](unsigned char scanCode) -> const char* {
+				TES3::DataHandler * dataHandler = tes3::getDataHandler();
+				if (dataHandler == nullptr) {
+					return nullptr;
+				}
+
+				unsigned int index = scanCode + TES3::GMST::sKeyName_00;
+				if (index < TES3::GMST::sKeyName_00 && index > TES3::GMST::sKeyName_FF) {
+					return nullptr;
+				}
+
+				char * keyName = dataHandler->nonDynamicData->GMSTs[index]->value.asString;
+				if (strlen(keyName) > 0) {
+					return keyName;
+				}
+				else {
+					return nullptr;
+				}
+			};
 		}
 	}
 }

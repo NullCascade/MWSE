@@ -22,6 +22,7 @@
     <ClInclude Include="D3DViewport.h" />
     <ClInclude Include="DynamicLuaObject.h" />
     <ClInclude Include="TES3MobController.h" />
+    <ClInclude Include="LuaExtendedInputConfig.h" />
     <ClInclude Include="TES3AttachmentLua.h" />
     <ClInclude Include="TES3StdString.h" />
     <ClInclude Include="TES3UIDefines.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="CodePatchUtil.cpp" />
     <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="LuaEvents.cpp" />
+    <ClCompile Include="LuaExtendedInputConfig.cpp" />
     <ClCompile Include="LuaManager.cpp" />
     <ClCompile Include="LuaTimer.cpp" />
     <ClCompile Include="LuaUtil.cpp" />
