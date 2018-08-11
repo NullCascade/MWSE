@@ -636,6 +636,43 @@ namespace mwse {
 				TES3::Reference* m_PreviousReference;
 				TES3::Reference* m_CurrentReference;
 			};
+
+			// ---------------------------------------------------------------------------- //
+
+			class WeatherCycledEvent : public GenericEvent {
+			public:
+				WeatherCycledEvent();
+			};
+
+			class WeatherChangedImmediateEvent : public GenericEvent {
+			public:
+				WeatherChangedImmediateEvent();
+				sol::table createEventTable();
+			};
+
+			class WeatherTransitionStartedEvent : public GenericEvent {
+			public:
+				WeatherTransitionStartedEvent();
+				sol::table createEventTable();
+			};
+
+			class WeatherTransitionFinishedEvent : public GenericEvent {
+			public:
+				WeatherTransitionFinishedEvent();
+				sol::table createEventTable();
+			};
+
+			// ---------------------------------------------------------------------------- //
+
+			class MusicSelectTrackEvent : public GenericEvent {
+			public:
+				MusicSelectTrackEvent(int situation);
+				sol::table createEventTable();
+
+			protected:
+				int m_Situation;
+			};
+
 		}
 	}
 }

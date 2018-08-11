@@ -67,6 +67,14 @@ namespace TES3 {
 	};
 	static_assert(sizeof(NonDynamicData) == 0xB264, "TES3::NonDynamicData failed size validation");
 
+	struct SoundEvent {
+		Reference* reference;
+		Sound* sound;
+		SoundBuffer* soundBuffer;
+		unsigned char unknown_0xC;
+	};
+	static_assert(sizeof(SoundEvent) == 0x10, "TES3::SoundEvent failed size validation");
+
 	namespace CellGrid {
 		enum CellGrid {
 			NorthWest = 0,
@@ -88,14 +96,8 @@ namespace TES3 {
 		void * worldObjectRoot; // 0x8C
 		void * worldPickObjectRoot; // 0x90
 		void * worldLandscapeRoot; // 0x94
-		char unknown_0x98;
-		char unknown_0x99;
-		char unknown_0x9A;
-		char unknown_0x9B;
-		char unknown_0x9C;
-		char unknown_0x9D;
-		char unknown_0x9E;
-		char unknown_0x9F;
+		void * sgSunlight;
+		void * sgFogProperty;
 		int centralGridX; // 0xA0
 		int centralGridY; // 0xA4
 		bool cellChanged; // 0xA8
@@ -106,19 +108,13 @@ namespace TES3 {
 		int unknown_0xB8;
 		int unknown_0xBC;
 		Iterator<void> collisionGrid[2304]; // 0xC0
-		int unknown_0xB4C0;
-		int unknown_0xB4C4;
-		char unknown_0xB4C8;
-		char unknown_0xB4C9;
-		char unknown_0xB4CA;
-		char unknown_0xB4CB;
-		char unknown_0xB4CC;
-		char unknown_0xB4CD;
-		char unknown_0xB4CE;
-		char unknown_0xB4CF;
-		void * sounds; // 0xB4D0
-		void * tempSounds; // 0xB4D4
-		void * unknown_0xB4D8; // 0xB4D8
+		int collision_0xB4C0;
+		int collision_0xB4C4;
+		int collision_0xB4C8;
+		int collision_0xB4CC;
+		Iterator<SoundEvent>* soundEvents; // 0xB4D0
+		Iterator<SoundEvent>* tempSoundEvents; // 0xB4D4
+		Iterator<SoundEvent>* lightSoundEvents; // 0xB4D8
 		bool showActorDrawBounds; // 0xB4DC
 		char unknown_0xB4DD;
 		char unknown_0xB4DE;
@@ -197,9 +193,11 @@ namespace TES3 {
 		// Other related this-call functions.
 		//
 
-		void addSound(Sound* sound, Reference* reference = 0, int unknown1 = 0, unsigned char volume = 250, float pitch = 1.0, int unknown2 = 0, int unknown3 = 0);
-		Sound* addSound(const char* soundId, Reference* reference = 0, int unknown1  = 0, unsigned char volume = 250, float pitch = 1.0, int unknown2 = 0);
-		bool getSoundPlaying(Sound*, Reference*);
+		void addSound(Sound* sound, Reference* reference = nullptr, int playbackFlags = 0, unsigned char volume = 250, float pitch = 1.0, bool isVoiceover = false, int unknown = 0);
+		Sound* addSound(const char* soundId, Reference* reference = 0, int playbackFlags = 0, unsigned char volume = 250, float pitch = 1.0, int unknown = 0);
+		SoundEvent* getSoundPlaying(Sound*, Reference*);
+		void adjustSoundVolume(Sound*, Reference*, unsigned char volume);
+		void removeSound(Sound*, Reference*);
 
 	};
 	static_assert(sizeof(DataHandler) == 0xB558, "TES3::DataHandler failed size validation");

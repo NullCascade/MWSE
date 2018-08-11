@@ -133,15 +133,21 @@ local function onClickModConfigButton()
 		modConfigContainer.layoutHeightFraction = 1.0
 		modConfigContainer.paddingLeft = 4
 
+		local containerPane = modConfigContainer:createThinBorder{}
+		containerPane.layoutWidthFraction = 1.0
+		containerPane.layoutHeightFraction = 1.0
+		containerPane.paddingAllSides = 12
+		containerPane.flowDirection = "top_to_bottom"
+
 		-- Splash screen.
-		local splash = modConfigContainer:createImage({ path = "textures/mwse/menu_modconfig_splash.tga" })
+		local splash = containerPane:createImage({ path = "textures/mwse/menu_modconfig_splash.tga" })
 		splash.layoutOriginFractionX = 0.5
 		splash.borderTop = 25
 
 		-- Create a link back to the website.
-		local site = modConfigContainer:createLabel({ text = "mwse.readthedocs.io" })
+		local site = containerPane:createLabel({ text = "mwse.readthedocs.io" })
 		site.layoutOriginFractionX = 0.5
-		site.color = { 112 / 255, 126 / 255, 207 / 255 }
+		site.color = tes3ui.getPalette("link_color")
 		site:register("mouseClick", function()
 			tes3.messageBox({
 				message = "Open web browser?",

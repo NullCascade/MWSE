@@ -13,6 +13,7 @@ namespace NI {
 	struct RTTI;
 	struct SwitchNode;
 	struct Transform;
+	struct TriShape;
 
 	struct Object_vTable;
 	struct AVObject_vTable;

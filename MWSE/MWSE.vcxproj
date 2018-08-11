@@ -13,6 +13,8 @@
   <ItemGroup>
     <ClInclude Include="ArrayUtil.h" />
     <ClInclude Include="CodePatchUtil.h" />
+    <ClInclude Include="NIPointer.h" />
+    <ClInclude Include="NIStream.h" />
     <ClInclude Include="TES3CrimeEvent.h" />
     <ClInclude Include="TES3CrimeTree.h" />
     <ClInclude Include="D3DColorValue.h" />
@@ -21,6 +23,7 @@
     <ClInclude Include="D3DVector.h" />
     <ClInclude Include="D3DViewport.h" />
     <ClInclude Include="DynamicLuaObject.h" />
+    <ClInclude Include="TES3GameFileLua.h" />
     <ClInclude Include="TES3MobController.h" />
     <ClInclude Include="LuaExtendedInputConfig.h" />
     <ClInclude Include="TES3AttachmentLua.h" />
@@ -256,14 +259,19 @@
     <ClCompile Include="NINodeLua.cpp" />
     <ClCompile Include="NIObject.cpp" />
     <ClCompile Include="NIObjectLua.cpp" />
+    <ClCompile Include="NIObjectNET.cpp" />
     <ClCompile Include="NIPick.cpp" />
     <ClCompile Include="NIPickLua.cpp" />
+    <ClCompile Include="NIStream.cpp" />
     <ClCompile Include="NISwitchNodeLua.cpp" />
     <ClCompile Include="NIUtil.cpp" />
     <ClCompile Include="PatchUtil.cpp" />
     <ClCompile Include="RngUtil.cpp" />
     <ClCompile Include="ScriptUtil.cpp" />
     <ClCompile Include="ScriptUtilLua.cpp" />
+    <ClCompile Include="TES3AudioController.cpp" />
+    <ClCompile Include="TES3Game.cpp" />
+    <ClCompile Include="TES3GameFileLua.cpp" />
     <ClCompile Include="TES3StdString.cpp" />
     <ClCompile Include="TES3AttachmentLua.cpp" />
     <ClCompile Include="TES3CrimeEvent.cpp" />
@@ -362,6 +370,7 @@
     <ClCompile Include="TES3VectorsLua.cpp" />
     <ClCompile Include="TES3Weapon.cpp" />
     <ClCompile Include="TES3WeaponLua.cpp" />
+    <ClCompile Include="TES3WeatherController.cpp" />
     <ClCompile Include="TES3WeatherControllerLua.cpp" />
     <ClCompile Include="TES3WeatherLua.cpp" />
     <ClCompile Include="TES3WorldController.cpp" />

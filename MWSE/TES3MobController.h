@@ -37,6 +37,7 @@ namespace TES3 {
 
 		bool detectPresence(MobileActor * actor, bool unknown = true);
 		void checkRadius(MobileActor * actor, Iterator<void> * container);
+		void checkPlayerDistance();
 
 	};
 	static_assert(sizeof(MobController_0x24) == 0x830, "TES3::MobController_0x24 failed size validation");
@@ -83,6 +84,13 @@ namespace TES3 {
 		int unknown_0x80;
 		int unknown_0x84;
 		int unknown_0x88;
+
+		//
+		// Related this-call functions.
+		//
+
+		void checkPlayerDistance();
+
 	};
 	static_assert(sizeof(MobController) == 0x8C, "TES3::MobController failed size validation");
 }

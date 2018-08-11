@@ -34,7 +34,9 @@ namespace mwse {
 			{
 				// Start our usertype. We must finish this with state.set_usertype.
 				auto usertypeDefinition = state.create_simple_usertype<NI::Node>();
-				usertypeDefinition.set("new", sol::no_constructor);
+				usertypeDefinition.set("new", []() {
+					return NI::Pointer<NI::Node>(new (tes3::_new<NI::Node>()) NI::Node());
+				});
 
 				// Define inheritance structures. These must be defined in order from top to bottom. The complete chain must be defined.
 				usertypeDefinition.set(sol::base_classes, sol::bases<NI::AVObject, NI::ObjectNET, NI::Object>());
@@ -50,7 +52,7 @@ namespace mwse {
 				usertypeDefinition.set("detachChild", [](NI::Node& self, NI::AVObject * child) {
 					NI::AVObject * returnedChild = nullptr;
 					self.detachChild(&returnedChild, child);
-					return makeLuaObject(returnedChild);
+					return makeLuaObject(NI::Pointer<NI::Object>(returnedChild));
 				});
 				usertypeDefinition.set("detachChildAt", [](NI::Node& self, unsigned int index) -> sol::object {
 					if (--index < 0) {
@@ -59,7 +61,7 @@ namespace mwse {
 
 					NI::AVObject * returnedChild = nullptr;
 					self.detachChildAt(&returnedChild, index);
-					return makeLuaObject(returnedChild);
+					return makeLuaObject(NI::Pointer<NI::Object>(returnedChild));
 				});
 
 				// Finish up our usertype.

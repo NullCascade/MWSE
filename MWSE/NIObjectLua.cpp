@@ -10,6 +10,7 @@
 #include "NINode.h"
 #include "NIObject.h"
 #include "NIObjectNET.h"
+#include "NIPointer.h"
 #include "NIRTTI.h"
 
 namespace mwse {
@@ -64,7 +65,10 @@ namespace mwse {
 				usertypeDefinition.set(sol::base_classes, sol::bases<NI::Object>());
 
 				// Basic property binding.
-				usertypeDefinition.set("name", sol::readonly_property([](NI::ObjectNET& self) { return self.name; }));
+				usertypeDefinition.set("name", sol::property(
+					[](NI::ObjectNET& self) { return self.name; },
+					[](NI::ObjectNET& self, const char * name) { self.setName(name); }
+				));
 
 				// Finish up our usertype.
 				state.set_usertype("niObjectNET", usertypeDefinition);
@@ -87,6 +91,12 @@ namespace mwse {
 				usertypeDefinition.set("worldBoundOrigin", &NI::AVObject::worldBoundOrigin);
 				usertypeDefinition.set("worldBoundRadius", &NI::AVObject::worldBoundRadius);
 				usertypeDefinition.set("worldTransform", &NI::AVObject::worldTransform);
+
+				// Friendly access to flags.
+				usertypeDefinition.set("appCulled", sol::property(
+					[](NI::AVObject& self) -> bool { return (self.flags & 1) == 1; },
+					[](NI::AVObject& self, bool set) { set ? self.flags |= 1 : self.flags &= ~1; }
+				));
 
 				// Access to other objects that need to be packaged.
 				usertypeDefinition.set("parent", sol::readonly_property([](NI::AVObject& self) { return makeLuaObject(self.parentNode); }));

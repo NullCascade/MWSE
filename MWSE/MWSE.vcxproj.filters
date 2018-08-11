@@ -178,12 +178,6 @@
     <Filter Include="Header Files\DataAdapters\TES3\Crime">
       <UniqueIdentifier>{dd191e36-f5a8-4159-882d-f7eabf36ec1d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Lua\Input">
-      <UniqueIdentifier>{177e22f0-8719-47a5-a272-529d84fd0619}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Lua\Input">
-      <UniqueIdentifier>{d62ef76f-2fe3-43f6-a38a-08bb6f14b177}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Flags.h">
@@ -861,8 +855,14 @@
     <ClInclude Include="TES3CrimeTree.h">
       <Filter>Header Files\DataAdapters\TES3\Crime</Filter>
     </ClInclude>
-    <ClInclude Include="LuaExtendedInputConfig.h">
-      <Filter>Header Files\Lua\Input</Filter>
+    <ClInclude Include="NIPointer.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="TES3GameFileLua.h">
+      <Filter>Header Files\Lua\Bindings\TES3</Filter>
+    </ClInclude>
+    <ClInclude Include="NIStream.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1933,9 +1933,24 @@
     </ClCompile>
     <ClCompile Include="TES3StdString.cpp">
       <Filter>Source Files\DataAdapters\TES3</Filter>
-    </ClInclude>
-    <ClCompile Include="LuaExtendedInputConfig.cpp">
-      <Filter>Source Files\Lua\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="TES3WeatherController.cpp">
+      <Filter>Source Files\DataAdapters\TES3</Filter>
+    </ClCompile>
+    <ClCompile Include="NIStream.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="TES3AudioController.cpp">
+      <Filter>Source Files\DataAdapters\TES3</Filter>
+    </ClCompile>
+    <ClCompile Include="TES3Game.cpp">
+      <Filter>Source Files\DataAdapters\TES3</Filter>
+    </ClCompile>
+    <ClCompile Include="TES3GameFileLua.cpp">
+      <Filter>Source Files\Lua\Bindings\TES3</Filter>
+    </ClCompile>
+    <ClCompile Include="NIObjectNET.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

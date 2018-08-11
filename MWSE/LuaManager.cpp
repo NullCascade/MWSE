@@ -26,6 +26,7 @@
 #include "TES3MagicEffect.h"
 #include "TES3MagicEffectInstance.h"
 #include "TES3Spell.h"
+#include "TES3MobController.h"
 #include "TES3MobileActor.h"
 #include "TES3MobileCreature.h"
 #include "TES3MobilePlayer.h"
@@ -61,6 +62,7 @@
 #include "TES3EnchantmentLua.h"
 #include "TES3FactionLua.h"
 #include "TES3GameLua.h"
+#include "TES3GameFileLua.h"
 #include "TES3GameSettingLua.h"
 #include "TES3GlobalVariableLua.h"
 #include "TES3IngredientLua.h"
@@ -273,6 +275,7 @@ namespace mwse {
 			bindTES3Enchantment();
 			bindTES3Faction();
 			bindTES3Game();
+			bindTES3GameFile();
 			bindTES3GameSetting();
 			bindTES3GlobalVariable();
 			bindTES3Ingredient();
@@ -651,6 +654,23 @@ namespace mwse {
 
 		void OnNewGame() {
 			tes3::startNewGame();
+		}
+
+		void __fastcall OnNewGameViaStartingCell(TES3::MobController * mobController) {
+			// Call overwritten code.
+			mobController->checkPlayerDistance();
+
+			// Fixup lua state/shorthands.
+			LuaManager& luaManager = LuaManager::getInstance();
+			sol::state& state = luaManager.getState();
+			TES3::MobilePlayer * macp = tes3::getWorldController()->getMobilePlayer();
+			state["tes3"]["mobilePlayer"] = mwse::lua::makeLuaObject(macp);
+			state["tes3"]["player"] = mwse::lua::makeLuaObject(macp->reference);
+
+			// Fire off the loaded/cellChanged events.
+			lastCell = tes3::getDataHandler()->currentCell;
+			luaManager.triggerEvent(new event::LoadedGameEvent(nullptr, false, true));
+			luaManager.triggerEvent(new event::CellChangedEvent(lastCell, nullptr));
 		}
 
 		//
@@ -1282,9 +1302,77 @@ namespace mwse {
 
 		static void HookPostFindActivationTarget() {
 			TES3::Reference *currentTarget = (*global_TES3_Game)->playerTarget;
-			if(previousTarget != currentTarget) {
+			if (previousTarget != currentTarget) {
 				LuaManager::getInstance().triggerEvent(new event::ActivationTargetChangedEvent(previousTarget, currentTarget));
 			}
+		}
+
+		//
+		// Event: Weather cycle and transition events
+		//
+
+		// Fix missing coverage of updates to lastActiveRegion
+		__declspec(naked) void patchWeatherRegionCheck() {
+			__asm {
+				mov ecx, [esi + 0x58]	// ecx = WorldController->weatherController
+				mov [ecx + 0x1D0], eax  // weatherController->lastActiveRegion = eax
+				nop
+			}
+		}
+		const size_t patchWeatherRegionCheck_size = 0xA;
+
+		bool __fastcall OnWeatherCycle(TES3::Cell* cell, DWORD _UNUSED_) {
+			// Fire off the event.
+			LuaManager::getInstance().triggerEvent(new event::WeatherCycledEvent());
+
+			// Call original function.
+			return reinterpret_cast<bool (__thiscall *)(TES3::Cell*)>(0x4E22F0)(cell);
+		}
+
+		void __fastcall OnWeatherImmediateChange(TES3::WeatherController* controller, DWORD _UNUSED_, DWORD weatherId, DWORD transitionScalar) {
+			// Call original function.
+			reinterpret_cast<void (__thiscall *)(TES3::WeatherController*, DWORD, DWORD)>(0x441C40)(controller, weatherId, transitionScalar);
+
+			// Fire off the event, after function completes.
+			LuaManager::getInstance().triggerEvent(new event::WeatherChangedImmediateEvent());
+		}
+
+		void* __cdecl OnWeatherTransitionBegin(const char* texturePath, void* data) {
+			// Fire off the event.
+			LuaManager::getInstance().triggerEvent(new event::WeatherTransitionStartedEvent());
+
+			// Call original function.
+			return reinterpret_cast<void* (__cdecl *)(const char*, void*)>(0x6DE7F0)(texturePath, data);
+		}
+
+		void __fastcall OnWeatherTransitionEnd(void* modelData, DWORD _UNUSED_) {
+			// Fire off the event.
+			LuaManager::getInstance().triggerEvent(new event::WeatherTransitionFinishedEvent());
+
+			// Call original function.
+			reinterpret_cast<void (__thiscall *)(void*)>(0x414890)(modelData);
+		}
+
+		//
+		// Event: Music, new track
+		//
+
+		bool __fastcall OnSelectMusicTrack(TES3::WorldController* controller, DWORD _UNUSED_, int situation) {
+			// Fire off the event.
+			sol::table eventData = LuaManager::getInstance().triggerEvent(new event::MusicSelectTrackEvent(situation));
+
+			if (eventData.valid()) {
+				sol::optional<std::string> musicPath = eventData["music"];
+				if (musicPath) {
+					const auto TES3_getThreadSafeStringBuffer = reinterpret_cast<char*(__thiscall*)(char*)>(0x4D51B0);
+					char* buffer = TES3_getThreadSafeStringBuffer(reinterpret_cast<char*>(0x7CB478));
+					snprintf(buffer, 512, "Data Files/music/%s", musicPath.value().c_str());
+					return true;
+				}
+			}
+
+			// Call original function.
+			return reinterpret_cast<bool(__thiscall *)(TES3::WorldController*, int)>(0x410EA0)(controller, situation);
 		}
 
 		void LuaManager::executeMainModScripts(const char* path, const char* filename) {
@@ -1443,6 +1531,7 @@ namespace mwse {
 			// Additional load/loaded events for new game.
 			genCallEnforced(0x5FCCF4, 0x5FAEA0, reinterpret_cast<DWORD>(OnNewGame));
 			genCallEnforced(0x5FCDAA, 0x5FAEA0, reinterpret_cast<DWORD>(OnNewGame));
+			genCallEnforced(0x41A6E4, 0x563CE0, reinterpret_cast<DWORD>(OnNewGameViaStartingCell));
 
 			// Event: Start Combat
 			genCallEnforced(0x5073BC, 0x530470, reinterpret_cast<DWORD>(OnStartCombat));
@@ -1729,6 +1818,20 @@ namespace mwse {
 			genCallEnforced(0x41CA64, 0x567990, reinterpret_cast<DWORD>(HookPreFindActivationTarget));
 			genJumpUnprotected(0x41CCF5, reinterpret_cast<DWORD>(HookPostFindActivationTarget));
 
+			// Event: Weather transitions
+			genCallEnforced(0x410294, 0x4E22F0, reinterpret_cast<DWORD>(OnWeatherCycle));
+			genCallEnforced(0x410368, 0x441C40, reinterpret_cast<DWORD>(OnWeatherImmediateChange));
+			genCallEnforced(0x441084, 0x441C40, reinterpret_cast<DWORD>(OnWeatherImmediateChange));
+			genCallEnforced(0x45CE2D, 0x441C40, reinterpret_cast<DWORD>(OnWeatherImmediateChange));
+			genCallEnforced(0x45D211, 0x441C40, reinterpret_cast<DWORD>(OnWeatherImmediateChange));
+			genCallEnforced(0x441B49, 0x6DE7F0, reinterpret_cast<DWORD>(OnWeatherTransitionBegin));
+			genCallEnforced(0x440F07, 0x414890, reinterpret_cast<DWORD>(OnWeatherTransitionEnd));
+			writePatchCodeUnprotected(0x410308, (BYTE*)&patchWeatherRegionCheck, patchWeatherRegionCheck_size);
+
+			// Event: Select music track
+			genCallEnforced(0x40F8CA, 0x410EA0, reinterpret_cast<DWORD>(OnSelectMusicTrack));
+			genCallEnforced(0x40F901, 0x410EA0, reinterpret_cast<DWORD>(OnSelectMusicTrack));
+
 			// UI framework hooks
 			TES3::UI::hook();
 
@@ -1869,17 +1972,19 @@ namespace mwse {
 			buttonPressedCallback = callback.value_or(sol::nil);
 		}
 
-		sol::object LuaManager::triggerButtonPressed() {
+		void LuaManager::triggerButtonPressed() {
 			if (buttonPressedCallback != sol::nil) {
 				sol::protected_function callback = buttonPressedCallback;
 				buttonPressedCallback = sol::nil;
 				sol::table eventData = luaState.create_table();
 				eventData["button"] = tes3::ui::getButtonPressedIndex();
 				tes3::ui::resetButtonPressedIndex();
-				return callback(eventData);
+				sol::protected_function_result result = callback(eventData);
+				if (!result.valid()) {
+					sol::error err = result;
+					log::getLog() << "Runtime error when running tes3.messageBox button callback:\n" << err.what() << std::endl;
+				}
 			}
-
-			return sol::nil;
 		}
 
 		sol::object LuaManager::getCachedUserdata(TES3::BaseObject* object) {

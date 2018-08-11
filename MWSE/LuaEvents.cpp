@@ -18,6 +18,7 @@
 #include "TES3UIManager.h"
 #include "TES3Spell.h"
 #include "TES3Weapon.h"
+#include "TES3WeatherController.h"
 #include "TES3WorldController.h"
 
 #include "UIUtil.h"
@@ -1365,6 +1366,76 @@ namespace mwse {
 
 				return eventData;
 			}
+
+			//
+			// Weather transition events.
+			//
+
+			WeatherCycledEvent::WeatherCycledEvent() : GenericEvent("weatherCycled")
+			{
+
+			}
+
+			WeatherChangedImmediateEvent::WeatherChangedImmediateEvent() : GenericEvent("weatherChangedImmediate")
+			{
+
+			}
+
+			sol::table WeatherChangedImmediateEvent::createEventTable() {
+				sol::table eventData = LuaManager::getInstance().getState().create_table();
+				auto controller = tes3::getWorldController()->weatherController;
+
+				eventData["to"] = makeLuaObject(controller->currentWeather);
+
+				return eventData;
+			}
+
+			WeatherTransitionStartedEvent::WeatherTransitionStartedEvent() : GenericEvent("weatherTransitionStarted")
+			{
+
+			}
+
+			sol::table WeatherTransitionStartedEvent::createEventTable() {
+				sol::table eventData = LuaManager::getInstance().getState().create_table();
+				auto controller = tes3::getWorldController()->weatherController;
+
+				eventData["from"] = makeLuaObject(controller->currentWeather);
+				eventData["to"] = makeLuaObject(controller->nextWeather);
+
+				return eventData;
+			}
+
+			WeatherTransitionFinishedEvent::WeatherTransitionFinishedEvent() : GenericEvent("weatherTransitionFinished")
+			{
+
+			}
+
+			sol::table WeatherTransitionFinishedEvent::createEventTable() {
+				sol::table eventData = LuaManager::getInstance().getState().create_table();
+				auto controller = tes3::getWorldController()->weatherController;
+
+				eventData["to"] = makeLuaObject(controller->currentWeather);
+
+				return eventData;
+			}
+
+			//
+			// Music events.
+			//
+
+			MusicSelectTrackEvent::MusicSelectTrackEvent(int situation) :
+				GenericEvent("musicSelectTrack"),
+				m_Situation(situation)
+			{
+
+			}
+
+			sol::table MusicSelectTrackEvent::createEventTable() {
+				sol::table eventData = LuaManager::getInstance().getState().create_table();
+				eventData["situation"] = m_Situation;
+				return eventData;
+			}
+
 		}
 	}
 }

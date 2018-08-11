@@ -8,6 +8,12 @@
 #include "TES3Vectors.h"
 
 namespace TES3 {
+	enum class MusicSituation : int {
+		Explore = 0,
+		Combat = 1,
+		Uninterruptible = 2
+	};
+
 	struct WorldControllerRenderCamera {
 		void * vTable;
 		NI::Object * renderer;
@@ -89,7 +95,7 @@ namespace TES3 {
 		int unknown_0x28;
 		float deltaTime; // 0xC
 		int unknown_0x30;
-		void * audio; // 0x34
+		AudioController * audioController; // 0x34
 		int unknown_0x38;
 		int unknown_0x3C;
 		int unknown_0x40;
@@ -152,14 +158,14 @@ namespace TES3 {
 		int mouseSensitivity; // 0xE8
 		int horzSensitivity; // 0xEC
 		int shaderWaterReflectUpdate; // 0xF0
-		NI::Object * nodeCursor; // 0xF4
+		NI::Node * nodeCursor; // 0xF4
 		WorldControllerRenderCamera splashscreenCamera; // 0xF8
 		WorldControllerRenderCamera worldCamera; // 0x124
-		WorldControllerRenderCamera unknown_0x150;
-		WorldControllerRenderCamera unknown_0x17C;
+		WorldControllerRenderCamera armCamera; // 0x150
+		WorldControllerRenderCamera menuCamera; // 0x17C
 		WorldControllerRenderTarget characterRenderTarget; // 0x1A8
-		WorldControllerRenderTarget unknown_0x22C;
-		WorldControllerRenderCamera unknown_0x2B0;
+		WorldControllerRenderTarget unknown_0x22C; // 0x22C
+		WorldControllerRenderCamera shadowCamera; // 0x2B0
 		int unknown_0x2DC;
 		void * fogOfWarController; // 0x2E0
 		void * uiInventoryData; // 0x2E8
@@ -189,7 +195,7 @@ namespace TES3 {
 		bool showSubtitles; // 0x344
 		int countMusicTracksBattle; // 0x348
 		int countMusicTracksExplore; // 0x34C
-		unsigned int musicState; // 0x350
+		MusicSituation musicSituation; // 0x350
 		int unknown_0x354;
 		int unknown_0x358;
 		int unknown_0x35C;

@@ -3,6 +3,7 @@
 #include "NIDefines.h"
 #include "TES3Defines.h"
 
+#define NOMINMAX
 #include <Windows.h>
 
 namespace TES3 {
@@ -86,6 +87,13 @@ namespace TES3 {
 		int unknown_0x108;
 		char unknown_0x10C;
 		char unknown_0x10D[3]; // Padding.
+
+		//
+		// Other related this-call functions.
+		//
+
+		bool initialize();
+
 	};
 	static_assert(sizeof(Game) == 0x110, "TES3::Game failed size validation");
 }

@@ -9,6 +9,7 @@
 
 #include "TES3MobilePlayer.h"
 #include "TES3Reference.h"
+#include "TES3Sound.h"
 #include "TES3WorldController.h"
 
 #define TES3_NonDynamicData_saveGame 0x4C4250
@@ -27,6 +28,8 @@
 #define TES3_DataHandler_addSound 0x48BD40
 #define TES3_DataHandler_addSoundByName 0x48BCB0
 #define TES3_DataHandler_getSoundPlaying 0x48BBD0
+#define TES3_DataHandler_removeSound 0x48C0D0
+#define TES3_Audio_setBufferVolume 0x4029F0
 
 namespace TES3 {
 
@@ -152,15 +155,29 @@ namespace TES3 {
 	// DataHandler
 	//
 
-	void DataHandler::addSound(Sound* sound, Reference* reference, int unknown1, unsigned char volume, float pitch, int unknown2, int unknown3) {
-		reinterpret_cast<void(__thiscall *)(DataHandler*, Sound*, Reference*, int, unsigned char, float, int, int)>(TES3_DataHandler_addSound)(this, sound, reference, unknown1, volume, pitch, unknown2, unknown3);
+	void DataHandler::addSound(Sound* sound, Reference* reference, int playbackFlags, unsigned char volume, float pitch, bool isVoiceover, int unknown) {
+		reinterpret_cast<void(__thiscall *)(DataHandler*, Sound*, Reference*, int, unsigned char, float, int, int)>(TES3_DataHandler_addSound)(this, sound, reference, playbackFlags, volume, pitch, isVoiceover, unknown);
 	}
 
-	Sound* DataHandler::addSound(const char* soundId, Reference* reference, int unknown1, unsigned char volume, float pitch, int unknown2) {
-		return reinterpret_cast<Sound*(__thiscall *)(DataHandler*, const char*, Reference*, int, unsigned char, float, int)>(TES3_DataHandler_addSound)(this, soundId, reference, unknown1, volume, pitch, unknown2);
+	Sound* DataHandler::addSound(const char* soundId, Reference* reference, int playbackFlags, unsigned char volume, float pitch, int unknown) {
+		return reinterpret_cast<Sound*(__thiscall *)(DataHandler*, const char*, Reference*, int, unsigned char, float, int)>(TES3_DataHandler_addSoundByName)(this, soundId, reference, playbackFlags, volume, pitch, unknown);
 	}
 
-	bool DataHandler::getSoundPlaying(Sound* sound, Reference* reference) {
-		return reinterpret_cast<Sound*(__thiscall *)(DataHandler*, Sound*, Reference*)>(TES3_DataHandler_getSoundPlaying)(this, sound, reference);
+	SoundEvent* DataHandler::getSoundPlaying(Sound* sound, Reference* reference) {
+		return reinterpret_cast<SoundEvent*(__thiscall *)(DataHandler*, Sound*, Reference*)>(TES3_DataHandler_getSoundPlaying)(this, sound, reference);
 	}
+
+	void DataHandler::adjustSoundVolume(Sound* sound, Reference* reference, unsigned char volume) {
+		SoundEvent* e = getSoundPlaying(sound, reference);
+		if (e) {
+			// Active buffer differs between sounds and temp sounds
+			SoundBuffer* buffer = e->soundBuffer ? e->soundBuffer : e->sound->soundBuffer;
+			reinterpret_cast<void(__stdcall*)(SoundBuffer*, unsigned char)>(TES3_Audio_setBufferVolume)(buffer, volume);
+		}
+	}
+
+	void DataHandler::removeSound(Sound* sound, Reference* reference) {
+		reinterpret_cast<void(__thiscall *)(DataHandler*, Sound*, Reference*)>(TES3_DataHandler_removeSound)(this, sound, reference);
+	}
+
 }

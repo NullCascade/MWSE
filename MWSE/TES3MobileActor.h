@@ -64,12 +64,24 @@ namespace TES3 {
 	}
 
 	struct MobileActor : MobileObject {
+		struct ActiveMagicEffect {
+			ActiveMagicEffect* next;
+			ActiveMagicEffect* prev;
+			unsigned int magicInstanceSerial;
+			short magicInstanceEffectIndex;
+			short magicEffectID;
+			bool isHarmful;
+			unsigned short duration;
+			unsigned short magnitudeMin;
+			unsigned char skillOrAttributeID;
+		};
+
 		void * unknown_0x60;
-		int unknown_0x64;
-		Vector3 unknown_0x68;
+		float thisFrameDistanceMoved;
+		Vector3 thisFrameDeltaPosition;
 		float unknown_0x74;
 		int unknown_0x78;
-		int unknown_0x7C;
+		char unknown_0x7C;
 		Iterator<MobileActor> listTargetActors; // 0x80
 		Iterator<MobileActor> listFriendlyActors; // 0x94
 		float scanTimer; // 0xA8
@@ -94,7 +106,7 @@ namespace TES3 {
 		char unknown_0x1C5;
 		char unknown_0x1C6;
 		char unknown_0x1C7;
-		void * activeMagicEffects; // 0x1C8 // Maybe?
+		ActiveMagicEffect* activeMagicEffects; // 0x1C8
 		int activeMagicEffectCount; // 0x1CC
 		int unknown_0x1D0;
 		char unknown_0x1D4;
@@ -201,6 +213,8 @@ namespace TES3 {
 		float calculateSwimRunSpeed();
 		float calculateFlySpeed();
 
+		void updateDerivedStatistics(Statistic * baseStatistic);
+
 		//
 		// Custom functions.
 		//
@@ -210,5 +224,6 @@ namespace TES3 {
 
 		bool equipItem(Object* item);
 	};
+	static_assert(sizeof(MobileActor::ActiveMagicEffect) == 0x18, "TES3::MobileActor::ActiveMagicEffect failed size validation");
 	static_assert(sizeof(MobileActor) == 0x3B0, "TES3::MobileActor failed size validation");
 }

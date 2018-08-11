@@ -22,7 +22,7 @@ namespace mwse {
 				usertypeDefinition.set(sol::base_classes, sol::bases<TES3::BaseObject>());
 				setUserdataForBaseObject(usertypeDefinition);
 
-				// Override the id property to use the soundgen name, rather than the vtable.
+				// Override the id property to use the sound name, rather than the vtable.
 				usertypeDefinition.set(sol::meta_function::to_string, sol::readonly_property([](TES3::Sound& self) { return self.id; }));
 				usertypeDefinition.set("id", sol::readonly_property([](TES3::Sound& self) { return self.id; }));
 
@@ -31,11 +31,10 @@ namespace mwse {
 
 				// Basic function binding.
 				usertypeDefinition.set("play", [](TES3::Sound& self, sol::optional<sol::table> params) {
-					TES3::Reference * reference = getOptionalParamReference(params, "reference");
-					unsigned char volume = getOptionalParam<double>(params, "volume", 1.0) * 255;
+					bool loop = getOptionalParam<bool>(params, "loop", false);
+					unsigned char volume = getOptionalParam<double>(params, "volume", 1.0) * 250;
 					float pitch = getOptionalParam<double>(params, "pitch", 1.0);
-					bool isNot3D = getOptionalParam<bool>(params, "isNot3D", reference == NULL);
-					return self.play(reference, volume, pitch, isNot3D);
+					return self.play(loop ? TES3::SoundPlayFlags::Loop : 0, volume, pitch, true);
 				});
 
 				// Finish up our usertype.

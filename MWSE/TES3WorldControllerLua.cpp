@@ -79,7 +79,7 @@ namespace mwse {
 				usertypeDefinition.set("monthsToRespawn", &TES3::WorldController::gvarMonthsToRespawn);
 				usertypeDefinition.set("mouseSensitivityX", &TES3::WorldController::horzSensitivity);
 				usertypeDefinition.set("mouseSensitivityY", &TES3::WorldController::mouseSensitivity);
-				usertypeDefinition.set("musicState", &TES3::WorldController::musicState);
+				usertypeDefinition.set("musicSituation", &TES3::WorldController::musicSituation);
 				usertypeDefinition.set("parentWindowHandle", &TES3::WorldController::Win32_hWndParent);
 				usertypeDefinition.set("projectionDistance", &TES3::WorldController::projectionDistance);
 				usertypeDefinition.set("scriptGlobals", &TES3::WorldController::scriptGlobals);
@@ -99,6 +99,9 @@ namespace mwse {
 				usertypeDefinition.set("werewolfFOV", &TES3::WorldController::werewolfFOV);
 				usertypeDefinition.set("windowHandle", &TES3::WorldController::Win32_hWnd);
 				usertypeDefinition.set("worldCamera", &TES3::WorldController::worldCamera);
+				usertypeDefinition.set("armCamera", &TES3::WorldController::armCamera);
+				usertypeDefinition.set("menuCamera", &TES3::WorldController::menuCamera);
+				usertypeDefinition.set("shadowCamera", &TES3::WorldController::shadowCamera);
 				usertypeDefinition.set("year", &TES3::WorldController::gvarYear);
 
 				// Access to other objects that need to be packaged.

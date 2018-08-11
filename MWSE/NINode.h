@@ -9,6 +9,9 @@ namespace NI {
 		void * effectList; // 0xA8 // Maybe?
 		void * bound; // 0xAC // Maybe?
 
+		Node();
+		~Node();
+
 		//
 		// vTable wrappers.
 		//

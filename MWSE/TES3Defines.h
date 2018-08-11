@@ -12,6 +12,7 @@ namespace TES3 {
 	struct Apparatus;
 	struct Armor;
 	struct Attachment;
+	struct AudioController;
 	struct BaseObject;
 	struct BaseObjectVirtualTable;
 	struct Bodypart;
@@ -88,6 +89,7 @@ namespace TES3 {
 	struct ScriptVariables;
 	struct SkillStatistic;
 	struct Sound;
+	struct SoundBuffer;
 	struct SoundGenerator;
 	struct Spell;
 	struct SpellList;

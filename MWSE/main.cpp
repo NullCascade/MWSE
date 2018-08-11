@@ -33,6 +33,7 @@
 #include "MWSEDefs.h"
 
 #include "LuaManager.h"
+#include "TES3Game.h"
 
 TES3MACHINE* mge_virtual_machine = NULL;
 void* external_malloc = NULL;
@@ -75,6 +76,13 @@ VersionStruct GetMGEVersion() {
 	delete[] pbVersionInfo;
 
 	return version;
+}
+
+bool __fastcall OnGameStructInitialized(TES3::Game * game) {
+	// Setup our lua interface before initializing.
+	mwse::lua::LuaManager::getInstance().hook();
+
+	return game->initialize();
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
@@ -168,8 +176,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 			mwse::log::getLog() << "Failed to detect Morrowind Code Patch installed features. MCP may not be installed, or the mcpatch\\installed file may have been deleted. Mods will be unable to detect MCP feature support." << std::endl;
 		}
 
-		// Hook Lua interface.
-		mwse::lua::LuaManager::getInstance().hook();
+		// Delay our lua hook until later, to ensure that Mod Organizer's VFS is hooked up.
+		mwse::genCallEnforced(0x417195, 0x417880, reinterpret_cast<DWORD>(OnGameStructInitialized));
 	}
 	break;
 	case DLL_THREAD_ATTACH:
