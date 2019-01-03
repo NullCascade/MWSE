@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TES3Collections.h"
+#include "TES3UIVector.h"
 
 #include "LuaUtil.h"
 

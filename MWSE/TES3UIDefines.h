@@ -14,6 +14,7 @@ namespace TES3 {
 		// UI_ID and Property are convertible.
 
 		enum class PropertyType {
+			None = 0x0,
 			Integer = 0x1,
 			Float = 0x2,
 			Unknown_4 = 0x4,

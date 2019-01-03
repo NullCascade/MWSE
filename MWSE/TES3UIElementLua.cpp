@@ -61,6 +61,84 @@ namespace mwse {
 			return prop == TES3::UI::Property::boolean_true;
 		}
 
+		void compileTreeToTable(sol::state& state, sol::table& table, TES3::UI::TreeNode * node) {
+			if (node == nullptr) {
+				return;
+			}
+
+			TES3::UI::TreeItem * item = &node->item;
+			switch (item->valueType) {
+				case TES3::UI::PropertyType::Integer:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+					valueTable["value"] = item->value.integerValue;
+					table.add(valueTable);
+					break;
+				}
+				case TES3::UI::PropertyType::Float:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+					valueTable["value"] = item->value.floatValue;
+					table.add(valueTable);
+					break;
+				}
+				case TES3::UI::PropertyType::Pointer:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+					valueTable["value"] = "[pointer]";
+					table.add(valueTable);
+					break;
+				}
+				case TES3::UI::PropertyType::Property:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+
+					auto value = item->value.propertyValue;
+					if (value == TES3::UI::Property::boolean_true) {
+						valueTable["value"] = true;
+					}
+					else if (value == TES3::UI::Property::boolean_false) {
+						valueTable["value"] = false;
+					}
+					else {
+						valueTable["value"] = value;
+					}
+
+					table.add(valueTable);
+					break;
+				}
+				case TES3::UI::PropertyType::EventCallback:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+					valueTable["value"] = "[eventCallback]";
+					table.add(valueTable);
+					break;
+				}
+				case TES3::UI::PropertyType::PropertyAccessCallback:
+				{
+					sol::table valueTable = state.create_table();
+					valueTable["id"] = item->key;
+					valueTable["idName"] = TES3::UI::getNameForUIID(item->key);
+					valueTable["value"] = "[accessCallback]";
+					table.add(valueTable);
+					break;
+				}
+			}
+
+			compileTreeToTable(state, table, node->branchLess);
+			compileTreeToTable(state, table, node->branchGreaterThanOrEqual);
+		}
+
 		void bindTES3UIElement() {
 			// Get our lua state.
 			sol::state& state = LuaManager::getInstance().getState();
@@ -84,6 +162,14 @@ namespace mwse {
 					return children;
 				}
 			));
+			usertypeDefinition.set("properties", sol::readonly_property([](const Element& self) {
+				sol::state& state = LuaManager::getInstance().getState();
+				sol::table properties = state.create_table();
+
+				compileTreeToTable(state, properties, self.properties.root);
+
+				return properties;
+			}));
 			usertypeDefinition.set("widget", sol::readonly_property([](Element& self) { return makeWidget(self); }));
 			usertypeDefinition.set("texture", &Element::texture);
 

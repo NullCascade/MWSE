@@ -5,6 +5,10 @@
 #include "TES3Util.h"
 #include "TES3WorldController.h"
 
+#include "Log.h"
+
+#include <unordered_map>
+
 namespace TES3 {
 	namespace UI {
 		const DWORD TES3_hook_dispatchMousewheelUp = 0x58F19B;
@@ -12,7 +16,8 @@ namespace TES3 {
 
 		const auto TES3_uiHelpRoot = reinterpret_cast<Element* const*>(0x7D1C74);
 
-		const auto TES3_ui_registerID = reinterpret_cast<UI_ID (__cdecl *)(const char *)>(0x58DF10);
+		const auto TES3_ui_registerID = reinterpret_cast<UI_ID(__cdecl *)(const char *)>(0x58DF10);
+		const auto TES3_ui_registerIDByString = reinterpret_cast<UI_ID(__cdecl *)(String, int)>(0x57B290);
 		const auto TES3_ui_createChildElement = reinterpret_cast<Element* (__thiscall *)(Element*)>(0x582B50);
 		const auto TES3_ui_createMenu = reinterpret_cast<Element* (__cdecl *)(UI_ID)>(0x595400);
 		const auto TES3_ui_createTooltipMenu = reinterpret_cast<Element* (__cdecl *)(UI_ID)>(0x595A40);
@@ -26,12 +31,26 @@ namespace TES3 {
 		const auto TES3_ui_getServiceActor = reinterpret_cast<MobileActor* (__cdecl*)()>(0x5BFEA0);
 		const auto TES3_ui_updateDialogDisposition = reinterpret_cast<void (__cdecl*)()>(0x5C0780);
 
+		std::unordered_map<UI_ID, std::string> uiIdNameMap;
+
 		//
 		// UI framework functions
 		//
 
 		UI_ID registerID(const char *name) {
 			return TES3_ui_registerID(name);
+		}
+
+		UI_ID registerIDWithString(String name, int unknown) {
+			auto result = TES3_ui_registerIDByString(name, unknown);
+
+			auto mapHit = uiIdNameMap.find(result);
+			if (mapHit == uiIdNameMap.end()) {
+				mwse::log::getLog() << "Property mapped: " << result << " -> " << name.cString << std::endl;
+				uiIdNameMap[result] = name.cString;
+			}
+
+			return result;
 		}
 
 		Property registerProperty(const char *name) {
@@ -207,6 +226,14 @@ namespace TES3 {
 			return TES3_UpdateInventorySelectTiles();
 		}
 
+		const char* getNameForUIID(UI_ID id) {
+			auto result = uiIdNameMap.find(id);
+			if (result != uiIdNameMap.end()) {
+				return result->second.c_str();
+			}
+			return nullptr;
+		}
+
 		void hook() {
 			// Patch mousewheel event dispatch to not redirect to the top-level element,
 			// allowing mousewheel to apply to more than the first scrollpane in a menu
@@ -217,6 +244,40 @@ namespace TES3 {
 			auto patch = &Element::patchUpdateLayout_propagateFlow;
 			mwse::genCallEnforced(0x585E1E, 0x584850, *reinterpret_cast<DWORD*>(&patch));
 			mwse::genCallEnforced(0x5863AE, 0x584850, *reinterpret_cast<DWORD*>(&patch));
+
+			// Patch UI system so that newly created IDs can be looked up.
+			mwse::genCallEnforced(0x58DF3D, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x593F36, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x5DDFCD, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x5DE154, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x5DE1D9, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x5DE2DB, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x5E8881, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x611FA0, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x61242E, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x61270A, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x637D55, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x637DAC, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x638DE1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x63B1E1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x63E4E1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x6406B1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x642501, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x643051, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x645931, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x6484C1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x648501, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x648541, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64A841, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64BBA1, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E14B, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E19E, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E28C, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E2DF, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E37D, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E3F5, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E43D, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
+			mwse::genCallEnforced(0x64E47C, 0x57B290, reinterpret_cast<DWORD>(registerIDWithString));
 		}
 
 	}

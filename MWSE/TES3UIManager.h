@@ -3,9 +3,12 @@
 #include "TES3UIDefines.h"
 #include "TES3Vectors.h"
 
+#include <string>
+
 namespace TES3 {
 	namespace UI {
 		__declspec(dllexport) UI_ID registerID(const char* name);
+		__declspec(dllexport) UI_ID __cdecl registerIDWithString(String name, int unknown = 0);
 		__declspec(dllexport) Property registerProperty(const char* name);
 		__declspec(dllexport) Element* createMenu(UI_ID id);
 		__declspec(dllexport) Element* createHelpLayerMenu(UI_ID id);
@@ -34,6 +37,8 @@ namespace TES3 {
 		__declspec(dllexport) void updateContentsMenuTiles();
 		__declspec(dllexport) void updateBarterMenuTiles();
 		__declspec(dllexport) int updateSelectInventoryTiles();
+
+		__declspec(dllexport) const char* getNameForUIID(UI_ID);
 
 		void hook();
 	}
