@@ -10,6 +10,11 @@
 #include "LuaManager.h"
 #include "LuaIsGuardEvent.h"
 
+#include "TES3DataHandler.h"
+#include "TES3MobilePlayer.h"
+#include "TES3Race.h"
+#include "TES3WorldController.h"
+
 #define TES3_UI_ID_MenuDialog 0x7D3442
 #define TES3_UI_ID_MenuDialog_start_disposition 0x7D3486
 
@@ -72,6 +77,41 @@ namespace TES3 {
 	//
 	// NPC
 	//
+
+	const char* NPC::getModelPath() const {
+		if (_strnicmp(objectID, "Player1stPerson", 32) == 0) {
+			auto worldController = WorldController::get();
+			auto macp = worldController ? worldController->getMobilePlayer() : nullptr;
+			if (macp && macp->getFlagWerewolf()) {
+				return "Wolf\\Skin.1st.nif";
+			}
+			else if (model && strnlen_s(model, 32) > 0) {
+				return model;
+			}
+			else if (getIsFemale()) {
+				return "base_anim_female.1st.nif";
+			}
+			else {
+				return "base_anim.1st.nif";
+			}
+		}
+		else if (model && strnlen_s(model, 32) > 0) {
+			return model;
+		}
+		else {
+			if (race && race->getIsBeast()) {
+				return "base_animKnA.nif";
+			}
+			else {
+				auto animationFile = TES3::DataHandler::get()->nonDynamicData->getBaseAnimationFile(getIsFemale(), 0);
+				if (animationFile && strnlen_s(animationFile, 32) > 0) {
+					return animationFile;
+				}
+				return "man_size_test.nif";
+			}
+		}
+		return nullptr;
+	}
 
 	std::reference_wrapper<unsigned char[8]> NPC::getAttributes() {
 		return std::ref(attributes);

@@ -82,6 +82,9 @@ namespace TES3 {
 		// Custom functions.
 		//
 
+		// Overwrite to support custom 1st person models.
+		const char* getModelPath() const;
+
 		std::reference_wrapper<unsigned char[8]> getAttributes();
 		std::reference_wrapper<unsigned char[27]> getSkills();
 

@@ -4082,6 +4082,10 @@ namespace mwse {
 			// Patch custom magic effect saving and loading.
 			genJumpUnprotected(TES3_PATCH_MAGIC_SAVE_LOAD, reinterpret_cast<DWORD>(PatchMagicSaveLoad), TES3_PATCH_MAGIC_SAVE_LOAD_SIZE);
 
+			// Patch NPC::getModelPath to allow custom models for 1st person.
+			auto npcGetModelPath = &TES3::NPC::getModelPath;
+			overrideVirtualTableEnforced(0x749DE8, offsetof(TES3::ObjectVirtualTable, getModelPath), 0x4D5DF0 , *reinterpret_cast<DWORD*>(&npcGetModelPath));
+
 			// Look for main.lua scripts in the usual directories.
 			executeMainModScripts("Data Files\\MWSE\\core");
 			executeMainModScripts("Data Files\\MWSE\\mods");

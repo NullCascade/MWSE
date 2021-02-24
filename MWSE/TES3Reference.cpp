@@ -34,6 +34,9 @@
 #include "TES3NPC.h"
 #include "TES3WorldController.h"
 
+#include "StringUtil.h"
+#include "TES3Util.h"
+
 #include "BitUtil.h"
 
 #define TES3_Reference_activate 0x4E9610
@@ -254,6 +257,20 @@ namespace TES3 {
 		if (mobile != nullptr) {
 			if (mobile->actorType == TES3::MobileActorType::Player) {
 				auto firstPersonRef = macp->firstPersonReference;
+
+				std::string firstPersonModel = path;
+				if (mwse::string::replace(firstPersonModel, ".nif", ".1st.nif")) {
+					std::string firstPersonModelPath = "Meshes\\" + firstPersonModel;
+					if (mwse::tes3::resolveAssetPath(firstPersonModelPath.c_str()) == 0) {
+						firstPersonModel = "";
+					}
+				}
+				else {
+					firstPersonModel = "";
+				}
+
+				static_cast<TES3::NPCInstance*>(firstPersonRef->baseObject)->baseNPC->setModelPath(firstPersonModel.c_str());
+
 				if (firstPersonRef->sceneNode) {
 					auto parent = firstPersonRef->sceneNode->parentNode;
 					firstPersonRef->resetVisualNode();

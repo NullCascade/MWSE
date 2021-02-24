@@ -4384,9 +4384,19 @@ namespace mwse {
 			return tes3::testLineOfSight(&position1.value(), height1.value(), &position2.value(), height2.value());
 		}
 
+		const auto TES3_Actor_EquipItem = reinterpret_cast<void(__thiscall*)(TES3::Actor*, TES3::BaseObject*, TES3::ItemData*, TES3::EquipmentStack**, TES3::MobileActor*)>(0x4958B0);
+		void TEST() {
+			auto macp = TES3::WorldController::get()->getMobilePlayer();
+			auto werewolfRobe = static_cast<TES3::Item*>(TES3::DataHandler::get()->nonDynamicData->resolveObject("WerewolfRobe"));
+			macp->npcInstance->addItem(werewolfRobe, 1);
+			TES3_Actor_EquipItem(macp->npcInstance, werewolfRobe, nullptr, nullptr, nullptr);
+		}
+
 		void bindTES3Util() {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
+
+			state["TEST"] = TEST;
 
 			//
 			// Extend tes3 library with extra functions.
