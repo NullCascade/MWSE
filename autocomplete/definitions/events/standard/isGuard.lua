@@ -7,7 +7,7 @@ return {
 			description = "The NPC that the guard status is being checked for.",
 		},
 		isGuard = {
-			type = "bool",
+			type = "boolean",
 			readonly = false,
 			description = "The previously calculated guard status.",
 		},

@@ -32,7 +32,7 @@ return {
 			description = "The chance the trap disarm will be successful.",
 		},
 		["trapPresent"] = {
-			type = "bool",
+			type = "boolean",
 			readOnly = true,
 			description = "Indicates if a trap is present on the reference.",
 		},

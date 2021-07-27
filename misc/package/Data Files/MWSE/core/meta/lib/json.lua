@@ -9,7 +9,7 @@ json = {}
 --- Decode string into a table.
 --- @param s string No description yet available.
 --- @param position number No description yet available.
---- @param nullValue unknown No description yet available.
+--- @param nullValue string|nil No description yet available.
 --- @return table result No description yet available.
 function json.decode(s, position, nullValue) end
 

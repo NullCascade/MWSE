@@ -32,7 +32,7 @@ return {
 			description = "The chance the lockpick will be successful.",
 		},
 		["lockPresent"] = {
-			type = "bool",
+			type = "boolean",
 			readOnly = true,
 			description = "Indicates if a lock is present on the reference.",
 		},

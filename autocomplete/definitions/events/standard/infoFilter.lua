@@ -28,7 +28,7 @@ return {
 			description = "The dialogue object.",
 		},
 		["passes"] = {
-			type = "bool",
+			type = "boolean",
 			readOnly = true,
 			description = "Indicates if the filter passes.",
 		},

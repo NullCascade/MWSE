@@ -8,14 +8,14 @@
 			"type": "shell",
 			"group": "build",
 			"command": "lua",
-			"args": [".\\meta-EmmyLua\\build.lua"],
+			"args": [".\\builders\\emmy.lua"],
 			"problemMatcher": []
 		},
 		{
 			"label": "Build Autodocs",
 			"type": "shell",
 			"command": "lua",
-			"args": [".\\readthedocs\\build.lua"],
+			"args": [".\\builders\\readthedocs.lua"],
 			"group": "build",
 			"problemMatcher": []
 		},
