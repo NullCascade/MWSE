@@ -32,6 +32,8 @@ namespace NI {
 	struct ParticleGrowFade;
 	struct ParticleModifier;
 	struct ParticleRotation;
+	struct Particles;
+	struct ParticlesData;
 	struct ParticleSystemController;
 	struct PerParticleData;
 	struct Pick;
@@ -43,6 +45,8 @@ namespace NI {
 	struct Property;
 	struct RenderedTexture;
 	struct Renderer;
+	struct RotatingParticles;
+	struct RotatingParticlesData;
 	struct RTTI;
 	struct Sequence;
 	struct SourceTexture;

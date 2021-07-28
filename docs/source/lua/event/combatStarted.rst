@@ -8,15 +8,15 @@ Related events: `combatStart`_, `combatStop`_, `combatStopped`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-target
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3mobileActor`_. Read-only. The mobile actor who combat has been triggered against.
-
 actor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3mobileActor`_. Read-only. The mobile actor who has entered combat.
+
+target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3mobileActor`_. Read-only. The mobile actor who combat has been triggered against.
 
 .. _`combatStart`: ../../lua/event/combatStart.html
 .. _`combatStop`: ../../lua/event/combatStop.html

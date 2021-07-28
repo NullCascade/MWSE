@@ -8,15 +8,15 @@ Related events: `cellActivated`_, `cellDeactivated`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-previousCell
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3cell`_. Read-only. The previous cell that the player came from. This will be nil when loading a game.
-
 cell
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3cell`_. Read-only. The new cell that the player has entered.
+
+previousCell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3cell`_. Read-only. The previous cell that the player came from. This will be nil when loading a game.
 
 .. _`cellActivated`: ../../lua/event/cellActivated.html
 .. _`cellDeactivated`: ../../lua/event/cellDeactivated.html

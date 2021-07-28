@@ -6,30 +6,30 @@ The uiObjectTooltip event triggers when a new tooltip is displayed for all in-wo
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-object
+count
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3physicalObject`_. Read-only. The object being examined.
+`number`_. Read-only. The number of items in the stack.
 
 itemData
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3itemData`_. Read-only. The item data of object, if any.
 
-tooltip
+object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3uiElement`_. Read-only. The newly created tooltip element. Due to timeouts and target changes, it may be destroyed at any time.
+`tes3physicalObject`_. Read-only. The object being examined.
 
 reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3reference`_. Read-only. The reference being examined. Only valid for in-world objects. For inventory tiles it will always be nil.
 
-count
+tooltip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`number`_. Read-only. The number of items in the stack.
+`tes3uiElement`_. Read-only. The newly created tooltip element. Due to timeouts and target changes, it may be destroyed at any time.
 
 .. _`number`: ../../lua/type/number.html
 .. _`tes3itemData`: ../../lua/type/tes3itemData.html

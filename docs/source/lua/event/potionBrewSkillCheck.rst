@@ -6,35 +6,35 @@ This event is triggered when the player attempts to brew a potion. It controls b
 Event Data
 ----------------------------------------------------------------------------------------------------
 
+alembic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3apparatus`_. Read-only. The alembic apparatus used to create the potion.
+
 calcinator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3apparatus`_. Read-only. The calcinator apparatus used to create the potion.
 
-success
+mortar
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`boolean`_. Can be modified. Whether the brewing is successful.
-
-retort
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3apparatus`_. Read-only. The retort apparatus used to create the potion.
+`tes3apparatus`_. Read-only. The mortar apparatus used to create the potion.
 
 potionStrength
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `number`_. Can be modified. The strength multiplier used to scale the potion effects. For each different effect, it can modify magnitude, duration, or both. This is initially equal to -1 if the potion failed to brew.
 
-alembic
+retort
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3apparatus`_. Read-only. The alembic apparatus used to create the potion.
+`tes3apparatus`_. Read-only. The retort apparatus used to create the potion.
 
-mortar
+success
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3apparatus`_. Read-only. The mortar apparatus used to create the potion.
+`boolean`_. Can be modified. Whether the brewing is successful.
 
 Examples
 ----------------------------------------------------------------------------------------------------

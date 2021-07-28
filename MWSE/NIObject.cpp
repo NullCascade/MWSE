@@ -16,6 +16,7 @@
 #include "NINode.h"
 #include "NIObjectNET.h"
 #include "NIParticleModifier.h"
+#include "NIParticles.h"
 #include "NIParticleSystemController.h"
 #include "NIPixelData.h"
 #include "NIPointLight.h"
@@ -166,6 +167,9 @@ namespace NI {
 			case RTTIStaticPtr::NiParticleRotation:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<ParticleRotation*>(this)));
 				break;
+			case RTTIStaticPtr::NiParticles:
+				ref = sol::make_object_userdata(L, Pointer(static_cast<Particles*>(this)));
+				break;
 			case RTTIStaticPtr::NiParticleSystemController:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<ParticleSystemController*>(this)));
 				break;
@@ -177,6 +181,9 @@ namespace NI {
 				break;
 			case RTTIStaticPtr::NiPointLight:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<PointLight*>(this)));
+				break;
+			case RTTIStaticPtr::NiRotatingParticles:
+				ref = sol::make_object_userdata(L, Pointer(static_cast<RotatingParticles*>(this)));
 				break;
 			case RTTIStaticPtr::NiSkinData:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<SkinData*>(this)));

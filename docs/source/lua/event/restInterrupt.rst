@@ -6,15 +6,15 @@ This event is invoked when a rest is about to be interrupted. The ambushing spaw
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-resting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`boolean`_. Read-only. If true, the player is attempting to rest, as opposed to wait.
-
 creature
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 tes3creature|tes3npc|tes3leveledCreature. The creature that is interrupting rest. Can be set to a creature, NPC, or leveled creature.
+
+resting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`boolean`_. Read-only. If true, the player is attempting to rest, as opposed to wait.
 
 waiting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

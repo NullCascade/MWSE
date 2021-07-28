@@ -23,15 +23,15 @@ itemData
 
 `tes3itemData`_. Read-only. The item data of item.
 
-reference
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3reference`_. Read-only. actor’s associated reference.
-
 mobile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3mobileActor`_. Read-only. The mobile actor that has unequipped the item.
+
+reference
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. actor’s associated reference.
 
 .. _`equip`: ../../lua/event/equip.html
 .. _`equipped`: ../../lua/event/equipped.html

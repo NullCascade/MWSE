@@ -10,15 +10,15 @@ Related events: `weatherCycled`_, `weatherTransitionFinished`_, `weatherChangedI
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-to
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3weather`_. The weather object that will be transitioned to.
-
 from
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3weather`_. Read-only. The weather object that is the current weather.
+
+to
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3weather`_. The weather object that will be transitioned to.
 
 .. _`weatherChangedImmediate`: ../../lua/event/weatherChangedImmediate.html
 .. _`weatherCycled`: ../../lua/event/weatherCycled.html

@@ -164,6 +164,7 @@
     <ClInclude Include="NILines.h" />
     <ClInclude Include="NILinesData.h" />
     <ClInclude Include="NIParticleModifier.h" />
+    <ClInclude Include="NIParticles.h" />
     <ClInclude Include="NIParticlesLua.h" />
     <ClInclude Include="NIParticleSystemController.h" />
     <ClInclude Include="NIPerParticleData.h" />
@@ -619,6 +620,7 @@
     <ClCompile Include="NIKeyframeManager.cpp" />
     <ClCompile Include="NILinesData.cpp" />
     <ClCompile Include="NIParticleModifier.cpp" />
+    <ClCompile Include="NIParticles.cpp" />
     <ClCompile Include="NIParticlesLua.cpp" />
     <ClCompile Include="NIParticleSystemController.cpp" />
     <ClCompile Include="NIProperty.cpp" />

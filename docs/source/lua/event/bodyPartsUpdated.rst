@@ -8,15 +8,15 @@ Related events: `bodyPartAssigned`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-reference
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3reference`_. Read-only. The reference for the actor whose body parts were updated.
-
 mobile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3mobileActor`_. Read-only. The mobile actor whose body parts were updated.
+
+reference
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. The reference for the actor whose body parts were updated.
 
 .. _`bodyPartAssigned`: ../../lua/event/bodyPartAssigned.html
 .. _`tes3mobileActor`: ../../lua/type/tes3mobileActor.html

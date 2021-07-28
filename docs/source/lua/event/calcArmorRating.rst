@@ -6,11 +6,6 @@ This event is fired before an actor's armor rating has been calculated, and can 
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-mobile
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3mobileActor`_. Read-only. The mobile whose AR is being calculated. May not always be available.
-
 armor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -21,15 +16,20 @@ armorRating
 
 `number`_. If set, the given armor rating will be used instead of the one calculated.
 
-reference
+mobile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3reference`_. Read-only. A shortcut to the mobile's reference. May not always be available.
+`tes3mobileActor`_. Read-only. The mobile whose AR is being calculated. May not always be available.
 
 npc
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3npc`_. Read-only. The NPC object whose AR is being calculated. May not always be available.
+
+reference
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. A shortcut to the mobile's reference. May not always be available.
 
 .. _`number`: ../../lua/type/number.html
 .. _`tes3armor`: ../../lua/type/tes3armor.html

@@ -8,30 +8,30 @@ Related events: `projectileHitActor`_, `projectileHitTerrain`_, `projectileExpir
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-mobile
+collisionPoint
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3mobileProjectile`_. Read-only. The mobile projectile that is expiring.
+`tes3vector3`_. Read-only. The collision point of the mobile projectile.
 
 firingReference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3reference`_. Read-only. Reference to the actor that fired the projectile.
 
-target
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3reference`_. Read-only. Reference to the object that was hit.
-
-collisionPoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3vector3`_. Read-only. The collision point of the mobile projectile.
-
 firingWeapon
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3weapon`_. Read-only. The weapon that fired the projectile.
+
+mobile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3mobileProjectile`_. Read-only. The mobile projectile that is expiring.
+
+target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. Reference to the object that was hit.
 
 .. _`projectileExpire`: ../../lua/event/projectileExpire.html
 .. _`projectileHitActor`: ../../lua/event/projectileHitActor.html

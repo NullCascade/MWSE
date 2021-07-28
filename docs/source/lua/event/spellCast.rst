@@ -13,20 +13,20 @@ castChance
 
 `number`_. The percentage chance of the caster successfully casting the spell. May be modified. Setting it to 0 will cause the cast to fail.
 
-weakestSchool
+caster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`number`_. Read-only. Of all the magic effects in the spell, there is a magic school which the caster has the lowest skill at casting. This school determines which skill will gain experience on a successful cast.
+`tes3reference`_. Read-only. The caster of the spell.
 
 source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3spell`_. Read-only. The magic source.
 
-caster
+weakestSchool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3reference`_. Read-only. The caster of the spell.
+`number`_. Read-only. Of all the magic effects in the spell, there is a magic school which the caster has the lowest skill at casting. This school determines which skill will gain experience on a successful cast.
 
 .. _`spellCasted`: ../../lua/event/spellCasted.html
 .. _`spellCastedFailure`: ../../lua/event/spellCastedFailure.html

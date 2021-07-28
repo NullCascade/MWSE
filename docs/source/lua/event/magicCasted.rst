@@ -6,25 +6,25 @@ This event is triggered when any spell or enchant is cast successfully, or when 
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-target
+caster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3reference`_. Read-only. The target of the spell. For self-targeted spells, this matches caster.
-
-sourceInstance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3magicSourceInstance`_. Read-only. The unique instance of the magic source.
+`tes3reference`_. Read-only. The caster of the spell.
 
 source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 tes3alchemy|tes3enchantment|tes3spell. Read-only. The magic source.
 
-caster
+sourceInstance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3reference`_. Read-only. The caster of the spell.
+`tes3magicSourceInstance`_. Read-only. The unique instance of the magic source.
+
+target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. The target of the spell. For self-targeted spells, this matches caster.
 
 .. _`tes3magicSourceInstance`: ../../lua/type/tes3magicSourceInstance.html
 .. _`tes3reference`: ../../lua/type/tes3reference.html

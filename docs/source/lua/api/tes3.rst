@@ -115,6 +115,7 @@ Functions
     tes3/getSpecializationName
     tes3/getTopMenu
     tes3/getTrap
+    tes3/getViewportSize
     tes3/getWerewolfKillCount
     tes3/hammerKey
     tes3/hasCodePatchFeature

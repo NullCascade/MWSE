@@ -6,14 +6,14 @@ This event is invoked whenever the player gains experience in a skill. The event
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-skill
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`number`_. Read-only. The skill that is gaining experience. This can be changed to provide experience to a different skill.
-
 progress
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `number`_. The amount of experience that skill is gaining. Note that experience is not on a scale of 1 to 100. This value is modifiable.
+
+skill
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`number`_. Read-only. The skill that is gaining experience. This can be changed to provide experience to a different skill.
 
 .. _`number`: ../../lua/type/number.html

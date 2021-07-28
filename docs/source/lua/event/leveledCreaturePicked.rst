@@ -8,15 +8,15 @@ Related events: `leveledItemPicked`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-pick
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3creature`_. The result of the pick by vanilla mechanism. This can be modified to change the result to something else.
-
 list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3leveledCreature`_. Read-only. The list responsible for creating a pick.
+
+pick
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3creature`_. The result of the pick by vanilla mechanism. This can be modified to change the result to something else.
 
 .. _`leveledItemPicked`: ../../lua/event/leveledItemPicked.html
 .. _`tes3creature`: ../../lua/type/tes3creature.html

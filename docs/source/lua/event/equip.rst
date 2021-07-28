@@ -15,15 +15,15 @@ item
 
 `tes3baseObject`_. Read-only. The object being equipped.
 
-reference
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3reference`_. Read-only. The reference to the mobile actor that is equipping the item.
-
 itemData
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3itemData`_. Read-only. The item data of item.
+
+reference
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. The reference to the mobile actor that is equipping the item.
 
 .. _`equipped`: ../../lua/event/equipped.html
 .. _`unequipped`: ../../lua/event/unequipped.html

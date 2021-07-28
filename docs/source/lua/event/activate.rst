@@ -27,20 +27,6 @@ target
 Examples
 ----------------------------------------------------------------------------------------------------
 
-Show a message for what the player is activating
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: lua
-
-    -- Show the id when the player activates an object.
-    local function myOnActivateCallback(e)
-        if (e.activator == tes3.player) then
-            tes3.messageBox({ message = "Activated " .. e.target.object.id })
-        end
-    end
-    event.register("activate", myOnActivateCallback)
-
-
 Prevent the player from activating NPCs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,6 +43,20 @@ Prevent the player from activating NPCs
         -- If the player targets an NPC, block the activation.
         if (e.target.object.objectType == tes3.objectType.npc) then
             return false
+        end
+    end
+    event.register("activate", myOnActivateCallback)
+
+
+Show a message for what the player is activating
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: lua
+
+    -- Show the id when the player activates an object.
+    local function myOnActivateCallback(e)
+        if (e.activator == tes3.player) then
+            tes3.messageBox({ message = "Activated " .. e.target.object.id })
         end
     end
     event.register("activate", myOnActivateCallback)

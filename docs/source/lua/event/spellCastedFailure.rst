@@ -8,6 +8,11 @@ Related events: `spellCast`_, `spellCasted`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
+caster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`tes3reference`_. Read-only. The caster of the spell.
+
 expGainSchool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -18,20 +23,15 @@ source
 
 `tes3spell`_. Read-only. The magic source.
 
-caster
+sourceInstance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`tes3reference`_. Read-only. The caster of the spell.
+`tes3magicSourceInstance`_. Read-only. The unique instance of the magic source.
 
 target
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `tes3reference`_. Read-only. The target of the spell. For self-targeted spells, this matches caster.
-
-sourceInstance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`tes3magicSourceInstance`_. Read-only. The unique instance of the magic source.
 
 .. _`spellCast`: ../../lua/event/spellCast.html
 .. _`spellCasted`: ../../lua/event/spellCasted.html

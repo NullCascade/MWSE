@@ -6,6 +6,11 @@ This event fires when a dialogue response is triggered.
 Event Data
 ----------------------------------------------------------------------------------------------------
 
+element
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+tesuiElement. Read-only. The command.
+
 item
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -16,19 +21,14 @@ itemData
 
 tesitemData. Read-only. The script variables.
 
-tile
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-tes3uiInventoryTile. Read-only. The dialogue info object.
-
 menu
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 tesuiElement. Read-only. The dialogue object.
 
-element
+tile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-tesuiElement. Read-only. The command.
+tes3uiInventoryTile. Read-only. The dialogue info object.
 
 .. _`tes3item`: ../../lua/type/tes3item.html

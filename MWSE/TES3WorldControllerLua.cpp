@@ -28,7 +28,7 @@ namespace mwse {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
 
-			// Binding for TES3::WorldControllerRenderCamera.
+			// Binding for TES3::WorldControllerRenderCamera::CameraData.
 			{
 				// Start our usertype. We must finish this with state.set_usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::WorldControllerRenderCamera::CameraData>("tes3worldControllerRenderCameraData");

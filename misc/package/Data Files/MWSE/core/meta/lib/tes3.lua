@@ -962,6 +962,11 @@ function tes3.getTrap(params) end
 --- @class tes3.getTrap.params
 --- @field reference tes3reference|tes3mobileActor|tes3mobileCreature|tes3mobileNPC|tes3mobilePlayer|string No description yet available.
 
+--- Returns both the viewport width and the viewport height. Note that this the real resolution of the screen. For a value scaled by MGE's menu scaling, see the same-named function in the tes3ui namespace. To get the scale used, check getViewportScale in the tes3ui namespace.
+--- @return number width The width of the viewport.
+--- @return number height The height of the viewport.
+function tes3.getViewportSize() end
+
 --- Returns the number of kills player commited as a Werewolf.
 --- @return number werewolfKills No description yet available.
 function tes3.getWerewolfKillCount() end

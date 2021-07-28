@@ -64,19 +64,20 @@ ignore (`table`_)
 Examples
 ----------------------------------------------------------------------------------------------------
 
-Multiple Results
+Get Activation Target
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This example performs a ray test and displays all results in the entire ray test, rather than ending at the first object hit.
+This example performs a ray test to match the normal activation target test. Unlike ``tes3.getPlayerTarget()`` this will return objects not normally available for activation.
 
 .. code-block:: lua
 
-    local results = tes3.rayTest{ tes3.getCameraPosition(), direction = tes3.getCameraVector(), findAll = true }
-    if results then
-        for i, hit in pairs(results) do
-            mwse.log("Ray hit #%d: %s", i, hit.reference or "<non-reference>");
-        end
+    local hitResult = tes3.rayTest({ position = tes3.getPlayerEyePosition(), direction = tes3.getPlayerEyeVector() })
+    local hitReference = hitResult and hitResult.reference
+    if (hitReference == nil) then
+        return
     end
+
+    tes3.messageBox("The player is looking at a '%s'", hitReference.object.name or hitReference.object.id)
 
 
 Get Camera Target
@@ -95,20 +96,19 @@ This example performs a ray test to see what the camera is currently looking at.
     tes3.messageBox("The camera is looking at a '%s'", hitReference.object.name or hitReference.object.id)
 
 
-Get Activation Target
+Multiple Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This example performs a ray test to match the normal activation target test. Unlike ``tes3.getPlayerTarget()`` this will return objects not normally available for activation.
+This example performs a ray test and displays all results in the entire ray test, rather than ending at the first object hit.
 
 .. code-block:: lua
 
-    local hitResult = tes3.rayTest({ position = tes3.getPlayerEyePosition(), direction = tes3.getPlayerEyeVector() })
-    local hitReference = hitResult and hitResult.reference
-    if (hitReference == nil) then
-        return
+    local results = tes3.rayTest{ tes3.getCameraPosition(), direction = tes3.getCameraVector(), findAll = true }
+    if results then
+        for i, hit in pairs(results) do
+            mwse.log("Ray hit #%d: %s", i, hit.reference or "<non-reference>");
+        end
     end
-
-    tes3.messageBox("The player is looking at a '%s'", hitReference.object.name or hitReference.object.id)
 
 
 Save rayTest result for use at a later point

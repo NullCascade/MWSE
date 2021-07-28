@@ -3,6 +3,7 @@
 #include "LuaManager.h"
 
 #include "NIParticleModifier.h"
+#include "NIParticles.h"
 #include "NIParticleSystemController.h"
 
 namespace mwse {
@@ -11,6 +12,60 @@ namespace mwse {
 			// Get our lua state.
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
+
+			// Binding for NI::Particles.
+			{
+				// Start our usertype.
+				auto usertypeDefinition = state.new_usertype<NI::Particles>("niParticles");
+				usertypeDefinition["new"] = sol::no_constructor;
+
+				// Define inheritance structures. These must be defined in order from top to bottom. The complete chain must be defined.
+				usertypeDefinition[sol::base_classes] = sol::bases<NI::TriBasedGeometry, NI::Geometry, NI::AVObject, NI::ObjectNET, NI::Object>();
+
+				// Basic property binding.
+				usertypeDefinition["data"] = sol::property(&NI::Particles::getModelData, &NI::Particles::setModelData);
+			}
+
+			// Binding for NI::RotatingParticles.
+			{
+				// Start our usertype.
+				auto usertypeDefinition = state.new_usertype<NI::RotatingParticles>("niRotatingParticles");
+				usertypeDefinition["new"] = sol::no_constructor;
+
+				// Define inheritance structures. These must be defined in order from top to bottom. The complete chain must be defined.
+				usertypeDefinition[sol::base_classes] = sol::bases<NI::Particles, NI::TriBasedGeometry, NI::Geometry, NI::AVObject, NI::ObjectNET, NI::Object>();
+
+				// Basic property binding.
+				usertypeDefinition["data"] = sol::property(&NI::RotatingParticles::getModelData, &NI::RotatingParticles::setModelData);
+			}
+
+			// Binding for NI::ParticlesData.
+			{
+				// Start our usertype.
+				auto usertypeDefinition = state.new_usertype<NI::ParticlesData>("niParticlesData");
+				usertypeDefinition["new"] = sol::no_constructor;
+
+				// Define inheritance structures. These must be defined in order from top to bottom. The complete chain must be defined.
+				usertypeDefinition[sol::base_classes] = sol::bases<NI::TriBasedGeometryData, NI::GeometryData, NI::Object>();
+
+				// Basic property binding.
+				usertypeDefinition["activeCount"] = sol::readonly_property(&NI::ParticlesData::activeCount);
+				usertypeDefinition["radius"] = sol::readonly_property(&NI::ParticlesData::radius);
+				usertypeDefinition["sizes"] = sol::readonly_property(&NI::ParticlesData::getSizes);
+			}
+
+			// Binding for NI::RotatingParticlesData.
+			{
+				// Start our usertype.
+				auto usertypeDefinition = state.new_usertype<NI::RotatingParticlesData>("niRotatingParticlesData");
+				usertypeDefinition["new"] = sol::no_constructor;
+
+				// Define inheritance structures. These must be defined in order from top to bottom. The complete chain must be defined.
+				usertypeDefinition[sol::base_classes] = sol::bases<NI::ParticlesData, NI::TriBasedGeometryData, NI::GeometryData, NI::Object>();
+
+				// Basic property binding.
+				usertypeDefinition["rotations"] = sol::readonly_property(&NI::RotatingParticlesData::getRotations);
+			}
 
 			// Binding for NI::ParticleSystemController.
 			{
@@ -183,8 +238,8 @@ namespace mwse {
 				usertypeDefinition["width"] = &NI::PlanarCollider::width;
 				usertypeDefinition["planeEquation"] = &NI::PlanarCollider::planeEquation;
 				usertypeDefinition["position"] = &NI::PlanarCollider::position;
-				usertypeDefinition["xVec"] = &NI::PlanarCollider::xVec;
-				usertypeDefinition["yVec"] = &NI::PlanarCollider::yVec;
+				usertypeDefinition["xAxis"] = &NI::PlanarCollider::xAxis;
+				usertypeDefinition["yAxis"] = &NI::PlanarCollider::yAxis;
 			}
 
 			// Binding for NI::SphericalCollider.

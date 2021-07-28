@@ -393,6 +393,8 @@ namespace mwse {
 			tes3ui["getMenuOnTop"] = TES3::UI::getMenuOnTop;
 			tes3ui["getPalette"] = TES3::UI::getPalette_lua;
 			tes3ui["getServiceActor"] = TES3::UI::getServiceActor;
+			tes3ui["getViewportSize"] = TES3::UI::getViewportSize_lua;
+			tes3ui["getViewportScale"] = TES3::UI::getViewportScale;
 			tes3ui["leaveMenuMode"] = TES3::UI::leaveMenuMode;
 			tes3ui["logToConsole"] = TES3::UI::logToConsole_lua;
 			tes3ui["lookupID"] = TES3::UI::lookupID;

@@ -80,8 +80,8 @@ namespace NI {
 		float width; // 0x2C
 		TES3::Vector4 planeEquation; // 0x30
 		TES3::Vector3 position; // 0x40
-		TES3::Vector3 xVec; // 0x4C
-		TES3::Vector3 yVec; // 0x58
+		TES3::Vector3 xAxis; // 0x4C
+		TES3::Vector3 yAxis; // 0x58
 	};
 	static_assert(sizeof(PlanarCollider) == 0x64, "NI::PlanarCollider failed size validation");
 

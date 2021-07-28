@@ -10,6 +10,7 @@
 #include "TES3UIManager.h"
 #include "TES3UIMenuController.h"
 
+#include "TES3Game.h"
 #include "TES3GameSetting.h"
 #include "TES3ItemData.h"
 #include "TES3NPC.h"
@@ -41,7 +42,7 @@ namespace TES3 {
 		const auto TES3_ui_onMenuUnfocus = reinterpret_cast<EventCallback>(0x58F790);
 		const auto TES3_ui_ScrollbarArrow_onClick = reinterpret_cast<EventCallback>(0x647A60);
 		const auto TES3_ui_requestMenuModeOn = reinterpret_cast<bool (__cdecl*)(UI_ID)>(0x595230);
-		const auto TES3_ui_requestMenuModeOff = reinterpret_cast<bool (__cdecl*)(UI_ID)>(0x595270);
+		const auto TES3_ui_requestMenuModeOff = reinterpret_cast<bool (__cdecl*)()>(0x595270);
 		const auto TES3_ui_getServiceActor = reinterpret_cast<MobileActor* (__cdecl*)()>(0x5BFEA0);
 		const auto TES3_ui_updateDialogDisposition = reinterpret_cast<void (__cdecl*)()>(0x5C0780);
 
@@ -150,13 +151,16 @@ namespace TES3 {
 		}
 
 		bool leaveMenuMode() {
-			return TES3_ui_requestMenuModeOff(0);
+			return TES3_ui_requestMenuModeOff();
 		}
 
 		const auto TES3_ui_closeJournal = reinterpret_cast<bool(__cdecl*)()>(0x5D6A10);
 		bool closeJournal() {
-			if (!TES3_ui_closeJournal()) return false;
-			while (TES3_ui_closeJournal());
+			if (!TES3_ui_closeJournal()) {
+				return false;
+			}
+			// Loop to exit out of all sub-sections of the journal.
+			while (TES3_ui_closeJournal()) {}
 			return true;
 		}
 
@@ -220,6 +224,15 @@ namespace TES3 {
 
 		void updateDialogDisposition() {
 			TES3_ui_updateDialogDisposition();
+		}
+
+		std::tuple<unsigned int, unsigned int> getViewportSize_lua() {
+			auto& viewportCameraData = TES3::WorldController::get()->menuCamera.cameraData;
+			return { viewportCameraData.viewportWidth, viewportCameraData.viewportHeight };
+		}
+
+		float getViewportScale() {
+			return float(TES3::Game::get()->windowWidth) / float(TES3::WorldController::get()->worldCamera.cameraData.viewportWidth);
 		}
 
 		const char* getInventorySelectType() {

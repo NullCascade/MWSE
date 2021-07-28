@@ -8,11 +8,6 @@ Related events: `loaded`_
 Event Data
 ----------------------------------------------------------------------------------------------------
 
-quickload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`boolean`_. Read-only. If true, the load came from the quickload system.
-
 filename
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -22,6 +17,11 @@ newGame
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `boolean`_. Read-only. If true, a new game is being started.
+
+quickload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`boolean`_. Read-only. If true, the load came from the quickload system.
 
 .. _`loaded`: ../../lua/event/loaded.html
 .. _`boolean`: ../../lua/type/boolean.html

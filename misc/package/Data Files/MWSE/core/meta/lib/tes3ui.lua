@@ -90,6 +90,15 @@ function tes3ui.getPalette(name) end
 --- @return tes3mobileActor|tes3mobileCreature|tes3mobileNPC|tes3mobilePlayer result No description yet available.
 function tes3ui.getServiceActor() end
 
+--- Returns the UI scale, set in MGE.
+--- @return number scale The UI scale value set from MGE.
+function tes3ui.getViewportScale() end
+
+--- Returns both the viewport width and the viewport height. Note that this value is not necessarily the real resolution of the screen. For that value, see the same-named function in the tes3 namespace. To get the scale used, check getViewportScale.
+--- @return number width The scaled width of the viewport.
+--- @return number height The scaled height of the viewport.
+function tes3ui.getViewportSize() end
+
 --- Requests menu mode be deactivated on a menu with a given id.
 --- @param id number No description yet available.
 --- @return boolean result No description yet available.

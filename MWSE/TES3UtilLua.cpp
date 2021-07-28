@@ -4614,6 +4614,11 @@ namespace mwse {
 			return true;
 		}
 
+		std::tuple<unsigned int, unsigned int> getViewportSize() {
+			auto game = TES3::Game::get();
+			return { game->windowWidth, game->windowHeight };
+		}
+
 		bool setVanityMode(sol::optional<sol::table> params) {
 			auto worldController = TES3::WorldController::get();
 			if (!worldController) {
@@ -4849,6 +4854,7 @@ namespace mwse {
 			tes3["getSoundPlaying"] = getSoundPlaying;
 			tes3["getTopMenu"] = TES3::UI::getMenuOnTop;
 			tes3["getTrap"] = getTrap;
+			tes3["getViewportSize"] = getViewportSize;
 			tes3["getWerewolfKillCount"] = getWerewolfKillCount;
 			tes3["getWorldController"] = TES3::WorldController::get;
 			tes3["hammerKey"] = hammerKey;

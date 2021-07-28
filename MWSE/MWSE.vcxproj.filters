@@ -1503,9 +1503,6 @@
     <ClInclude Include="LuaDamagedHandToHandEvent.h">
       <Filter>Header Files\Lua\Events</Filter>
     </ClInclude>
-    <ClInclude Include="LuaAttackStartEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TES3Sound.h">
       <Filter>Header Files\DataAdapters\TES3\_Unsorted_</Filter>
     </ClInclude>
@@ -1527,8 +1524,14 @@
     <ClInclude Include="LuaPotionBrewSkillCheckEvent.h">
       <Filter>Header Files\Lua\Events</Filter>
     </ClInclude>
+    <ClInclude Include="LuaAttackStartEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
     <ClInclude Include="NIParticlesLua.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Lua\Bindings\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="NIParticles.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3362,14 +3365,17 @@
     <ClCompile Include="LuaPotionBrewSkillCheckEvent.cpp">
       <Filter>Source Files\Lua</Filter>
     </ClCompile>
-    <ClCompile Include="NIParticlesLua.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NIParticleSystemController.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
     </ClCompile>
     <ClCompile Include="NIParticleModifier.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticlesLua.cpp">
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticles.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
