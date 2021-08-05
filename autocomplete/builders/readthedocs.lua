@@ -22,11 +22,19 @@ local rstHeaders = {
 --
 -- Handle link caching to optimize RTD build times.
 --
+-- We have to do some silly things to get the lua plugin to know we extend the file api.
+--
+
+local tempFile = io.tmpfile()
+local fileMetaTable = getmetatable(tempFile)
 
 local writtenLinks = {}
-local modifiedIoFileMetatable = false
 
-local function cachedWrite(self, str, ...)
+--- @diagnostic disable-next-line
+--- @class file*
+local file = fileMetaTable
+
+function file:cachedwrite(str, ...)
 	local output = str:format(...)
 	writtenLinks[self] = writtenLinks[self] or {}
 	for capture in string.gmatch(output, "`.-`_") do
@@ -35,24 +43,11 @@ local function cachedWrite(self, str, ...)
 	return self:write(output)
 end
 
-local function uncachedWrite(self, str, ...)
+function file:uncachedwrite(str, ...)
 	return self:write(str:format(...))
 end
 
-local originalIOOpen = io.open
-function io.open(...)
-	local file = originalIOOpen(...)
-	if (file) then
-		if (not modifiedIoFileMetatable) then
-			local mt = getmetatable(file)
-			mt.cachedwrite = cachedWrite
-			mt.uncachedwrite = uncachedWrite
-			modifiedIoFileMetatable = true
-		end
-		writtenLinks[file] = writtenLinks[file] or {}
-	end
-	return file
-end
+file = nil
 
 
 --
@@ -71,18 +66,6 @@ common.compilePath(lfs.join(common.pathDefinitions, "namedTypes"), classes, "cla
 local events = {}
 -- common.compilePath(lfs.join(common.pathDefinitions, "events\\standard"), events)
 
-local typeLinks = {
-	["bool"] = "lua/type/boolean",
-	["boolean"] = "lua/type/boolean",
-	["function"] = "lua/type/function",
-	["nil"] = "lua/type/nil",
-	["number"] = "lua/type/number",
-	["string"] = "lua/type/string",
-	["table"] = "lua/type/table",
-}
-for key, _ in pairs(classes) do
-	typeLinks[key] = common.urlJoin("lua/type", key)
-end
 
 --
 -- Build output
@@ -240,7 +223,7 @@ local function build(package, outDir)
 			local subtitle = package.type == "lib" and "Values" or "Properties"
 			file:cachedwrite("%s\n%s\n\n", subtitle, rstHeaders[2])
 			for _, fn in ipairs(values) do
-				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, fn.parent.key, fn.key)
 				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.valuetype or "any"), getArgumentDescription(fn))
 			end
 			file:cachedwrite("\n\n")
@@ -248,7 +231,9 @@ local function build(package, outDir)
 			file:cachedwrite("    :hidden:\n")
 			file:cachedwrite("    :maxdepth: 1\n\n")
 			for _, fn in ipairs(values) do
-				file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				if (fn.parent == package) then
+					file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				end
 			end
 			file:cachedwrite("\n")
 		end
@@ -258,7 +243,7 @@ local function build(package, outDir)
 		if (#methods > 0) then
 			file:cachedwrite("Methods\n%s\n\n", rstHeaders[2])
 			for _, fn in ipairs(methods) do
-				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, fn.parent.key, fn.key)
 				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.type or "any"), getArgumentDescription(fn))
 			end
 			file:cachedwrite("\n\n")
@@ -266,7 +251,9 @@ local function build(package, outDir)
 			file:cachedwrite("    :hidden:\n")
 			file:cachedwrite("    :maxdepth: 1\n\n")
 			for _, fn in ipairs(methods) do
-				file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				if (fn.parent == package) then
+					file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				end
 			end
 			file:cachedwrite("\n")
 		end
@@ -276,7 +263,7 @@ local function build(package, outDir)
 		if (#functions > 0) then
 			file:cachedwrite("Functions\n%s\n\n", rstHeaders[2])
 			for _, fn in ipairs(functions) do
-				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, fn.parent.key, fn.key)
 				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.type or "any"), getArgumentDescription(fn))
 			end
 			file:cachedwrite("\n\n")
@@ -284,7 +271,9 @@ local function build(package, outDir)
 			file:cachedwrite("    :hidden:\n")
 			file:cachedwrite("    :maxdepth: 1\n\n")
 			for _, fn in ipairs(functions) do
-				file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				if (fn.parent == package) then
+					file:cachedwrite("    %s/%s\n", package.key, fn.key)
+				end
 			end
 			file:cachedwrite("\n")
 		end
@@ -300,26 +289,25 @@ local function build(package, outDir)
 	writtenLinks[file] = nil
 	file:close()
 
-	if (package.type == "lib" or package.type == "class") then
-		-- Write out children in a subdirectory.
-		local children = table.values(getPackageComponentsDictionary(package, "children"), sortPackagesByKey)
-		if (#children > 0) then
-			lfs.mkdir(lfs.join(outDir, package.key))
-			for _, child in ipairs(children) do
-				if (child.type == "function" or child.type == "method") then
-					build(child, lfs.join(outDir, package.key))
-				end
-			end
+	-- Write out children in a subdirectory.
+	if (package.children and not table.empty(package.children)) then
+		lfs.mkdir(lfs.join(outDir, package.key))
+		for _, child in pairs(package.children) do
+			build(child, lfs.join(outDir, package.key))
 		end
 	end
 end
 
+--- comment
+--- @param collection any
+--- @param outdir any
 local function buildBuilder(collection, outdir)
 	lfs.remakedir(lfs.join(docsLuaSourceFolder, outdir))
 	for _, package in pairs(collection) do
 		build(package, lfs.join(docsLuaSourceFolder, outdir))
 	end
 end
+
 buildBuilder(libraries, "api")
 buildBuilder(classes, "type")
 -- buildBuilder(libraries, "events")

@@ -8,27 +8,37 @@
 			"type": "shell",
 			"group": "build",
 			"command": "lua",
-			"args": [".\\builders\\emmy.lua"],
+			"args": [
+				".\\builders\\emmy.lua"
+			],
 			"problemMatcher": []
 		},
 		{
 			"label": "Build Autodocs",
 			"type": "shell",
 			"command": "lua",
-			"args": [".\\builders\\readthedocs.lua"],
-			"group": "build",
+			"args": [
+				".\\builders\\readthedocs.lua"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"problemMatcher": []
 		},
-        {
-            "label": "Build All",
-            "command": "echo",
-			"args": ["Build complete!"],
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "dependsOn":["Build Autocomplete", "Build Autodocs"]
-        },
+		{
+			"label": "Build All",
+			"command": "echo",
+			"args": [
+				"Build complete!"
+			],
+			"type": "shell",
+			"group": "build",
+			"dependsOn": [
+				"Build Autocomplete",
+				"Build Autodocs"
+			],
+			"problemMatcher": []
+		}
 	]
 }

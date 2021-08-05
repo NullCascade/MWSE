@@ -388,7 +388,7 @@ function common.compileInheritances(classes)-- Figure out inheritances.
 			if (parent) then
 				parent.directDescendents = parent.directDescendents or {}
 				parent.directDescendents[class.key] = class
-				
+
 				while (parent) do
 					parent.allDescendents = parent.allDescendents or {}
 					parent.allDescendents[class.key] = class
@@ -397,7 +397,7 @@ function common.compileInheritances(classes)-- Figure out inheritances.
 			end
 		end
 	end
-	
+
 	-- Update allDescendentKeys
 	-- Explosions. I should have kept calling them explosion keys. Way cooler.
 	for _, class in pairs(classes) do
