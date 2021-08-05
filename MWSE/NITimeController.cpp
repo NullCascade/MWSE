@@ -34,8 +34,37 @@ namespace NI {
 		return vTable.asController->computeScaledTime(this, dt);
 	}
 
-	bool TimeController::targetIsRequiredType() {
+	bool TimeController::targetIsRequiredType() const {
 		return vTable.asController->targetIsRequiredType(this);
+	}
+
+	bool TimeController::getActive() const {
+		return flags & TimeControllerFlags::Active;
+	}
+
+	void TimeController::setActive(bool active) {
+		if (active) {
+			flags |= TimeControllerFlags::Active;
+		}
+		else {
+			flags &= ~TimeControllerFlags::Active;
+		}
+	}
+
+	unsigned int TimeController::getAnimTimingType() const {
+		return flags & TimeControllerFlags::AppTimingMask;
+	}
+
+	void TimeController::setAnimTimingType(unsigned int type) {
+		flags = (flags & ~TimeControllerFlags::AppTimingMask) | (type & TimeControllerFlags::AppTimingMask);
+	}
+
+	unsigned int TimeController::getCycleType() const {
+		return flags & TimeControllerFlags::CycleTypeMask;
+	}
+
+	void TimeController::setCycleType(unsigned int type) {
+		flags = (flags & ~TimeControllerFlags::CycleTypeMask) | (type & TimeControllerFlags::CycleTypeMask);
 	}
 
 }

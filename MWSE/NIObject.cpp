@@ -13,6 +13,7 @@
 #include "NICollisionSwitch.h"
 #include "NIDirectionalLight.h"
 #include "NIExtraData.h"
+#include "NILookAtController.h"
 #include "NINode.h"
 #include "NIObjectNET.h"
 #include "NIParticleModifier.h"
@@ -136,6 +137,9 @@ namespace NI {
 				break;
 			case RTTIStaticPtr::NiGravity:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<Gravity*>(this)));
+				break;
+			case RTTIStaticPtr::NiLookAtController:
+				ref = sol::make_object_userdata(L, Pointer(static_cast<LookAtController*>(this)));
 				break;
 			case RTTIStaticPtr::NiMaterialProperty:
 				ref = sol::make_object_userdata(L, Pointer(static_cast<MaterialProperty*>(this)));

@@ -36,7 +36,8 @@ namespace mwse::lua {
 			setUserdataForNIGeometryData(usertypeDefinition);
 
 			// Functions exposed as properties.
-			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriBasedGeometryData::getTriangleCount);
+			usertypeDefinition["activeTriangleCount"] = sol::property(&NI::TriBasedGeometryData::getActiveTriangleCount, &NI::TriBasedGeometryData::setActiveTriangleCount);
+			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriBasedGeometryData::triangleCount);
 		}
 
 		// Bind NI::TriShapeData
@@ -50,7 +51,9 @@ namespace mwse::lua {
 			setUserdataForNIGeometryData(usertypeDefinition);
 
 			// Functions exposed as properties.
-			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriShapeData::getTriangleCount);
+			usertypeDefinition["activeTriangleCount"] = sol::property(&NI::TriShapeData::getActiveTriangleCount, &NI::TriShapeData::setActiveTriangleCount);
+			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriShapeData::triangleCount);
+			usertypeDefinition["triangles"] = sol::readonly_property(&NI::TriShapeData::getTriangles);
 
 			// Basic function binding.
 			usertypeDefinition["copy"] = &NI::TriShapeData::copyData;

@@ -6,40 +6,55 @@
 
 namespace NI {
 	struct TimeController_vTable : Object_vTable {
-		void(__thiscall* start)(TimeController*, float); // 0x2C
-		void(__thiscall* stop)(TimeController*); // 0x30
-		void(__thiscall* update)(TimeController*, float); // 0x34
-		void(__thiscall* setTarget)(TimeController*, ObjectNET*); // 0x38
-		float(__thiscall* computeScaledTime)(TimeController*, float); // 0x3C
-		void* unknown_0x40;
-		bool(__thiscall* targetIsRequiredType)(TimeController*); // 0x44
+		void (__thiscall* start)(TimeController*, float); // 0x2C
+		void (__thiscall* stop)(TimeController*); // 0x30
+		void (__thiscall* update)(TimeController*, float); // 0x34
+		void (__thiscall* setTarget)(TimeController*, ObjectNET*); // 0x38
+		float (__thiscall* computeScaledTime)(TimeController*, float); // 0x3C
+		void (__thiscall* onPreDisplay)(TimeController*); // 0x40
+		bool (__thiscall* targetIsRequiredType)(const TimeController*); // 0x44
 
 		TimeController_vTable();
 	};
 	static_assert(sizeof(TimeController_vTable) == 0x48, "NI::TimeController's vtable failed size validation");
 
+	namespace TimeControllerFlags {
+		typedef unsigned short value_type;
+
+		enum TimeControllerFlags : value_type {
+			AppTime = 0,
+			AppInit = 1,
+			AppTimingMask = 1,
+			Loop = 0,
+			Reverse = 2,
+			Clamp = 4,
+			CycleTypeMask = 6,
+			Active = 8
+		};
+	}
+
 	struct TimeController : Object {
-		unsigned short deprecatedFlags; // 0x8
+		TimeControllerFlags::value_type flags; // 0x8
 		float frequency; // 0xC
 		float phase; // 0x10
 		float lowKeyFrame; // 0x14
 		float highKeyFrame; // 0x18
 		float startTime; // 0x1C
 		float lastTime; // 0x20
-		float unknown_0x24;
+		float lastScaledTime; // 0x24
 		ObjectNET * target; // 0x28
 		Pointer<TimeController> nextController; // 0x2C
-		bool unknown_0x30; // Force update? Compute scaled time?
+		bool updateRequired; // 0x30
 
 		//
-		//
+		// Construction/destruction.
 		//
 
 		void ctor();
 		void dtor();
 
 		//
-		//
+		// Related this-call functions.
 		//
 
 		void start(float time);
@@ -47,7 +62,14 @@ namespace NI {
 		void update(float deltaTime);
 		void setTarget(ObjectNET*);
 		float computeScaledTime(float dt);
-		bool targetIsRequiredType();
+		bool targetIsRequiredType() const;
+		bool getActive() const;
+		void setActive(bool active);
+		unsigned int getAnimTimingType() const;
+		void setAnimTimingType(unsigned int type);
+		unsigned int getCycleType() const;
+		void setCycleType(unsigned int type);
+
 
 		//
 		// Access to this type's raw functions.

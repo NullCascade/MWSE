@@ -13,7 +13,7 @@ namespace TES3 {
 		Element* createHelpLayerMenu(UI_ID id);
 		Element* createHelpLayerMenu_lua(sol::table params);
 		Element* createTooltipMenu(UI_ID id);
-		Element* createTooltipMenu_lua();
+		Element* createTooltipMenu_lua(sol::optional<sol::table> params);
 		void refreshTooltip();
 		Element* findMenu(UI_ID id);
 		Element* findMenu_lua(sol::object id);

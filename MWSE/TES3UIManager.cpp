@@ -114,8 +114,27 @@ namespace TES3 {
 			return TES3_ui_createTooltipMenu(id);
 		}
 
-		Element* createTooltipMenu_lua() {
-			return createTooltipMenu(TES3::UI::UI_ID(TES3::UI::Property::HelpMenu));
+		Element* createTooltipMenu_lua(sol::optional<sol::table> params) {
+			using mwse::lua::getOptionalParam;
+			using mwse::lua::getOptionalParamObject;
+
+			auto menu = createTooltipMenu(TES3::UI::UI_ID(TES3::UI::Property::HelpMenu));
+
+			if (!params) {
+				// Empty tooltip creation.
+				return menu;
+			}
+
+			auto item = getOptionalParamObject<TES3::Item>(params, "item");
+			if (item) {
+				auto itemData = getOptionalParam<TES3::ItemData*>(params, "itemData", nullptr);
+				auto count = itemData ? itemData->count : 0;
+
+				WorldController::get()->menuController->menuInputController->displayObjectTooltip(item, itemData, count);
+				return menu;
+			}
+
+			throw std::invalid_argument("createTooltipMenu: Could not find object matching arguments.");
 		}
 
 		void refreshTooltip() {

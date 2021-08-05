@@ -166,6 +166,7 @@
 
 #include "LuaDisableableEventManager.h"
 
+#include "LuaAbsorbedMagicEvent.h"
 #include "LuaActivationTargetChangedEvent.h"
 #include "LuaAddTopicEvent.h"
 #include "LuaAttackEvent.h"
@@ -3075,7 +3076,6 @@ namespace mwse {
 			auto macp = TES3::WorldController::get()->getMobilePlayer();
 			charge = onEnchantItemChargeRequired(macp, lastExaminedEnchantment, charge, nullptr);
 
-			lastExaminedEnchantment = nullptr;
 			return int(charge);
 		}
 
@@ -3530,6 +3530,14 @@ namespace mwse {
 
 			// Event: Spell Resist
 			genCallEnforced(0x518616, 0x517E40, reinterpret_cast<DWORD>(OnSpellResist));
+
+			// Event: Absorb magic
+			auto onAbsorbedMagic = &TES3::MagicSourceInstance::onAbsorbedMagic;
+			genCallEnforced(0x51783E, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x5178E9, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517A50, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517CA7, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517D90, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
 
 			// Event: Player exercise skill.
 			genCallEnforced(0x4EB387, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));

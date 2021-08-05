@@ -75,6 +75,7 @@ namespace TES3 {
 		void playSpellVFX(float scale, Vector3 position, Reference* attachedReference, float offsetZ, PhysicalObject* effectVisual, int effectIndex, int isContinuous);
 		void projectileHit(MobileObject::Collision* collision);
 		bool spellHit(Reference* hitReference, int effectIndex);
+		void onAbsorbedMagic(MobileActor* mact);
 
 		void retire(TES3::Reference* reference);
 

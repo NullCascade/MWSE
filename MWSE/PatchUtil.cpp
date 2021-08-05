@@ -327,11 +327,13 @@ namespace mwse {
 		// Seen with StarFire's StarfireNPCA_nightlife script. Doesn't seem to actually call RemoveItem.
 		// Mostly here to gather more information to help diagnose the crash.
 		//
-		// Note: This assumes the target reference is of an actor.
+		// referenceToThis is only accessed for clones.
 		//
 
 		TES3::Reference::ReferenceData* __fastcall PatchFixupActorSelfReference(TES3::Reference* self) {
-			if (self->baseObject->referenceToThis == nullptr) {
+			bool isClone = self->baseObject->isActor() && static_cast<TES3::Actor*>(self->baseObject)->isClone();
+
+			if (isClone && self->baseObject->referenceToThis == nullptr) {
 				self->baseObject->referenceToThis = self;
 
 				using namespace mwse::log;
@@ -344,7 +346,7 @@ namespace mwse {
 				log << "Object: " << self->baseObject->getObjectID() << std::endl;
 				prettyDump(static_cast<TES3::Actor*>(self->baseObject));
 
-				auto script = self->baseObject->getScript();
+				auto script = TES3::Script::currentlyExecutingScript;
 				if (script) {
 					log << "Script: " << script->getObjectID() << std::endl;
 					prettyDump(script);

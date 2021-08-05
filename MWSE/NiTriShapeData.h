@@ -20,7 +20,7 @@ namespace NI {
 		//
 
 		Pointer<TriShapeData> copyData(sol::optional<sol::table> filters) const;
-
+		nonstd::span<unsigned short> getTriangles();
 	};
 	static_assert(sizeof(TriShapeData) == 0x48, "NI::TriShapeData failed size validation");
 }

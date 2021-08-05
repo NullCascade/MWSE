@@ -1988,6 +1988,7 @@ namespace mwse {
 
 			// Retype our variables to something more friendly, and get additional params.
 			sol::optional<bool> limit = params["limit"];
+			sol::optional<bool> limitToBase = params["limitToBase"];
 
 			sol::optional<float> current = params["current"];
 			sol::optional<float> base = params["base"];
@@ -1996,11 +1997,11 @@ namespace mwse {
 			// Edit both.
 			if (value) {
 				statistic->modBaseCapped(value.value(), limit.value_or(false), limit.value_or(false));
-				statistic->modCurrentCapped(value.value(), limit.value_or(false), limit.value_or(false), limit.value_or(false));
+				statistic->modCurrentCapped(value.value(), limit.value_or(false), limitToBase.value_or(false), limit.value_or(false));
 			}
 			// If we're given a current value, modify it.
 			else if (current) {
-				statistic->modCurrentCapped(current.value(), limit.value_or(false), limit.value_or(false), limit.value_or(false));
+				statistic->modCurrentCapped(current.value(), limit.value_or(false), limitToBase.value_or(false), limit.value_or(false));
 			}
 			// If we're given a base value, modify it.
 			else if (base) {

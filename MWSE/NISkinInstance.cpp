@@ -10,14 +10,14 @@ namespace NI {
 
 	nonstd::span<unsigned short> SkinPartition::Partition::getStripLengths() {
 		if (bones) {
-			return nonstd::span<unsigned short>(bones, numBones);
+			return nonstd::span<unsigned short>(stripLengths, numStripLengths);
 		}
 		return {};
 	}
 
 	nonstd::span<unsigned short> SkinPartition::Partition::getTriangles() {
 		if (triangles) {
-			return nonstd::span<unsigned short>(triangles, numTriangles);
+			return nonstd::span<unsigned short>(triangles, 3 * numTriangles);
 		}
 		return {};
 	}

@@ -26,6 +26,9 @@ namespace mwse {
 
 			// Basic property binding.
 			usertypeDefinition["switchIndex"] = sol::property(&NI::SwitchNode::getSwitchIndex, &NI::SwitchNode::setSwitchIndex);
+
+			// Basic function binding.
+			usertypeDefinition["getActiveChild"] = &NI::SwitchNode::getActiveChild;
 		}
 	}
 }

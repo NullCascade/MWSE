@@ -85,7 +85,7 @@ Properties
     If true, references of this object can store temporary or persistent lua data.
 
 `value`_ (`number`_)
-    The value of the object.
+    The value of the object. For this object type, its maximum value is 65535. Larger numbers will overflow.
 
 `weight`_ (`number`_)
     The weight of the object.

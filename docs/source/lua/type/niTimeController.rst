@@ -6,10 +6,22 @@ Controls the timing and update functions for animation controllers.
 Properties
 ----------------------------------------------------------------------------------------------------
 
+`active`_ (`boolean`_)
+    If the controller is active. When inactive, the target does not get updated and animation timing does not advance.
+
+`animTimingType`_ (`number`_)
+    How the time parameter passed to the update function is treated. Type 0 is the default, which treats the update time as a delta time. Type 1 treats the update time an offset from the start of the animation.
+
+`cycleType`_ (`number`_)
+    The animation cycle type. Type 0 is looping, type 2 is reverse, type 4 is clamped.
+
 `frequency`_ (`number`_)
     The animation controller's frequency value.
 
 `highKeyFrame`_ (`number`_)
+    No description.
+
+`lastScaledTime`_ (`number`_)
     No description.
 
 `lastTime`_ (`number`_)
@@ -39,8 +51,12 @@ Properties
 .. toctree::
     :hidden:
 
+    niTimeController/active
+    niTimeController/animTimingType
+    niTimeController/cycleType
     niTimeController/frequency
     niTimeController/highKeyFrame
+    niTimeController/lastScaledTime
     niTimeController/lastTime
     niTimeController/lowKeyFrame
     niTimeController/nextController
@@ -50,8 +66,12 @@ Properties
     niTimeController/startTime
     niTimeController/target
 
+.. _`active`: niTimeController/active.html
+.. _`animTimingType`: niTimeController/animTimingType.html
+.. _`cycleType`: niTimeController/cycleType.html
 .. _`frequency`: niTimeController/frequency.html
 .. _`highKeyFrame`: niTimeController/highKeyFrame.html
+.. _`lastScaledTime`: niTimeController/lastScaledTime.html
 .. _`lastTime`: niTimeController/lastTime.html
 .. _`lowKeyFrame`: niTimeController/lowKeyFrame.html
 .. _`nextController`: niTimeController/nextController.html
@@ -77,7 +97,7 @@ Methods
     Starts the controller at the specified time.
 
 `stop`_
-    Stops the controller.
+    Stops the controller. If you only want to pause the controller, use the ``update`` property.
 
 .. toctree::
     :hidden:

@@ -14,6 +14,7 @@
     <ClInclude Include="ArrayUtil.h" />
     <ClInclude Include="BitUtil.h" />
     <ClInclude Include="BSAnimationManager.h" />
+    <ClInclude Include="LuaAbsorbedMagicEvent.h" />
     <ClInclude Include="LuaAttackStartEvent.h" />
     <ClInclude Include="LuaDamagedHandToHandEvent.h" />
     <ClInclude Include="LuaDamageHandToHandEvent.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="NIKeyframeManager.h" />
     <ClInclude Include="NILines.h" />
     <ClInclude Include="NILinesData.h" />
+    <ClInclude Include="NILookAtController.h" />
     <ClInclude Include="NIParticleModifier.h" />
     <ClInclude Include="NIParticles.h" />
     <ClInclude Include="NIParticlesLua.h" />
@@ -467,6 +469,7 @@
     <ClCompile Include="CodePatchUtil.cpp" />
     <ClCompile Include="DynamicLuaObject.cpp" />
     <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="LuaAbsorbedMagicEvent.cpp" />
     <ClCompile Include="LuaActivateEvent.cpp" />
     <ClCompile Include="LuaActivationTargetChangedEvent.cpp" />
     <ClCompile Include="LuaAddTopicEvent.cpp" />
@@ -619,6 +622,7 @@
     <ClCompile Include="NIGeometryDataLua.cpp" />
     <ClCompile Include="NIKeyframeManager.cpp" />
     <ClCompile Include="NILinesData.cpp" />
+    <ClCompile Include="NILookAtController.cpp" />
     <ClCompile Include="NIParticleModifier.cpp" />
     <ClCompile Include="NIParticles.cpp" />
     <ClCompile Include="NIParticlesLua.cpp" />

@@ -135,6 +135,9 @@ Methods
 `detachProperty`_ (`niProperty`_)
     Detaches and returns a property from the object which matches the given property type.
 
+`getActiveChild`_ (`niAVObject`_)
+    Gets the active child node, or returns nil if the switch index is -1.
+
 `getEffect`_ (`niDynamicEffect`_)
     Gets the effect for the given type.
 
@@ -178,6 +181,7 @@ Methods
     niSwitchNode/detachChild
     niSwitchNode/detachChildAt
     niSwitchNode/detachProperty
+    niSwitchNode/getActiveChild
     niSwitchNode/getEffect
     niSwitchNode/getObjectByName
     niSwitchNode/getProperty
@@ -197,6 +201,7 @@ Methods
 .. _`detachChild`: niSwitchNode/detachChild.html
 .. _`detachChildAt`: niSwitchNode/detachChildAt.html
 .. _`detachProperty`: niSwitchNode/detachProperty.html
+.. _`getActiveChild`: niSwitchNode/getActiveChild.html
 .. _`getEffect`: niSwitchNode/getEffect.html
 .. _`getObjectByName`: niSwitchNode/getObjectByName.html
 .. _`getProperty`: niSwitchNode/getProperty.html
