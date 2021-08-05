@@ -6,6 +6,7 @@ Fetches the list of the active ESM and ESP files.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+modList (`table`_)
+    No description available.
 
 .. _`table`: ../../../lua/type/table.html

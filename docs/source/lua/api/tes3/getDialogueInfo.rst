@@ -6,7 +6,8 @@ Locates and returns a Dialogue Info by a given id. This involves file IO and is 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3dialogueInfo`_.
+dialogueInfo (`tes3dialogueInfo`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

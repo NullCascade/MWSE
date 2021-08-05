@@ -6,7 +6,8 @@ Determines if the object is of a given type. Types can be found in the tes3.niTy
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

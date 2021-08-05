@@ -6,7 +6,8 @@ This creates a pre-sized table. This is useful for big tables if the final table
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_. The pre-sized table that was created.
+newTable (`table`_)
+    The pre-sized table that was created.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

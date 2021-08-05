@@ -6,7 +6,8 @@ Sets a locked reference's lock level. This does not lock the object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+set (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

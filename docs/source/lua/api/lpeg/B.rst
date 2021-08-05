@@ -10,7 +10,8 @@ Like the and predicate, this pattern never consumes any input, independently of 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,3 +21,4 @@ Accepts parameters in the following order:
 p (`pattern`_)
     The input pattern.
 
+.. _`pattern`: ../../../lua/type/pattern.html

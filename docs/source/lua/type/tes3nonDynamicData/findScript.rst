@@ -6,7 +6,8 @@ Locates a script for a given ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3script`_.
+result (`tes3script`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ id (`string`_)
     No description available.
 
 .. _`string`: ../../../lua/type/string.html
+.. _`tes3script`: ../../../lua/type/tes3script.html

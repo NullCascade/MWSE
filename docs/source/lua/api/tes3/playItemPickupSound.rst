@@ -6,7 +6,8 @@ Plays the sound responsible for picking up or putting down an item.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

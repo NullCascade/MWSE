@@ -1,6 +1,6 @@
 effectId
 ====================================================================================================
 
-`number`_. The magic effect ID.
+`number`_. Read-only. The magic effect ID.
 
 .. _`number`: ../../../lua/type/number.html

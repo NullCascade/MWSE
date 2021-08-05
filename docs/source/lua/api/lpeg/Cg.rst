@@ -13,7 +13,8 @@ values are only relevant for a following back capture or when used inside a tabl
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -26,3 +27,5 @@ p (`pattern`_)
 name (`value`_)
     Optional. The name of the group.
 
+.. _`pattern`: ../../../lua/type/pattern.html
+.. _`value`: ../../../lua/type/value.html

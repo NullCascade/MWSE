@@ -6,6 +6,7 @@ Returns a table with complete player kill counts. The table returned is formated
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+killMap (`table`_)
+    No description available.
 
 .. _`table`: ../../../lua/type/table.html

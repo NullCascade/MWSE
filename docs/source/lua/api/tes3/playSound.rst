@@ -6,7 +6,8 @@ Plays a sound on a given reference. Provides control over volume (including volu
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ reference (`tes3reference`_, `tes3mobileActor`_, `string`_)
     Optional. The reference to attach the sound to.
 
 loop (`boolean`_)
-    Default: ``false``. If true, the sound will loop.
+    If true, the sound will loop.
 
 mixChannel (`number`_)
     Default: ``tes3.audioMixType.effects``. The channel to base volume off of. Maps to tes3.audioMixType constants.

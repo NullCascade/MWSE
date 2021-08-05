@@ -6,7 +6,8 @@ Returns the object's owner, or nil if the object is unowned.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3object`_.
+object (`tes3object`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

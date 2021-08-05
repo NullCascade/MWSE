@@ -8,6 +8,7 @@ Note this function can be used once WorldController and MobilePlayer have finish
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_.
+cameraOffset (`tes3vector3`_)
+    No description available.
 
 .. _`tes3vector3`: ../../../lua/type/tes3vector3.html

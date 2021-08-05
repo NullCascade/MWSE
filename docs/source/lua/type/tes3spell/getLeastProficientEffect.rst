@@ -6,7 +6,8 @@ Returns the effect of the spell that a given actor is least proficient with.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3effect`_, `nil`_. The least proficient effect, or nil if the spell has no valid effects.
+effect (`tes3effect`_, `nil`_)
+    The least proficient effect, or nil if the spell has no valid effects.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

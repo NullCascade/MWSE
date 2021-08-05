@@ -6,7 +6,8 @@ Sets the value of a global value. If the global could not be found, the function
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+value (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

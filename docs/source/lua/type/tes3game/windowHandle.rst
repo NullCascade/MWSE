@@ -1,6 +1,6 @@
 windowHandle
 ====================================================================================================
 
-`number`_. The Windows HWND for the window.
+`number`_. Read-only. The Windows HWND for the window.
 
 .. _`number`: ../../../lua/type/number.html

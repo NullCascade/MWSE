@@ -6,7 +6,8 @@ Determines if the object is of a given type, or of a type derived from the given
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

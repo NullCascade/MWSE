@@ -8,7 +8,8 @@ The registry namespace is shared between Property and UI_ID. It is advisable to 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

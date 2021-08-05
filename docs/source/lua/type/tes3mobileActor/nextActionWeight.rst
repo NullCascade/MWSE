@@ -1,5 +1,6 @@
 nextActionWeight
 ====================================================================================================
 
-No description is currently available.
+`number`_. Read-only. No description available.
 
+.. _`number`: ../../../lua/type/number.html

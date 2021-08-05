@@ -6,7 +6,8 @@ Determines if a reference has access to another object, including its inventory.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+hasAccess (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,7 +6,8 @@ Detaches and returns a property from the object which matches the given property
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niProperty`_.
+result (`niProperty`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,7 +6,8 @@ Gets the magic effect instance for a given effect index and target reference. Ef
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3magicEffectInstance`_.
+result (`tes3magicEffectInstance`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

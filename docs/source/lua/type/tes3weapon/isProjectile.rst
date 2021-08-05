@@ -1,6 +1,6 @@
 isProjectile
 ====================================================================================================
 
-`boolean`_. If true, the weapon is a projectile.
+`boolean`_. Read-only. If true, the weapon is a projectile.
 
 .. _`boolean`: ../../../lua/type/boolean.html

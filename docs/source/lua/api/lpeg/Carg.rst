@@ -9,7 +9,8 @@ in the call to lpeg.match.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,3 +21,4 @@ n (`number`_)
     The argument to produce.
 
 .. _`number`: ../../../lua/type/number.html
+.. _`pattern`: ../../../lua/type/pattern.html

@@ -6,6 +6,7 @@ Calculates the length of the vector.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

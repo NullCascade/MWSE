@@ -6,6 +6,7 @@ Checks if the game is in menu mode.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. true if in menu mode.
+result (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

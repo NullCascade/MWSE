@@ -6,7 +6,8 @@ Equips an item, optionally adding the item if needed. If the best match is alrea
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+itemEquipped (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,13 +21,13 @@ itemData (`tes3itemData`_)
     Optional. The item data of the specific item to equip.
 
 addItem (`boolean`_)
-    Default: ``false``. If true, the item will be added to the actor's inventory if needed.
+    If true, the item will be added to the actor's inventory if needed.
 
 selectBestCondition (`boolean`_)
-    Default: ``false``. If true, the item in the inventory with the best condition and best charge will be selected.
+    If true, the item in the inventory with the best condition and best charge will be selected.
 
 selectWorstCondition (`boolean`_)
-    Default: ``false``. If true, the item in the inventory with the worst condition and worst charge will be selected. Can be useful for selecting tools.
+    If true, the item in the inventory with the worst condition and worst charge will be selected. Can be useful for selecting tools.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`string`: ../../../lua/type/string.html

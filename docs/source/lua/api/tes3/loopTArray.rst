@@ -6,7 +6,8 @@ This function returns a function that iterates over a tes3tarray object. This is
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`function`_.
+iterationFunction (`function`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ tarray (`tes3tarray`_)
     No description available.
 
 .. _`function`: ../../../lua/type/function.html
+.. _`tes3tarray`: ../../../lua/type/tes3tarray.html

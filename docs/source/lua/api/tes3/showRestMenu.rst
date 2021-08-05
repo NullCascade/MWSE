@@ -8,7 +8,8 @@ Various parameters can be used to allow resting in situations not normally possi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+success (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -34,6 +35,6 @@ resting (`boolean`_)
     Default: ``true``. Should this be a rest?
 
 waiting (`boolean`_)
-    Default: ``false``. Or, is this a wait?
+    Optional. Or, is this a wait?
 
 .. _`boolean`: ../../../lua/type/boolean.html

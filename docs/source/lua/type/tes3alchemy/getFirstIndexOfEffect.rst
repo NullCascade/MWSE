@@ -6,7 +6,8 @@ Returns the index of a first effect of a given effectId in the parent tes3alchem
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+index (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

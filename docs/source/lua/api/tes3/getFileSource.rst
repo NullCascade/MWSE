@@ -6,7 +6,8 @@ Determines if a file exists on the filesystem or inside of a bsa. The returned s
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+exists (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

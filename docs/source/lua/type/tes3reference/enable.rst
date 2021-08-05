@@ -6,6 +6,7 @@ Shows the reference, restarts all scripts for it, reattaches all dynamic lights 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. If true, the reference was successfully enabled.
+success (`boolean`_)
+    If true, the reference was successfully enabled.
 
 .. _`boolean`: ../../../lua/type/boolean.html

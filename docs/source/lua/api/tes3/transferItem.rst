@@ -6,7 +6,8 @@ Moves one or more items from one reference to another. Returns the actual amount
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+transferredCount (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

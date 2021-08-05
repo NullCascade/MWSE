@@ -1,11 +1,12 @@
 transpose
 ====================================================================================================
 
-No description is currently available.
+No description available.
 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3matrix33`_.
+result (`tes3matrix33`_)
+    No description available.
 
 .. _`tes3matrix33`: ../../../lua/type/tes3matrix33.html

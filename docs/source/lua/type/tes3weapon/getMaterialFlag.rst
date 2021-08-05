@@ -6,7 +6,8 @@ Access to the material flag bitfield. Known material flags can be accessed via o
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

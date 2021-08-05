@@ -8,7 +8,8 @@ If 'comp' is given, then it must be a function that receives two table elements,
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -26,3 +27,4 @@ comp (`unknown`_)
 
 .. _`number`: ../../../lua/type/number.html
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

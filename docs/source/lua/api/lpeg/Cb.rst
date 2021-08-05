@@ -16,7 +16,8 @@ it reuses values previously produced by the group or re-evaluates them.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -26,3 +27,5 @@ Accepts parameters in the following order:
 name (`value`_)
     The group capture to produce.
 
+.. _`pattern`: ../../../lua/type/pattern.html
+.. _`value`: ../../../lua/type/value.html

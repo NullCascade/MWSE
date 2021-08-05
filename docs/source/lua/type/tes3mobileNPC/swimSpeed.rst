@@ -1,6 +1,6 @@
 swimSpeed
 ====================================================================================================
 
-`number`_. The calculated swim movement speed.
+`number`_. Read-only. The calculated swim movement speed.
 
 .. _`number`: ../../../lua/type/number.html

@@ -6,7 +6,8 @@ Sets the index of a given journal in a way similar to the mwscript function SetJ
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+wasSet (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ speaker (`tes3mobileActor`_, `tes3reference`_, `string`_)
     No description available.
 
 showMessage (`boolean`_)
-    Default: ``false``. If set, a message may be shown to the player.
+    If set, a message may be shown to the player.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

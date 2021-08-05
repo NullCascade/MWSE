@@ -1,6 +1,6 @@
 iconPath
 ====================================================================================================
 
-`string`_. The path to the icon for the skill.
+`string`_. Read-only. The path to the icon for the skill.
 
 .. _`string`: ../../../lua/type/string.html

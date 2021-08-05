@@ -6,7 +6,8 @@ Returns the key for a given value, or nil if the table does not contain the valu
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`unknown`_.
+result (`unknown`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,3 +21,4 @@ value (`unknown`_)
     No description available.
 
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

@@ -6,6 +6,7 @@ Creates a copy of the bounding box.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3boundingBox`_.
+result (`tes3boundingBox`_)
+    No description available.
 
 .. _`tes3boundingBox`: ../../../lua/type/tes3boundingBox.html

@@ -6,7 +6,8 @@ Locates a help layer menu through its id. Help layer menus include notifications
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

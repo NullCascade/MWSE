@@ -1,6 +1,6 @@
 platformFilename
 ====================================================================================================
 
-`string`_. The platform-specific version of the filename.
+`string`_. Read-only. The platform-specific version of the filename.
 
 .. _`string`: ../../../lua/type/string.html

@@ -6,7 +6,8 @@ Returns an actor's current AI package ID, just as the mwscript function `GetCurr
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+packageID (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

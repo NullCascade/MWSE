@@ -15,7 +15,8 @@ Properties are named variables attached to an element. Gets a property value wit
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`object`_.
+result (`object`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -28,4 +29,5 @@ propName (`string`_)
 expectedUsertype (`string`_)
     Optional. A Lua usertype name, if expecting a non-standard object type.
 
+.. _`object`: ../../../lua/type/object.html
 .. _`string`: ../../../lua/type/string.html

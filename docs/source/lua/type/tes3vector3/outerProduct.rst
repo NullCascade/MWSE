@@ -6,7 +6,8 @@ Calculates the outer product with another vector.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3matrix33`_.
+result (`tes3matrix33`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

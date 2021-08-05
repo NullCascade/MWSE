@@ -6,6 +6,7 @@ This function returns true if player can rest.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+canRest (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

@@ -6,7 +6,8 @@ Creates a NIF model from a file. Still under research.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

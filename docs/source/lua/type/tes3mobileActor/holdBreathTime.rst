@@ -1,5 +1,6 @@
 holdBreathTime
 ====================================================================================================
 
-No description is currently available.
+`number`_. No description available.
 
+.. _`number`: ../../../lua/type/number.html

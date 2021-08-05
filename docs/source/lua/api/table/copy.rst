@@ -6,7 +6,8 @@ Shallowly copies a table's contents to a destination table. If no destination ta
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

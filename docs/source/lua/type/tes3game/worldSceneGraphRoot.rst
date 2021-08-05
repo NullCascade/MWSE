@@ -1,6 +1,6 @@
 worldSceneGraphRoot
 ====================================================================================================
 
-`niNode`_. Access to the root of the scene graph.
+`niNode`_. Read-only. Access to the root of the scene graph.
 
 .. _`niNode`: ../../../lua/type/niNode.html

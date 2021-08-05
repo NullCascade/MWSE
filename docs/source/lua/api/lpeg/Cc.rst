@@ -8,13 +8,16 @@ This pattern matches the empty string and produces all given values as its captu
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
 
 Accepts parameters in the following order:
 
-... (`values`_)
+unnamed (`values`_)
     Optional. The values to produce.
 
+.. _`pattern`: ../../../lua/type/pattern.html
+.. _`values`: ../../../lua/type/values.html

@@ -9,7 +9,8 @@ in the full documentation for details.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -19,4 +20,5 @@ Accepts parameters in the following order:
 v (`string`_)
     The index of the desired rule.
 
+.. _`pattern`: ../../../lua/type/pattern.html
 .. _`string`: ../../../lua/type/string.html

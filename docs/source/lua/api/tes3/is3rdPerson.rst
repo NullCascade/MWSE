@@ -6,6 +6,7 @@ Returns if the game is in 3rd person.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+state (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

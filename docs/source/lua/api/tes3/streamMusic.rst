@@ -6,7 +6,8 @@ This function interrupts the current music to play the specified music track.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

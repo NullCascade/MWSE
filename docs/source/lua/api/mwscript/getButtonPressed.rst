@@ -6,6 +6,7 @@ Wrapper for the GetButtonPressed mwscript function.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+buttonIndex (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

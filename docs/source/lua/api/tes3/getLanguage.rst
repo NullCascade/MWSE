@@ -6,6 +6,7 @@ Gets the language as an ISO string (e.g. "eng"), determined by the language entr
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+code (`string`_)
+    No description available.
 
 .. _`string`: ../../../lua/type/string.html

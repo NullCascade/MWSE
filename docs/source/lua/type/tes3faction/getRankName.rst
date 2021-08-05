@@ -6,7 +6,8 @@ This function fetches the player-facing name of a rank in the faction.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+result (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

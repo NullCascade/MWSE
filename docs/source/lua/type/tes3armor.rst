@@ -3,214 +3,168 @@ tes3armor
 
 An armor game object.
 
+This type inherits from the following parent types: `tes3item`_, `tes3physicalObject`_, `tes3object`_, `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`armorRating`_ (`number`_)
+`armorRating <tes3armor/armorRating.html>`_ (`number`_)
     The armor's defensive rating.
 
-`armorScalar`_ (`number`_)
-    Read-only. No description available.
+`armorScalar <tes3armor/armorScalar.html>`_ (`number`_)
+    No description available.
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`boundingBox`_ (`tes3boundingBox`_)
+`boundingBox <tes3physicalObject/boundingBox.html>`_ (`tes3boundingBox`_)
     The bounding box for the object.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`enchantCapacity`_ (`number`_)
+`enchantCapacity <tes3armor/enchantCapacity.html>`_ (`number`_)
     The object's enchantment capacity.
 
-`enchantment`_ (`tes3enchantment`_)
+`enchantment <tes3armor/enchantment.html>`_ (`tes3enchantment`_)
     The enchantment used by the object.
 
-`icon`_ (`string`_)
+`icon <tes3armor/icon.html>`_ (`string`_)
     The path to the object's icon.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`isLeftPart`_ (`boolean`_)
+`isLeftPart <tes3armor/isLeftPart.html>`_ (`boolean`_)
     Determines if the armor is the left part of a pair.
 
-`maxCondition`_ (`number`_)
+`maxCondition <tes3armor/maxCondition.html>`_ (`number`_)
     The object's maximum condition.
 
-`mesh`_ (`string`_)
+`mesh <tes3armor/mesh.html>`_ (`string`_)
     The path to the object's mesh.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`name`_ (`string`_)
+`name <tes3armor/name.html>`_ (`string`_)
     The player-facing name for the object.
 
-`nextInCollection`_ (`tes3object`_)
+`nextInCollection <tes3object/nextInCollection.html>`_ (`tes3object`_)
     The next object in parent collection's list.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`owningCollection`_ (`tes3referenceList`_)
+`owningCollection <tes3object/owningCollection.html>`_ (`tes3referenceList`_)
     The collection responsible for holding this object.
 
-`parts`_ (`table`_)
-    Read-only. An array-style table of the tes3wearablePart data on the object.
+`parts <tes3armor/parts.html>`_ (`table`_)
+    An array-style table of the tes3wearablePart data on the object.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`previousInCollection`_ (`tes3object`_)
+`previousInCollection <tes3object/previousInCollection.html>`_ (`tes3object`_)
     The previous object in parent collection's list.
 
-`scale`_ (`number`_)
+`scale <tes3object/scale.html>`_ (`number`_)
     The object's scale.
 
-`sceneNode`_ (`niNode`_)
+`sceneNode <tes3object/sceneNode.html>`_ (`niNode`_)
     The scene graph node for this object.
 
-`sceneReference`_ (`niNode`_)
+`sceneReference <tes3object/sceneReference.html>`_ (`niNode`_)
     The scene graph reference node for this object.
 
-`script`_ (`tes3script`_)
+`script <tes3armor/script.html>`_ (`tes3script`_)
     The script that runs on the object.
 
-`slot`_ (`number`_)
+`slot <tes3armor/slot.html>`_ (`number`_)
     The slot used by the armor.
 
-`slotName`_ (`string`_)
-    Read-only. The name of the slot used by the armor.
+`slotName <tes3armor/slotName.html>`_ (`string`_)
+    The name of the slot used by the armor.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`stolenList`_ (`tes3iterator`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`stolenList <tes3physicalObject/stolenList.html>`_ (`tes3iterator`_)
     A list of actors that the object has been stolen from.
 
-`supportsLuaData`_ (`boolean`_)
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
 
-`value`_ (`number`_)
+`value <tes3armor/value.html>`_ (`number`_)
     The value of the object.
 
-`weight`_ (`number`_)
+`weight <tes3armor/weight.html>`_ (`number`_)
     The weight of the object.
 
-`weightClass`_ (`number`_)
-    Read-only. The weight class of the armor. This value maps to tes3.armorWeightClass.* constants.
+`weightClass <tes3armor/weightClass.html>`_ (`number`_)
+    The weight class of the armor. This value maps to tes3.armorWeightClass.* constants.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3armor/armorRating
     tes3armor/armorScalar
-    tes3armor/blocked
-    tes3armor/boundingBox
-    tes3armor/deleted
-    tes3armor/disabled
     tes3armor/enchantCapacity
     tes3armor/enchantment
     tes3armor/icon
-    tes3armor/id
     tes3armor/isLeftPart
     tes3armor/maxCondition
     tes3armor/mesh
-    tes3armor/modified
     tes3armor/name
-    tes3armor/nextInCollection
-    tes3armor/objectFlags
-    tes3armor/objectType
-    tes3armor/owningCollection
     tes3armor/parts
-    tes3armor/persistent
-    tes3armor/previousInCollection
-    tes3armor/scale
-    tes3armor/sceneNode
-    tes3armor/sceneReference
     tes3armor/script
     tes3armor/slot
     tes3armor/slotName
-    tes3armor/sourceMod
-    tes3armor/sourceless
-    tes3armor/stolenList
-    tes3armor/supportsLuaData
     tes3armor/value
     tes3armor/weight
     tes3armor/weightClass
 
-.. _`armorRating`: tes3armor/armorRating.html
-.. _`armorScalar`: tes3armor/armorScalar.html
-.. _`blocked`: tes3armor/blocked.html
-.. _`boundingBox`: tes3armor/boundingBox.html
-.. _`deleted`: tes3armor/deleted.html
-.. _`disabled`: tes3armor/disabled.html
-.. _`enchantCapacity`: tes3armor/enchantCapacity.html
-.. _`enchantment`: tes3armor/enchantment.html
-.. _`icon`: tes3armor/icon.html
-.. _`id`: tes3armor/id.html
-.. _`isLeftPart`: tes3armor/isLeftPart.html
-.. _`maxCondition`: tes3armor/maxCondition.html
-.. _`mesh`: tes3armor/mesh.html
-.. _`modified`: tes3armor/modified.html
-.. _`name`: tes3armor/name.html
-.. _`nextInCollection`: tes3armor/nextInCollection.html
-.. _`objectFlags`: tes3armor/objectFlags.html
-.. _`objectType`: tes3armor/objectType.html
-.. _`owningCollection`: tes3armor/owningCollection.html
-.. _`parts`: tes3armor/parts.html
-.. _`persistent`: tes3armor/persistent.html
-.. _`previousInCollection`: tes3armor/previousInCollection.html
-.. _`scale`: tes3armor/scale.html
-.. _`sceneNode`: tes3armor/sceneNode.html
-.. _`sceneReference`: tes3armor/sceneReference.html
-.. _`script`: tes3armor/script.html
-.. _`slot`: tes3armor/slot.html
-.. _`slotName`: tes3armor/slotName.html
-.. _`sourceMod`: tes3armor/sourceMod.html
-.. _`sourceless`: tes3armor/sourceless.html
-.. _`stolenList`: tes3armor/stolenList.html
-.. _`supportsLuaData`: tes3armor/supportsLuaData.html
-.. _`value`: tes3armor/value.html
-.. _`weight`: tes3armor/weight.html
-.. _`weightClass`: tes3armor/weightClass.html
-
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
 
-`calculateArmorRating`_
+`calculateArmorRating <tes3armor/calculateArmorRating.html>`_ (`method`_)
     Calculates what armor rating is provided for a given mobile actor.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3armor/__tojson
     tes3armor/calculateArmorRating
 
-.. _`__tojson`: tes3armor/__tojson.html
-.. _`calculateArmorRating`: tes3armor/calculateArmorRating.html
-
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
 .. _`table`: ../../lua/type/table.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3boundingBox`: ../../lua/type/tes3boundingBox.html
 .. _`tes3enchantment`: ../../lua/type/tes3enchantment.html
+.. _`tes3item`: ../../lua/type/tes3item.html
 .. _`tes3iterator`: ../../lua/type/tes3iterator.html
 .. _`tes3object`: ../../lua/type/tes3object.html
+.. _`tes3physicalObject`: ../../lua/type/tes3physicalObject.html
 .. _`tes3referenceList`: ../../lua/type/tes3referenceList.html
+.. _`tes3script`: ../../lua/type/tes3script.html

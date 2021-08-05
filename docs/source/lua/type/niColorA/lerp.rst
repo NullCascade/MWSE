@@ -6,7 +6,8 @@ Calculates the interpolated color between this color and another, given a transi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niColorA`_. The calculated value.
+lerpedcolor (`niColorA`_)
+    The calculated value.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

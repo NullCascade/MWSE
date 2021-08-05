@@ -6,7 +6,8 @@ Registers a new armor slot. Adds a new place for armor pieces with a matching sl
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+wasAdded (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

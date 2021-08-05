@@ -6,6 +6,7 @@ Creates a copy of this object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niObject`_.
+result (`niObject`_)
+    No description available.
 
 .. _`niObject`: ../../../lua/type/niObject.html

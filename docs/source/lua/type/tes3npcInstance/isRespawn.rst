@@ -1,6 +1,6 @@
 isRespawn
 ====================================================================================================
 
-`boolean`_. If true, the actor's respawn flag is set.
+`boolean`_. Read-only. If true, the actor's respawn flag is set.
 
 .. _`boolean`: ../../../lua/type/boolean.html

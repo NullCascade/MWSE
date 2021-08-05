@@ -6,7 +6,8 @@ Determines if a merchant trades in a given item.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+trades (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

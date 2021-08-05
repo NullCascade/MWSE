@@ -6,7 +6,8 @@ Determines if the actor is currently being affected by a given alchemy, enchantm
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

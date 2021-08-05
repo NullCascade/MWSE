@@ -6,7 +6,8 @@ Returns an array-style table of all keys in the given table, t. Optionally, it w
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_. An array of all table keys.
+keys (`table`_)
+    An array of all table keys.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

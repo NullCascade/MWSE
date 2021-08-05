@@ -21,7 +21,7 @@ count (`number`_)
     Default: ``1``. The number of items to add.
 
 deleteItemData (`boolean`_)
-    Default: ``false``. If set, the itemData will be deleted after being removed.
+    If set, the itemData will be deleted after being removed.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

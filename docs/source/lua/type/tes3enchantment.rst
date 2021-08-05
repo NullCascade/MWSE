@@ -3,164 +3,131 @@ tes3enchantment
 
 An enchantment game object.
 
+This type inherits from the following parent types: `tes3object`_, `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`castType`_ (`number`_)
+`castType <tes3enchantment/castType.html>`_ (`number`_)
     The enchantment's cast type. Maps to tes3.enchantmentType.* constants.
 
-`chargeCost`_ (`number`_)
+`chargeCost <tes3enchantment/chargeCost.html>`_ (`number`_)
     The cost of using the enchantment.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`effects`_ (`table`_)
-    Read-only. An array-style table of the tes3effect data on the object.
+`effects <tes3enchantment/effects.html>`_ (`table`_)
+    An array-style table of the tes3effect data on the object.
 
-`flags`_ (`number`_)
+`flags <tes3enchantment/flags.html>`_ (`number`_)
     A bit field for the enchantment's flags.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`maxCharge`_ (`number`_)
+`maxCharge <tes3enchantment/maxCharge.html>`_ (`number`_)
     The maximum charge for the associated enchantment.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`nextInCollection`_ (`tes3object`_)
+`nextInCollection <tes3object/nextInCollection.html>`_ (`tes3object`_)
     The next object in parent collection's list.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`owningCollection`_ (`tes3referenceList`_)
+`owningCollection <tes3object/owningCollection.html>`_ (`tes3referenceList`_)
     The collection responsible for holding this object.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`previousInCollection`_ (`tes3object`_)
+`previousInCollection <tes3object/previousInCollection.html>`_ (`tes3object`_)
     The previous object in parent collection's list.
 
-`scale`_ (`number`_)
+`scale <tes3object/scale.html>`_ (`number`_)
     The object's scale.
 
-`sceneNode`_ (`niNode`_)
+`sceneNode <tes3object/sceneNode.html>`_ (`niNode`_)
     The scene graph node for this object.
 
-`sceneReference`_ (`niNode`_)
+`sceneReference <tes3object/sceneReference.html>`_ (`niNode`_)
     The scene graph reference node for this object.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`supportsLuaData`_ (`boolean`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3enchantment/blocked
     tes3enchantment/castType
     tes3enchantment/chargeCost
-    tes3enchantment/deleted
-    tes3enchantment/disabled
     tes3enchantment/effects
     tes3enchantment/flags
-    tes3enchantment/id
     tes3enchantment/maxCharge
-    tes3enchantment/modified
-    tes3enchantment/nextInCollection
-    tes3enchantment/objectFlags
-    tes3enchantment/objectType
-    tes3enchantment/owningCollection
-    tes3enchantment/persistent
-    tes3enchantment/previousInCollection
-    tes3enchantment/scale
-    tes3enchantment/sceneNode
-    tes3enchantment/sceneReference
-    tes3enchantment/sourceMod
-    tes3enchantment/sourceless
-    tes3enchantment/supportsLuaData
-
-.. _`blocked`: tes3enchantment/blocked.html
-.. _`castType`: tes3enchantment/castType.html
-.. _`chargeCost`: tes3enchantment/chargeCost.html
-.. _`deleted`: tes3enchantment/deleted.html
-.. _`disabled`: tes3enchantment/disabled.html
-.. _`effects`: tes3enchantment/effects.html
-.. _`flags`: tes3enchantment/flags.html
-.. _`id`: tes3enchantment/id.html
-.. _`maxCharge`: tes3enchantment/maxCharge.html
-.. _`modified`: tes3enchantment/modified.html
-.. _`nextInCollection`: tes3enchantment/nextInCollection.html
-.. _`objectFlags`: tes3enchantment/objectFlags.html
-.. _`objectType`: tes3enchantment/objectType.html
-.. _`owningCollection`: tes3enchantment/owningCollection.html
-.. _`persistent`: tes3enchantment/persistent.html
-.. _`previousInCollection`: tes3enchantment/previousInCollection.html
-.. _`scale`: tes3enchantment/scale.html
-.. _`sceneNode`: tes3enchantment/sceneNode.html
-.. _`sceneReference`: tes3enchantment/sceneReference.html
-.. _`sourceMod`: tes3enchantment/sourceMod.html
-.. _`sourceless`: tes3enchantment/sourceless.html
-.. _`supportsLuaData`: tes3enchantment/supportsLuaData.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
 
-`getActiveEffectCount`_ (`number`_)
+`getActiveEffectCount <tes3enchantment/getActiveEffectCount.html>`_ (`method`_)
     Returns the amount of effects the tes3enchantment object has.
 
-`getFirstIndexOfEffect`_ (`number`_)
+`getFirstIndexOfEffect <tes3enchantment/getFirstIndexOfEffect.html>`_ (`method`_)
     Returns the index of a first effect of a given effectId in the parent tes3enchantment object.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3enchantment/__tojson
     tes3enchantment/getActiveEffectCount
     tes3enchantment/getFirstIndexOfEffect
-
-.. _`__tojson`: tes3enchantment/__tojson.html
-.. _`getActiveEffectCount`: tes3enchantment/getActiveEffectCount.html
-.. _`getFirstIndexOfEffect`: tes3enchantment/getFirstIndexOfEffect.html
 
 Functions
 ----------------------------------------------------------------------------------------------------
 
-`create`_
+`create <tes3enchantment/create.html>`_ (`function`_)
     Creates a new enchantment object, which will be stored as part of the current saved game.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3enchantment/create
 
-.. _`create`: tes3enchantment/create.html
-
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`function`: ../../lua/type/function.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
 .. _`table`: ../../lua/type/table.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3object`: ../../lua/type/tes3object.html
 .. _`tes3referenceList`: ../../lua/type/tes3referenceList.html

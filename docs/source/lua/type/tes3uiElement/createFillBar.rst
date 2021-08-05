@@ -13,7 +13,8 @@ Creates a horizontal quantity indicator bar.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -29,5 +30,17 @@ current (`number`_)
 max (`number`_)
     Optional. The initial maximum value.
 
+.. _``element.widget.current``: Current (filled) value.
+        | `number`: ../../../lua/type/`element.widget.current``: Current (filled) value.
+        | `number.html
+.. _``element.widget.fillColor``: Colour of filled area.
+        | `number`: ../../../lua/type/`element.widget.fillColor``: Colour of filled area.
+        | `number.html
+.. _``element.widget.max``: Maximum value.
+        | `boolean`: ../../../lua/type/`element.widget.max``: Maximum value.
+        | `boolean.html
+.. _``element.widget.showText``: If text of the format "current/max" is shown. Default is ``true``.
+        | `table`: ../../../lua/type/`element.widget.showText``: If text of the format "current/max" is shown. Default is ``true``.
+        | `table.html
 .. _`number`: ../../../lua/type/number.html
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

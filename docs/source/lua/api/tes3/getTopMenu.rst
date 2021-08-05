@@ -6,6 +6,7 @@ Gets the top-level UI menu.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+menu (`tes3uiElement`_)
+    No description available.
 
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

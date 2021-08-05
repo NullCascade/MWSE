@@ -6,7 +6,8 @@ Adds an item to a given reference's inventory or mobile's inventory.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+addedCount (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ playSound (`boolean`_)
     Default: ``true``. If false, the up/down sound for the item won't be played.
 
 limit (`boolean`_)
-    Default: ``false``. If false, items can be placed into containers that shouldn't normally be allowed. This includes organic containers, and containers that are full.
+    If false, items can be placed into containers that shouldn't normally be allowed. This includes organic containers, and containers that are full.
 
 updateGUI (`boolean`_)
     Default: ``true``. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though `tes3ui.forcePlayerInventoryUpdate()` must manually be called after all inventory updates are finished.

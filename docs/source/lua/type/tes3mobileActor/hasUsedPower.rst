@@ -6,7 +6,8 @@ Check if a power has been used and is recharging.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,47 +6,50 @@ Represents an individual instance of a magic effect being applied to a reference
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`createdData`_ (`tes3itemStack`_)
-    Read-only. The bound or summoned data associated with the instance. The stack's object will be a reference in the case of summoned creatures.
+`createdData <tes3magicEffectInstance/createdData.html>`_ (`tes3itemStack`_)
+    The bound or summoned data associated with the instance. The stack's object will be a reference in the case of summoned creatures.
 
-`cumulativeMagnitude`_ (`number`_)
+`cumulativeMagnitude <tes3magicEffectInstance/cumulativeMagnitude.html>`_ (`number`_)
     No description available.
 
-`lastUsedArmor`_ (`tes3armor`_)
-    Read-only. No description available.
-
-`lastUsedEnchItem`_ (`tes3item`_)
-    Read-only. No description available.
-
-`lastUsedLight`_ (`tes3light`_)
-    Read-only. No description available.
-
-`lastUsedShield`_ (`tes3armor`_)
-    Read-only. No description available.
-
-`lastUsedWeapon`_ (`tes3weapon`_)
-    Read-only. No description available.
-
-`magnitude`_ (`number`_)
+`lastUsedArmor <tes3magicEffectInstance/lastUsedArmor.html>`_ (`tes3armor`_)
     No description available.
 
-`resistedPercent`_ (`number`_)
+`lastUsedEnchItem <tes3magicEffectInstance/lastUsedEnchItem.html>`_ (`tes3item`_)
     No description available.
 
-`state`_ (`number`_)
+`lastUsedLight <tes3magicEffectInstance/lastUsedLight.html>`_ (`tes3light`_)
     No description available.
 
-`target`_ (`tes3reference`_)
+`lastUsedShield <tes3magicEffectInstance/lastUsedShield.html>`_ (`tes3armor`_)
     No description available.
 
-`timeActive`_ (`number`_)
+`lastUsedWeapon <tes3magicEffectInstance/lastUsedWeapon.html>`_ (`tes3weapon`_)
     No description available.
 
-`visual`_ (`number`_)
+`magnitude <tes3magicEffectInstance/magnitude.html>`_ (`number`_)
     No description available.
+
+`resistedPercent <tes3magicEffectInstance/resistedPercent.html>`_ (`number`_)
+    No description available.
+
+`state <tes3magicEffectInstance/state.html>`_ (`number`_)
+    No description available.
+
+`target <tes3magicEffectInstance/target.html>`_ (`tes3reference`_)
+    No description available.
+
+`timeActive <tes3magicEffectInstance/timeActive.html>`_ (`number`_)
+    No description available.
+
+`visual <tes3magicEffectInstance/visual.html>`_ (`number`_)
+    No description available.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3magicEffectInstance/createdData
     tes3magicEffectInstance/cumulativeMagnitude
@@ -61,20 +64,6 @@ Properties
     tes3magicEffectInstance/target
     tes3magicEffectInstance/timeActive
     tes3magicEffectInstance/visual
-
-.. _`createdData`: tes3magicEffectInstance/createdData.html
-.. _`cumulativeMagnitude`: tes3magicEffectInstance/cumulativeMagnitude.html
-.. _`lastUsedArmor`: tes3magicEffectInstance/lastUsedArmor.html
-.. _`lastUsedEnchItem`: tes3magicEffectInstance/lastUsedEnchItem.html
-.. _`lastUsedLight`: tes3magicEffectInstance/lastUsedLight.html
-.. _`lastUsedShield`: tes3magicEffectInstance/lastUsedShield.html
-.. _`lastUsedWeapon`: tes3magicEffectInstance/lastUsedWeapon.html
-.. _`magnitude`: tes3magicEffectInstance/magnitude.html
-.. _`resistedPercent`: tes3magicEffectInstance/resistedPercent.html
-.. _`state`: tes3magicEffectInstance/state.html
-.. _`target`: tes3magicEffectInstance/target.html
-.. _`timeActive`: tes3magicEffectInstance/timeActive.html
-.. _`visual`: tes3magicEffectInstance/visual.html
 
 .. _`number`: ../../lua/type/number.html
 .. _`tes3armor`: ../../lua/type/tes3armor.html

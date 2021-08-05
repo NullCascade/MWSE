@@ -1,6 +1,6 @@
 magnitudeMin
 ====================================================================================================
 
-`number`_. Deprecated.
+`number`_. Read-only. Deprecated.
 
 .. _`number`: ../../../lua/type/number.html

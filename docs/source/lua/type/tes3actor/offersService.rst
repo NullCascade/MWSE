@@ -6,7 +6,8 @@ Checks if the actor will offer a service in dialogue. This an offer and may stil
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

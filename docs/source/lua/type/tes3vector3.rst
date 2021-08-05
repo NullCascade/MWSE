@@ -6,29 +6,32 @@ A simple trio of floating-point numbers.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`angle`_ (`number`_)
+`angle <tes3vector3/angle.html>`_ (`number`_)
     The angle between the vector and the water plane.
 
-`b`_ (`number`_)
+`b <tes3vector3/b.html>`_ (`number`_)
     The third value in the vector. An alias for z.
 
-`g`_ (`number`_)
+`g <tes3vector3/g.html>`_ (`number`_)
     The second value in the vector. An alias for y.
 
-`r`_ (`number`_)
+`r <tes3vector3/r.html>`_ (`number`_)
     The first value in the vector. An alias for x.
 
-`x`_ (`number`_)
+`x <tes3vector3/x.html>`_ (`number`_)
     The first value in the vector.
 
-`y`_ (`number`_)
+`y <tes3vector3/y.html>`_ (`number`_)
     The second value in the vector.
 
-`z`_ (`number`_)
+`z <tes3vector3/z.html>`_ (`number`_)
     The third value in the vector.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3vector3/angle
     tes3vector3/b
@@ -38,58 +41,53 @@ Properties
     tes3vector3/y
     tes3vector3/z
 
-.. _`angle`: tes3vector3/angle.html
-.. _`b`: tes3vector3/b.html
-.. _`g`: tes3vector3/g.html
-.. _`r`: tes3vector3/r.html
-.. _`x`: tes3vector3/x.html
-.. _`y`: tes3vector3/y.html
-.. _`z`: tes3vector3/z.html
-
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`copy`_ (`tes3vector3`_)
+`copy <tes3vector3/copy.html>`_ (`method`_)
     Creates a copy of the vector.
 
-`cross`_ (`tes3vector3`_)
+`cross <tes3vector3/cross.html>`_ (`method`_)
     Calculates the cross product with another vector.
 
-`distance`_ (`number`_)
+`distance <tes3vector3/distance.html>`_ (`method`_)
     Calculates the distance to another vector.
 
-`dot`_ (`tes3vector3`_)
+`dot <tes3vector3/dot.html>`_ (`method`_)
     Calculates the dot product with another vector.
 
-`heightDifference`_ (`number`_)
+`heightDifference <tes3vector3/heightDifference.html>`_ (`method`_)
     Calculates the vertical distance to another vector.
 
-`interpolate`_ (`tes3vector3`_)
+`interpolate <tes3vector3/interpolate.html>`_ (`method`_)
     Calculates the interpolated position against the target vector using the distance parameter.
 
-`length`_ (`number`_)
+`length <tes3vector3/length.html>`_ (`method`_)
     Calculates the length of the vector.
 
-`lerp`_
+`lerp <tes3vector3/lerp.html>`_ (`method`_)
     Calculates the interpolated vector between this vector and another, given a transition.
 
-`negate`_
+`negate <tes3vector3/negate.html>`_ (`method`_)
     Negates all values in the vector.
 
-`normalize`_ (`bool`_)
+`normalize <tes3vector3/normalize.html>`_ (`method`_)
     Normalize the vector in-place, or set its components to zero if normalization is not possible. Returns true if the vector was successfully normalized.
 
-`normalized`_ (`tes3vector3`_)
+`normalized <tes3vector3/normalized.html>`_ (`method`_)
     Get a normalized copy of the vector.
 
-`outerProduct`_ (`tes3matrix33`_)
+`outerProduct <tes3vector3/outerProduct.html>`_ (`method`_)
     Calculates the outer product with another vector.
 
-`toColor`_ (`niColor`_)
+`toColor <tes3vector3/toColor.html>`_ (`method`_)
     Converts the vector to niColor.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3vector3/copy
     tes3vector3/cross
@@ -105,22 +103,5 @@ Methods
     tes3vector3/outerProduct
     tes3vector3/toColor
 
-.. _`copy`: tes3vector3/copy.html
-.. _`cross`: tes3vector3/cross.html
-.. _`distance`: tes3vector3/distance.html
-.. _`dot`: tes3vector3/dot.html
-.. _`heightDifference`: tes3vector3/heightDifference.html
-.. _`interpolate`: tes3vector3/interpolate.html
-.. _`length`: tes3vector3/length.html
-.. _`lerp`: tes3vector3/lerp.html
-.. _`negate`: tes3vector3/negate.html
-.. _`normalize`: tes3vector3/normalize.html
-.. _`normalized`: tes3vector3/normalized.html
-.. _`outerProduct`: tes3vector3/outerProduct.html
-.. _`toColor`: tes3vector3/toColor.html
-
-.. _`bool`: ../../lua/type/boolean.html
-.. _`niColor`: ../../lua/type/niColor.html
+.. _`method`: ../../lua/type/method.html
 .. _`number`: ../../lua/type/number.html
-.. _`tes3matrix33`: ../../lua/type/tes3matrix33.html
-.. _`tes3vector3`: ../../lua/type/tes3vector3.html

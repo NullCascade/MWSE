@@ -3,126 +3,97 @@ niTriShapeData
 
 Contains the geometry data for an `NiTriShape` object.
 
+This type inherits from the following parent types: `niTriBasedGeometryData`_, `niGeometryData`_, `niObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`bounds`_ (`niBound`_)
+`bounds <niGeometryData/bounds.html>`_ (`niBound`_)
     The bounds of the object.
 
-`colors`_ (`niColorA`_)
-    Read-only. The color for the object.
+`colors <niGeometryData/colors.html>`_ (`niColorA`_)
+    The color for the object.
 
-`normals`_ (`tes3vector3`_)
-    Read-only. The normals list for the object.
+`normals <niGeometryData/normals.html>`_ (`tes3vector3`_)
+    The normals list for the object.
 
-`references`_ (`string`_)
-    Read-only. The number of references that exist for the given object. When this value hits zero, the object's memory is freed.
+`references <niObject/references.html>`_ (`string`_)
+    The number of references that exist for the given object. When this value hits zero, the object's memory is freed.
 
-`runTimeTypeInformation`_ (`niRTTI`_)
+`runTimeTypeInformation <niObject/runTimeTypeInformation.html>`_ (`niRTTI`_)
     The runtime type information for this object.
 
-`texCoords`_ (`tes3vector2`_)
-    Read-only. The array of texture coordinates.
+`texCoords <niGeometryData/texCoords.html>`_ (`tes3vector2`_)
+    The array of texture coordinates.
 
-`textureSets`_ (`number`_)
+`textures <niGeometryData/textures.html>`_ (`tes3vector2`_)
+    The array of texture coordinates.
+
+`textureSets <niGeometryData/textureSets.html>`_ (`number`_)
     The number of texture coordinate sets in the data.
 
-`textures`_ (`tes3vector2`_)
-    Read-only. The array of texture coordinates.
-
-`triangleCount`_ (`number`_)
+`triangleCount <niTriShapeData/triangleCount.html>`_ (`number`_)
     The triangle count of the object.
 
-`triangleCount`_ (`number`_)
-    The triangle count of the object.
-
-`uniqueID`_ (`number`_)
+`uniqueID <niGeometryData/uniqueID.html>`_ (`number`_)
     A unique ID for this model, assigned at model creation.
 
-`vertexCount`_ (`number`_)
-    Read-only. The vertex count for the object.
+`vertexCount <niGeometryData/vertexCount.html>`_ (`number`_)
+    The vertex count for the object.
 
-`vertices`_ (`tes3vector3`_)
-    Read-only. The array of vertex position data.
+`vertices <niGeometryData/vertices.html>`_ (`tes3vector3`_)
+    The array of vertex position data.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    niTriShapeData/bounds
-    niTriShapeData/colors
-    niTriShapeData/normals
-    niTriShapeData/references
-    niTriShapeData/runTimeTypeInformation
-    niTriShapeData/texCoords
-    niTriShapeData/textureSets
-    niTriShapeData/textures
     niTriShapeData/triangleCount
-    niTriShapeData/triangleCount
-    niTriShapeData/uniqueID
-    niTriShapeData/vertexCount
-    niTriShapeData/vertices
-
-.. _`bounds`: niTriShapeData/bounds.html
-.. _`colors`: niTriShapeData/colors.html
-.. _`normals`: niTriShapeData/normals.html
-.. _`references`: niTriShapeData/references.html
-.. _`runTimeTypeInformation`: niTriShapeData/runTimeTypeInformation.html
-.. _`texCoords`: niTriShapeData/texCoords.html
-.. _`textureSets`: niTriShapeData/textureSets.html
-.. _`textures`: niTriShapeData/textures.html
-.. _`triangleCount`: niTriShapeData/triangleCount.html
-.. _`triangleCount`: niTriShapeData/triangleCount.html
-.. _`uniqueID`: niTriShapeData/uniqueID.html
-.. _`vertexCount`: niTriShapeData/vertexCount.html
-.. _`vertices`: niTriShapeData/vertices.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`clone`_ (`niObject`_)
+`clone <niObject/clone.html>`_ (`method`_)
     Creates a copy of this object.
 
-`copy`_
+`copy <niTriShapeData/copy.html>`_ (`method`_)
     Creates a copy of the data. An optional table of filters can be passed to remove information from the copy.
 
-`isInstanceOfType`_ (`boolean`_)
+`isInstanceOfType <niObject/isInstanceOfType.html>`_ (`method`_)
     Determines if the object is of a given type, or of a type derived from the given type. Types can be found in the tes3.niType table.
 
-`isOfType`_ (`boolean`_)
+`isOfType <niObject/isOfType.html>`_ (`method`_)
     Determines if the object is of a given type. Types can be found in the tes3.niType table.
 
-`markAsChanged`_
+`markAsChanged <niGeometryData/markAsChanged.html>`_ (`method`_)
     Tells the renderer that the object has changed. Should be called after you have finished changing any vertex data.
 
 If you have altered vertex positions, you may need to also call `updateModelBound`_. You should call it if vertices have been moved outside the bounds of the original model.
 
-`updateModelBound`_
+`updateModelBound <niGeometryData/updateModelBound.html>`_ (`method`_)
     Updates the geometry bounds to match the vertex data. You should call it if vertices have been moved outside the bounds of the original model, or if the effective bounds have become significantly smaller. 
 
 If you already know the effective radius of the vertex data, you could more efficiently set the bounds directly instead of calling this function.
 
+
+
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    niTriShapeData/clone
     niTriShapeData/copy
-    niTriShapeData/isInstanceOfType
-    niTriShapeData/isOfType
-    niTriShapeData/markAsChanged
-    niTriShapeData/updateModelBound
 
-.. _`clone`: niTriShapeData/clone.html
-.. _`copy`: niTriShapeData/copy.html
-.. _`isInstanceOfType`: niTriShapeData/isInstanceOfType.html
-.. _`isOfType`: niTriShapeData/isOfType.html
-.. _`markAsChanged`: niTriShapeData/markAsChanged.html
-.. _`updateModelBound`: niTriShapeData/updateModelBound.html
-
-.. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
+.. _`niBound`: ../../lua/type/niBound.html
 .. _`niColorA`: ../../lua/type/niColorA.html
+.. _`niGeometryData`: ../../lua/type/niGeometryData.html
 .. _`niObject`: ../../lua/type/niObject.html
 .. _`niRTTI`: ../../lua/type/niRTTI.html
+.. _`niTriBasedGeometryData`: ../../lua/type/niTriBasedGeometryData.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
 .. _`tes3vector2`: ../../lua/type/tes3vector2.html
 .. _`tes3vector3`: ../../lua/type/tes3vector3.html
+.. _`updateModelBound`: ../../lua/type/updateModelBound.html

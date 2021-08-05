@@ -18,7 +18,8 @@ and quite efficient; see examples in the full documentation for details.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`values`_.
+result (`values`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -34,31 +35,7 @@ subject (`string`_)
 init (`number`_)
     Optional. Start the match at this position in subject.
 
-Examples
-----------------------------------------------------------------------------------------------------
-
-Simple Match
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Create a pattern that matches a word followed by the end of the string, and use it to match strings.
-
-.. code-block:: lua
-
-    local lpeg = require("lpeg")
-
-    local function onLoaded(e)
-
-        -- matches a word followed by end-of-string
-        p = lpeg.R("az")^1 * -1
-
-        mwse.log(p:match("hello"))        --> 6
-        mwse.log(lpeg.match(p, "hello"))  --> 6
-        mwse.log(p:match("1 hello"))      --> nil
-
-    end
-
-    event.register("loaded", onLoaded)
-
-
 .. _`number`: ../../../lua/type/number.html
+.. _`pattern`: ../../../lua/type/pattern.html
 .. _`string`: ../../../lua/type/string.html
+.. _`values`: ../../../lua/type/values.html

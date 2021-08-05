@@ -8,7 +8,8 @@ Note that unlike the vanity mode caused by not doing anything for a while, this 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+changedVanityMode (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -22,6 +23,6 @@ checkVanityDisabled (`boolean`_)
     Default: ``true``. 
 
 toggle (`boolean`_)
-    Default: ``false``. 
+    Optional. 
 
 .. _`boolean`: ../../../lua/type/boolean.html

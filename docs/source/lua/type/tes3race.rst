@@ -3,146 +3,118 @@ tes3race
 
 A core object representing a character race.
 
+This type inherits from the following parent types: `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`abilities`_ (`tes3spellList`_)
-    Read-only. A list of abilities that NPCs of that race have access to. It is a tes3spellList, which is a list wrapper with helper functions. The actual list is accessed with .iterator. e.g. for _, ability in pairs(race.abilities.iterator) do print(ability.name) end
+`abilities <tes3race/abilities.html>`_ (`tes3spellList`_)
+    A list of abilities that NPCs of that race have access to. It is a tes3spellList, which is a list wrapper with helper functions. The actual list is accessed with .iterator. e.g. for _, ability in pairs(race.abilities.iterator) do print(ability.name) end
 
-`baseAttributes`_ (`table`_)
-    Read-only. Array-style table access to base 8 attributes for the race. Each element in the array is a tes3raceBaseAttribute.
+`baseAttributes <tes3race/baseAttributes.html>`_ (`table`_)
+    Array-style table access to base 8 attributes for the race. Each element in the array is a tes3raceBaseAttribute.
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`description`_ (`string`_)
-    Read-only. Loads from disk and returns the description of the race.
+`description <tes3race/description.html>`_ (`string`_)
+    Loads from disk and returns the description of the race.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`femaleBody`_ (`tes3raceBodyParts`_)
-    Read-only. Access to all the body parts that will be used for female actors of this race.
+`femaleBody <tes3race/femaleBody.html>`_ (`tes3raceBodyParts`_)
+    Access to all the body parts that will be used for female actors of this race.
 
-`flags`_ (`number`_)
+`flags <tes3race/flags.html>`_ (`number`_)
     Raw bit-based flags.
 
-`height`_ (`tes3raceHeightWeight`_)
-    Read-only. Access to the the height pair for males/females of the race.
+`height <tes3race/height.html>`_ (`tes3raceHeightWeight`_)
+    Access to the the height pair for males/females of the race.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`isBeast`_ (`boolean`_)
+`isBeast <tes3race/isBeast.html>`_ (`boolean`_)
     Access to the beast race flag.
 
-`isPlayable`_ (`boolean`_)
+`isPlayable <tes3race/isPlayable.html>`_ (`boolean`_)
     Access to the playable race flag.
 
-`maleBody`_ (`tes3raceBodyParts`_)
-    Read-only. Access to all the body parts that will be used for male actors of this race.
+`maleBody <tes3race/maleBody.html>`_ (`tes3raceBodyParts`_)
+    Access to all the body parts that will be used for male actors of this race.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`name`_ (`string`_)
-    Read-only. The player-facing name for the object.
+`name <tes3race/name.html>`_ (`string`_)
+    The player-facing name for the object.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`skillBonuses`_ (`table`_)
-    Read-only. Array-style table access for 7 skill bonuses for the race. Each element in the array is a tes3raceSkillBonus.
+`skillBonuses <tes3race/skillBonuses.html>`_ (`table`_)
+    Array-style table access for 7 skill bonuses for the race. Each element in the array is a tes3raceSkillBonus.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`supportsLuaData`_ (`boolean`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
 
-`weight`_ (`tes3raceHeightWeight`_)
-    Read-only. Access to the the height pair for males/females of the race.
+`weight <tes3race/weight.html>`_ (`tes3raceHeightWeight`_)
+    Access to the the height pair for males/females of the race.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3race/abilities
     tes3race/baseAttributes
-    tes3race/blocked
-    tes3race/deleted
     tes3race/description
-    tes3race/disabled
     tes3race/femaleBody
     tes3race/flags
     tes3race/height
-    tes3race/id
     tes3race/isBeast
     tes3race/isPlayable
     tes3race/maleBody
-    tes3race/modified
     tes3race/name
-    tes3race/objectFlags
-    tes3race/objectType
-    tes3race/persistent
     tes3race/skillBonuses
-    tes3race/sourceMod
-    tes3race/sourceless
-    tes3race/supportsLuaData
     tes3race/weight
-
-.. _`abilities`: tes3race/abilities.html
-.. _`baseAttributes`: tes3race/baseAttributes.html
-.. _`blocked`: tes3race/blocked.html
-.. _`deleted`: tes3race/deleted.html
-.. _`description`: tes3race/description.html
-.. _`disabled`: tes3race/disabled.html
-.. _`femaleBody`: tes3race/femaleBody.html
-.. _`flags`: tes3race/flags.html
-.. _`height`: tes3race/height.html
-.. _`id`: tes3race/id.html
-.. _`isBeast`: tes3race/isBeast.html
-.. _`isPlayable`: tes3race/isPlayable.html
-.. _`maleBody`: tes3race/maleBody.html
-.. _`modified`: tes3race/modified.html
-.. _`name`: tes3race/name.html
-.. _`objectFlags`: tes3race/objectFlags.html
-.. _`objectType`: tes3race/objectType.html
-.. _`persistent`: tes3race/persistent.html
-.. _`skillBonuses`: tes3race/skillBonuses.html
-.. _`sourceMod`: tes3race/sourceMod.html
-.. _`sourceless`: tes3race/sourceless.html
-.. _`supportsLuaData`: tes3race/supportsLuaData.html
-.. _`weight`: tes3race/weight.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3race/__tojson
-
-.. _`__tojson`: tes3race/__tojson.html
 
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
 .. _`table`: ../../lua/type/table.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3raceBodyParts`: ../../lua/type/tes3raceBodyParts.html
 .. _`tes3raceHeightWeight`: ../../lua/type/tes3raceHeightWeight.html
 .. _`tes3spellList`: ../../lua/type/tes3spellList.html

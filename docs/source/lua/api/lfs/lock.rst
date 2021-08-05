@@ -6,9 +6,13 @@ Locks a file or a part of it. This function works on open files; the file handle
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_, `nil`_. true if the operation was successful, or nil in the case of an error.
+The function has more than one return value.
 
-`string`_, `nil`_. In the case of an error, a string describing the issue. In particular, if the lock exists and is not stale it returns the "File exists" message.
+success (`boolean`_, `nil`_)
+    true if the operation was successful, or nil in the case of an error.
+
+error (`string`_, `nil`_)
+    In the case of an error, a string describing the issue. In particular, if the lock exists and is not stale it returns the "File exists" message.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,30 +6,28 @@ An attachment-capable structure that maintains lock and trap data.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`key`_ (`tes3misc`_)
+`key <tes3lockNode/key.html>`_ (`tes3misc`_)
     The key that will open this door.
 
-`level`_ (`number`_)
+`level <tes3lockNode/level.html>`_ (`number`_)
     The level of the lock.
 
-`locked`_ (`boolean`_)
+`locked <tes3lockNode/locked.html>`_ (`boolean`_)
     The locked state.
 
-`trap`_ (`tes3spell`_)
+`trap <tes3lockNode/trap.html>`_ (`tes3spell`_)
     The trap associated with the object.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3lockNode/key
     tes3lockNode/level
     tes3lockNode/locked
     tes3lockNode/trap
-
-.. _`key`: tes3lockNode/key.html
-.. _`level`: tes3lockNode/level.html
-.. _`locked`: tes3lockNode/locked.html
-.. _`trap`: tes3lockNode/trap.html
 
 .. _`boolean`: ../../lua/type/boolean.html
 .. _`number`: ../../lua/type/number.html

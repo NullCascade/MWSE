@@ -6,7 +6,8 @@ Fetches the core game character class object for a given class ID. If the class 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3class`_.
+class (`tes3class`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

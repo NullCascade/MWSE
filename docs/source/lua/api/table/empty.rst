@@ -6,7 +6,8 @@ Returns true if the table is empty, otherwise, it returns false.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

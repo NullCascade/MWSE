@@ -6,7 +6,8 @@ This function fetches a reference's attached animation groups' timings.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,7 +6,8 @@ Without a reference, this function returns true if the sound is playing unattach
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+soundIsPlaying (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

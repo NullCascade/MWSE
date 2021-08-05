@@ -10,7 +10,8 @@ Unlike standard menus, help layer menus are always created with a fixed frame.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

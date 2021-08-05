@@ -6,6 +6,7 @@ Forces a toggle of the player's POV the next simulation frame, and returns if th
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+was3rdPerson (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

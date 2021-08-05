@@ -6,7 +6,8 @@ Returns an actor's equipped item stack, provided a given filter
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3equipmentStack`_.
+stack (`tes3equipmentStack`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -27,39 +28,6 @@ slot (`number`_)
 
 type (`number`_)
     Optional. Maps to tes3.weaponType. Used to filter equipment by type.
-
-Examples
-----------------------------------------------------------------------------------------------------
-
-Get Player’s Equipped Light
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In this example, we print the object ID of the player’s equipped light source.
-
-.. code-block:: lua
-
-    local equippedLightStack = tes3.getEquippedItem({ actor = tes3.player, objectType = tes3.objectType.light })
-    if (equippedLightStack) then
-        mwse.log("Equipped light: %s", equippedLightStack.object.id)
-    else
-        mwse.log("No light equipped.")
-    end
-
-
-Get Player’s Shield
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This example shows the player’s shield.
-
-.. code-block:: lua
-
-    local equippedShieldStack = tes3.getEquippedItem({ actor = tes3.player, objectType = tes3.objectType.armor, slot = tes3.armorSlot.shield })
-    if (equippedShieldStack) then
-        mwse.log("Equipped shield: %s", equippedShieldStack.object.id)
-    else
-        mwse.log("No shield equipped.")
-    end
-
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

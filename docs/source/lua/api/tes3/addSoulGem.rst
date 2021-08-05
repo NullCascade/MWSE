@@ -6,7 +6,8 @@ Causes a misc item to be recognized as a soul gem, so that it can be used for so
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+wasAdded (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

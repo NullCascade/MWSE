@@ -6,7 +6,8 @@ Gets the magnitude from the casting source for a given effect index.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

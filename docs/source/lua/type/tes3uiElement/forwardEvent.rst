@@ -11,3 +11,4 @@ Accepts parameters in the following order:
 id (`tes3uiEvent`_)
     The original UI event.
 
+.. _`tes3uiEvent`: ../../../lua/type/tes3uiEvent.html

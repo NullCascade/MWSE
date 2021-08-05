@@ -6,7 +6,8 @@ Fetches the core game faction object for a given faction ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3faction`_.
+faction (`tes3faction`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

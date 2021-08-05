@@ -1,11 +1,12 @@
 getViewToPointWithFacing
 ====================================================================================================
 
-No description is currently available.
+No description available.
 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

@@ -6,7 +6,8 @@ This function removes a creature from the creature leveled list. True is returne
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

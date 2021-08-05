@@ -6,7 +6,8 @@ Returns true if a mouse button was down last frame, and up this frame.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

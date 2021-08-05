@@ -3,14 +3,9 @@ tes3.playAnimation
 
 Plays a given animation group. Optional flags can be used to define how the group starts.
 
-Animation Start Flags
-----------------------------------------------------------------------------------------------------
+When 'group' is specified, the actor AI is paused while playing the animation, as if in an idle state. When one or more of 'lower', 'upper', or 'shield' are specified without 'group', the actor AI retains control, and the animations are layered. e.g. tes3.playAnimation{reference = ..., upper = tes3.animationGroup.idle3, loopCount = 0} will play the idle3 animation once (without looping) on the upper body, while the player or NPC is still able to walk around. Using 'upper' defers combat actions until the animation is done. Using 'shield' still allows combat actions.
 
-The ``startFlag`` parameter determines under what condition the new animation will play.
-
-- ``tes3.animationStartFlag.normal``: The current animation will finish its full cycle, and the new animation will start from its beginning.
-- ``tes3.animationStartFlag.immediate``: The current animation will stop regardless of the frame it is on, and the new animation will start from its beginning.
-- ``tes3.animationStartFlag.immediateLoop``: Immediate Loop. The current animation will stop regardless of the frame it is on, and the new animation will start at the beginning of its loop cycle.
+As a special case, tes3.playAnimation{reference = ..., group = 0} returns control to the AI, as the AI knows that is the actor's neutral idle state.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

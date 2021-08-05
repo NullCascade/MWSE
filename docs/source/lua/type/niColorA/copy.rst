@@ -6,6 +6,7 @@ Creates a copy of the color object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niColorA`_.
+result (`niColorA`_)
+    No description available.
 
 .. _`niColorA`: ../../../lua/type/niColorA.html

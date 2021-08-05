@@ -6,6 +6,7 @@ Clones a reference for a base actor into a reference to an instance of that acto
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

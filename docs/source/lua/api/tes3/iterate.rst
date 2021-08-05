@@ -6,7 +6,8 @@ This function returns a function that iterates over a tes3iterator object. This 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`function`_.
+function (`function`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

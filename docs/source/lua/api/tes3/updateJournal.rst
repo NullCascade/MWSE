@@ -6,7 +6,8 @@ Updates the journal index in a way similar to the mwscript function Journal.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+wasSet (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ index (`number`_)
     No description available.
 
 showMessage (`boolean`_)
-    Default: ``false``. If set, a message may be shown to the player.
+    If set, a message may be shown to the player.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

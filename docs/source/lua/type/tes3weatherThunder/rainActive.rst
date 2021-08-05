@@ -1,6 +1,6 @@
 rainActive
 ====================================================================================================
 
-`bool`_. The weather's active rain flag.
+`boolean`_. Read-only. The weather's active rain flag.
 
-.. _`bool`: ../../../lua/type/boolean.html
+.. _`boolean`: ../../../lua/type/boolean.html

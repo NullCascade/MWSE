@@ -6,47 +6,50 @@ A structure that keeps track of combat session data.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`alchemyPriority`_ (`number`_)
+`alchemyPriority <tes3combatSession/alchemyPriority.html>`_ (`number`_)
     No description available.
 
-`data`_
+`data <tes3combatSession/data.html>`_ (`any`_)
     No description available.
 
-`distance`_ (`number`_)
+`distance <tes3combatSession/distance.html>`_ (`number`_)
     No description available.
 
-`lastUseTimestamp`_ (`number`_)
+`lastUseTimestamp <tes3combatSession/lastUseTimestamp.html>`_ (`number`_)
     No description available.
 
-`mobile`_ (`tes3mobileActor`_)
-    Read-only. No description available.
-
-`potionUseFlag`_ (`number`_)
+`mobile <tes3combatSession/mobile.html>`_ (`tes3mobileActor`_)
     No description available.
 
-`selectedAction`_ (`number`_)
+`potionUseFlag <tes3combatSession/potionUseFlag.html>`_ (`number`_)
     No description available.
 
-`selectedAlchemy`_ (`tes3alchemy`_)
+`selectedAction <tes3combatSession/selectedAction.html>`_ (`number`_)
     No description available.
 
-`selectedItem`_ (`tes3itemStack`_)
+`selectedAlchemy <tes3combatSession/selectedAlchemy.html>`_ (`tes3alchemy`_)
     No description available.
 
-`selectedShield`_ (`tes3equipmentStack`_)
-    Read-only. No description available.
-
-`selectedSpell`_ (`tes3spell`_)
+`selectedItem <tes3combatSession/selectedItem.html>`_ (`tes3itemStack`_)
     No description available.
 
-`selectedWeapon`_ (`tes3equipmentStack`_)
-    Read-only. No description available.
-
-`selectionPriority`_ (`number`_)
+`selectedShield <tes3combatSession/selectedShield.html>`_ (`tes3equipmentStack`_)
     No description available.
+
+`selectedSpell <tes3combatSession/selectedSpell.html>`_ (`tes3spell`_)
+    No description available.
+
+`selectedWeapon <tes3combatSession/selectedWeapon.html>`_ (`tes3equipmentStack`_)
+    No description available.
+
+`selectionPriority <tes3combatSession/selectionPriority.html>`_ (`number`_)
+    No description available.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3combatSession/alchemyPriority
     tes3combatSession/data
@@ -62,38 +65,26 @@ Properties
     tes3combatSession/selectedWeapon
     tes3combatSession/selectionPriority
 
-.. _`alchemyPriority`: tes3combatSession/alchemyPriority.html
-.. _`data`: tes3combatSession/data.html
-.. _`distance`: tes3combatSession/distance.html
-.. _`lastUseTimestamp`: tes3combatSession/lastUseTimestamp.html
-.. _`mobile`: tes3combatSession/mobile.html
-.. _`potionUseFlag`: tes3combatSession/potionUseFlag.html
-.. _`selectedAction`: tes3combatSession/selectedAction.html
-.. _`selectedAlchemy`: tes3combatSession/selectedAlchemy.html
-.. _`selectedItem`: tes3combatSession/selectedItem.html
-.. _`selectedShield`: tes3combatSession/selectedShield.html
-.. _`selectedSpell`: tes3combatSession/selectedSpell.html
-.. _`selectedWeapon`: tes3combatSession/selectedWeapon.html
-.. _`selectionPriority`: tes3combatSession/selectionPriority.html
-
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`changeEquipment`_
+`changeEquipment <tes3combatSession/changeEquipment.html>`_ (`method`_)
     This method equips an item to the mobile in this combat sesion.
 
-`selectAlchemyWithEffect`_ (`number`_)
+`selectAlchemyWithEffect <tes3combatSession/selectAlchemyWithEffect.html>`_ (`method`_)
     Selects the alchemy item with the greatest value, for a given effect ID and loads it into the selectedAlchemy property.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3combatSession/changeEquipment
     tes3combatSession/selectAlchemyWithEffect
 
-.. _`changeEquipment`: tes3combatSession/changeEquipment.html
-.. _`selectAlchemyWithEffect`: tes3combatSession/selectAlchemyWithEffect.html
-
+.. _`any`: ../../lua/type/any.html
+.. _`method`: ../../lua/type/method.html
 .. _`number`: ../../lua/type/number.html
 .. _`tes3alchemy`: ../../lua/type/tes3alchemy.html
 .. _`tes3equipmentStack`: ../../lua/type/tes3equipmentStack.html

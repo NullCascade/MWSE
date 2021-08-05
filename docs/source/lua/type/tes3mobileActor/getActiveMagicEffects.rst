@@ -6,7 +6,8 @@ Fetches a filtered list of the active magic effects on the actor. Returns a tabl
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

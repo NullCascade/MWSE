@@ -8,7 +8,8 @@ When the caster is the player, the target parameter is optional; without a targe
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -25,13 +26,13 @@ spell (`tes3spell`_, `string`_)
     The spell the caster uses.
 
 instant (`boolean`_)
-    Default: ``false``. When true, the spell is cast instantly. No animation is performed.
+    When true, the spell is cast instantly. No animation is performed.
 
 alwaysSucceeds (`boolean`_)
     Default: ``true``. When true, the spell cannot fail and does not consume magicka. When false, it is cast using the actor's spell skill, and requires and takes enough magicka to cast. Only applies when 'instant' is true.
 
 bypassResistances (`boolean`_)
-    Default: ``false``. The spell will bypass the target's resistances. Only applies when 'instant' is true.
+    The spell will bypass the target's resistances. Only applies when 'instant' is true.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`string`: ../../../lua/type/string.html

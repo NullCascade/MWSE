@@ -10,7 +10,8 @@ Fetches the dynamic light attachment. If there isn't one, a new one will be crea
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3lightNode`_.
+result (`tes3lightNode`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -25,3 +26,4 @@ phase (`number`_)
 
 .. _`niPointLight`: ../../../lua/type/niPointLight.html
 .. _`number`: ../../../lua/type/number.html
+.. _`tes3lightNode`: ../../../lua/type/tes3lightNode.html

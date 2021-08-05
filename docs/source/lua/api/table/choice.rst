@@ -6,7 +6,8 @@ Returns a random element from the given table.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`unknown`_.
+result (`unknown`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ t (`table`_)
     No description available.
 
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

@@ -9,5 +9,7 @@ captured value is a number.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
+.. _`pattern`: ../../../lua/type/pattern.html

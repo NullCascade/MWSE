@@ -6,7 +6,8 @@ Attempts a persuasion attempt on an actor, potentially adjusting their dispositi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+success (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

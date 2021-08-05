@@ -6,6 +6,7 @@ Returns true if the sound is actively looping.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

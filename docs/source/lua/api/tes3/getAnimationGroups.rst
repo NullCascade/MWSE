@@ -6,7 +6,8 @@ This function fetches a reference's attached animation groups.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+animData (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

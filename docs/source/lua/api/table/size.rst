@@ -6,7 +6,8 @@ Returns the number of elements inside the table. Unlike the length operator (#) 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

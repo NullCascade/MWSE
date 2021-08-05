@@ -6,7 +6,8 @@ Damages the actor, with options to control mitigation and difficulty scaling. In
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

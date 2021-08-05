@@ -6,6 +6,7 @@ Chooses a random item from the list, based on the player's level.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3creature`_.
+result (`tes3creature`_)
+    No description available.
 
 .. _`tes3creature`: ../../../lua/type/tes3creature.html

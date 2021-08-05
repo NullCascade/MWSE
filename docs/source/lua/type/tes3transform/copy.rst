@@ -6,6 +6,7 @@ Creates a copy of the transform.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3transform`_.
+result (`tes3transform`_)
+    No description available.
 
 .. _`tes3transform`: ../../../lua/type/tes3transform.html

@@ -6,7 +6,8 @@ Damages the actor's fatigue, with accompanying reaction from the reciever. Invok
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

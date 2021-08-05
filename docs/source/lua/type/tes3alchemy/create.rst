@@ -41,3 +41,4 @@ effects (`table`_)
 .. _`number`: ../../../lua/type/number.html
 .. _`string`: ../../../lua/type/string.html
 .. _`table`: ../../../lua/type/table.html
+.. _`tes3script`: ../../../lua/type/tes3script.html

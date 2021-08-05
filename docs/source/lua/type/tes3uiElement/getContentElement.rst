@@ -8,6 +8,7 @@ Returns the descendant element that creation functions used on this element will
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

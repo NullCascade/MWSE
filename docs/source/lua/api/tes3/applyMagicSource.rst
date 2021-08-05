@@ -6,7 +6,8 @@ tes3.applyMagicSource
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3magicSourceInstance`_.
+instance (`tes3magicSourceInstance`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ effects (`table`_)
     Optional. A table of custom effects to apply as a potion. Maximal number of effects is 8.
 
 createCopy (`boolean`_)
-    Default: ``false``. This parameter controls whether the function will return the original magic source or a copy of the magic source. This parameter is only used if source is alchemy.
+    Optional. This parameter controls whether the function will return the original magic source or a copy of the magic source. This parameter is only used if source is alchemy.
 
 fromStack (`tes3equipmentStack`_)
     Optional. The piece of equipment this magic source is coming from. The fromStack has to be an already equipped item from tes3actor.equipment. This will probably change in the future.
@@ -38,7 +39,7 @@ target (`tes3reference`_, `tes3mobileActor`_, `string`_)
     Optional. The target of the magic.
 
 bypassResistances (`boolean`_)
-    Default: ``false``. Is this effect going to bypass magic resistance?
+    Optional. Is this effect going to bypass magic resistance?
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

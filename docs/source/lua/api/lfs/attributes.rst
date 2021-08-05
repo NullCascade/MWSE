@@ -6,9 +6,13 @@ Returns a table with the file attributes corresponding to filepath (or nil follo
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_, `string`_, `number`_, `nil`_. All attributes in a table, the value of a specific attribute if one was requested, or nil on an error.
+The function has more than one return value.
 
-`string`_, `nil`_. In the case of an error, a string describing the issue.
+attributes (`table`_, `string`_, `number`_, `nil`_)
+    All attributes in a table, the value of a specific attribute if one was requested, or nil on an error.
+
+error (`string`_, `nil`_)
+    In the case of an error, a string describing the issue.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

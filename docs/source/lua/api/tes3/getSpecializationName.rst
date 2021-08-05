@@ -6,6 +6,7 @@ Returns the lowercase identifying name of a specialization type for a given nume
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+name (`string`_)
+    No description available.
 
 .. _`string`: ../../../lua/type/string.html

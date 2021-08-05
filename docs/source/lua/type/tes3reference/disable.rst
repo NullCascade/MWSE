@@ -6,6 +6,7 @@ Hides the reference, stops all scripts for it, detaches all dynamic lights and s
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. If true, the reference was successfully disabled.
+success (`boolean`_)
+    If true, the reference was successfully disabled.
 
 .. _`boolean`: ../../../lua/type/boolean.html

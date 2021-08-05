@@ -6,7 +6,8 @@ Creates a top-level menu.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,10 +18,10 @@ id (`number`_)
     The menu’s ID. The menu can be later accessed by tes3ui.findMenu(id).
 
 dragFrame (`boolean`_)
-    Default: ``false``. Constructs a draggable and resizeable frame and background for the menu. It is similar to the stats, inventory, magic and map menus in the standard UI. After construction, position and minimum dimensions should be set.
+    Constructs a draggable and resizeable frame and background for the menu. It is similar to the stats, inventory, magic and map menus in the standard UI. After construction, position and minimum dimensions should be set.
 
 fixedFrame (`boolean`_)
-    Default: ``false``. Constructs a fixed (non-draggable) frame and background for the menu. The layout system should automatically centre and size it to fit whatever is added to the menu.
+    Constructs a fixed (non-draggable) frame and background for the menu. The layout system should automatically centre and size it to fit whatever is added to the menu.
 
 loadable (`boolean`_)
     Default: ``true``. If set to false, calls to loadMenuPosition will fail.

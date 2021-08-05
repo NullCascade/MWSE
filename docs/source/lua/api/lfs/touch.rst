@@ -6,9 +6,13 @@ Set access and modification times of a file. Both access and modified times are 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_, `nil`_. true in case of success, or nil on an error.
+The function has more than one return value.
 
-`string`_, `nil`_. In the case of an error, a string describing the issue.
+success (`boolean`_, `nil`_)
+    true in case of success, or nil on an error.
+
+error (`string`_, `nil`_)
+    In the case of an error, a string describing the issue.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

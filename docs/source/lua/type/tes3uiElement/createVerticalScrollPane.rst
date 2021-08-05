@@ -13,7 +13,8 @@ Creates a vertically scrolling pane. Useful as a list box.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -23,5 +24,8 @@ Accepts parameters in the following order:
 id (`number`_)
     Optional. A registered identifier to help find this element later.
 
+.. _``element.widget.positionY``: Vertical scroll offset in pixels.
+        | `boolean`: ../../../lua/type/`element.widget.positionY``: Vertical scroll offset in pixels.
+        | `boolean.html
 .. _`number`: ../../../lua/type/number.html
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

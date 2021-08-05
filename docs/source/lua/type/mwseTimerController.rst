@@ -6,42 +6,45 @@ A Timer Controller is a class used to sort and trigger callbacks based on an arb
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`clock`_ (`number`_)
+`clock <mwseTimerController/clock.html>`_ (`number`_)
     The current clock time for this timer controller.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     mwseTimerController/clock
-
-.. _`clock`: mwseTimerController/clock.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`create`_ (`mwseTimer`_)
+`create <mwseTimerController/create.html>`_ (`method`_)
     Creates a timer for the given Timer Controller.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     mwseTimerController/create
-
-.. _`create`: mwseTimerController/create.html
 
 Functions
 ----------------------------------------------------------------------------------------------------
 
-`new`_ (`mwseTimerController`_)
+`new <mwseTimerController/new.html>`_ (`function`_)
     Creates a new Timer Controller. Its initial clock is zero, unless a start time is provided.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     mwseTimerController/new
 
-.. _`new`: mwseTimerController/new.html
-
-.. _`mwseTimer`: ../../lua/type/mwseTimer.html
-.. _`mwseTimerController`: ../../lua/type/mwseTimerController.html
+.. _`function`: ../../lua/type/function.html
+.. _`method`: ../../lua/type/method.html
 .. _`number`: ../../lua/type/number.html

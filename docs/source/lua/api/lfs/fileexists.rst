@@ -6,7 +6,8 @@ Simple check to determine if a file exists.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. true if the file exists.
+success (`boolean`_)
+    true if the file exists.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

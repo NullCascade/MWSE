@@ -6,7 +6,8 @@ Iteration function used for looping over game options.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3object`_.
+object (`tes3object`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

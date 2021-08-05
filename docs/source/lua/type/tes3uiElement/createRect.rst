@@ -6,7 +6,8 @@ Creates a filled rectangle. The rectangle is displayed as filled with the elemen
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

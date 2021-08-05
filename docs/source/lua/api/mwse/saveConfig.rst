@@ -3,6 +3,12 @@ mwse.saveConfig
 
 Saves a config table to Data Files\MWSE\config\{fileName}.json.
 
+Returns
+----------------------------------------------------------------------------------------------------
+
+result (`table`_)
+    No description available.
+
 Parameters
 ----------------------------------------------------------------------------------------------------
 
@@ -19,3 +25,4 @@ config (`table`_)
 
 .. _`string`: ../../../lua/type/string.html
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

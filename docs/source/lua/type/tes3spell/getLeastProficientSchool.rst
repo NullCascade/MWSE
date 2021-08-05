@@ -6,7 +6,8 @@ Returns the school of the least proficient effect on the spell, for a given acto
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_, `nil`_. The least proficient school ID, or nil if the spell has no valid effects.
+schoolID (`number`_, `nil`_)
+    The least proficient school ID, or nil if the spell has no valid effects.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

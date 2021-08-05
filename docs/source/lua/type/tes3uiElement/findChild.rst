@@ -6,7 +6,8 @@ Finds a child element matching the ``id`` argument. Searches children recursivel
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

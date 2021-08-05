@@ -6,6 +6,7 @@ Gets the fatigue-based skill scaling term used by many game mechanics, based on 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

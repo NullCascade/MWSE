@@ -14,4 +14,5 @@ propName (`string`_)
 value (`object`_)
     The value to set.
 
+.. _`object`: ../../../lua/type/object.html
 .. _`string`: ../../../lua/type/string.html

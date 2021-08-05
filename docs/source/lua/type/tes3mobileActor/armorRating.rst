@@ -1,7 +1,7 @@
 armorRating
 ====================================================================================================
 
-`number`_. The actor's current armour rating, taking equipment condition into account. Armour mitigation can be automatically applied to damage by using the applyDamage function.
+`number`_. Read-only. The actor's current armour rating, taking equipment condition into account. Armour mitigation can be automatically applied to damage by using the applyDamage function.
 
 Armour mitigation calculation:
 x = damage / (damage + target.armorRating)

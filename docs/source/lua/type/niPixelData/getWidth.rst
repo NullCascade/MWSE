@@ -6,7 +6,8 @@ Returns the width of the mipmap level at the given index, where level 1 is the l
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

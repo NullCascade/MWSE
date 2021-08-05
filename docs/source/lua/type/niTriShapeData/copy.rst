@@ -6,7 +6,8 @@ Creates a copy of the data. An optional table of filters can be passed to remove
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niTriShapeData`_. The duplicated data.
+copiedData (`niTriShapeData`_)
+    The duplicated data.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

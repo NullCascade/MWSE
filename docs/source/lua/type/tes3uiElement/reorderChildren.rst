@@ -8,7 +8,8 @@ reorderChildren
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -24,6 +25,8 @@ moveFrom (`tes3uiElement`_, `number`_)
 count (`number`_)
     The property name.
 
+.. _``count`` elements are taken from starting child `Element`: ../../../lua/type/`count`` elements are taken from starting child `Element.html
+.. _``moveFrom``, and moved before the child `Element`: ../../../lua/type/`moveFrom``, and moved before the child `Element.html
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

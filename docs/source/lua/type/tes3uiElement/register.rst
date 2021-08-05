@@ -119,6 +119,142 @@ eventID (`string`_)
 callback (`function`_)
     The callback function.
 
+.. _`Element`: ../../../lua/type/Element.html
+.. _``event`` handler, which can add or override an existing event handler. The use of ``registerBefore`` or ``registerAfter`` is recommended if you do not want to replace the existing event handler. The eventID can be a standard ``event`` name, or an event specific to an element class. The callback receives an argument with the event data. See below for details.
+    
+The original Morrowind callback is captured and can be invoked with the ``forwardEvent`` method on the event argument. If there is an existing Lua callback, it is replaced.
+
+
+
+Lua UI event specification:
+
+Events can be bound to elements via the `Element`: ../../../lua/type/`event`` handler, which can add or override an existing event handler. The use of ``registerBefore`` or ``registerAfter`` is recommended if you do not want to replace the existing event handler. The eventID can be a standard ``event`` name, or an event specific to an element class. The callback receives an argument with the event data. See below for details.
+    
+The original Morrowind callback is captured and can be invoked with the ``forwardEvent`` method on the event argument. If there is an existing Lua callback, it is replaced.
+
+
+
+Lua UI event specification:
+
+Events can be bound to elements via the `Element.html
+.. _``forwardEvent`` method.  Note that handler may or may not destroy the event widget or the menu, so you should know how it behaves before accessing any elements after a callback. 
+
+**Example**
+
+.. code-block:: lua
+
+    local function onClick(e)
+        -- pre-event code
+        e.source:forwardEvent(e)
+        -- post-event code
+    end
+    
+    local button = menu:findChild("MenuExample_Ok")
+    button:register("mouseClick", onClick)
+
+
+Event handler
+-------------------------------------------------------------------------------
+
+The standard type signature for events.
+
+`boolean`: ../../../lua/type/`forwardEvent`` method.  Note that handler may or may not destroy the event widget or the menu, so you should know how it behaves before accessing any elements after a callback. 
+
+**Example**
+
+.. code-block:: lua
+
+    local function onClick(e)
+        -- pre-event code
+        e.source:forwardEvent(e)
+        -- post-event code
+    end
+    
+    local button = menu:findChild("MenuExample_Ok")
+    button:register("mouseClick", onClick)
+
+
+Event handler
+-------------------------------------------------------------------------------
+
+The standard type signature for events.
+
+`boolean.html
+.. _``optional``
+        Returning ``false`` may cancel an interaction for certain events. e.g. unfocus
+   
+    EventData:
+        **source** (`Element`: ../../../lua/type/`optional``
+        Returning ``false`` may cancel an interaction for certain events. e.g. unfocus
+   
+    EventData:
+        **source** (`Element.html
+.. _``register`` method, which takes an event name. Event names can be one of the standard events listed here, or a widget-specific event.
+
+Standard events:
+    **mouseLeave**
+        Mouse cursor moving outside an element. Triggers once.
+    **mouseOver**
+        Mouse cursor moving over an element. Triggers once.
+    **mouseDown**
+        Left mouse button down over an element.
+    **mouseClick**
+        Left mouse button up over an element, after a mouseDown over the element.
+    **mouseScrollUp**
+        ..
+    **mouseScrollDown**
+        Mouse wheel scrolling.
+    **mouseDoubleClick**
+        Standard double-click.
+    **mouseStillIdle**
+        Mouse cursor positioned outside an element. Triggers every frame.
+    **mouseStillOver**
+        Mouse cursor positioned over an element. Triggers every frame.
+    **mouseStillPressed**
+        Mouse cursor positioned over an element, after a mouseDown over the element. Triggers every frame.
+    **mouseStillPressedOutside**
+        Apparently not working in the engine. Mouse cursor positioned outside an element, after a mouseDown over the element. Triggers every frame.
+    **mouseRelease**
+        Left mouse button up over an element.
+    **keyPress**
+        A raw key press.
+    **keyEnter**
+        The Return key is pressed.
+    **help**
+        On mouseover, but also marking the element as having a tooltip. Create a tooltip within the callback using the `tes3ui.createTooltipMenu`: ../../../lua/type/`register`` method, which takes an event name. Event names can be one of the standard events listed here, or a widget-specific event.
+
+Standard events:
+    **mouseLeave**
+        Mouse cursor moving outside an element. Triggers once.
+    **mouseOver**
+        Mouse cursor moving over an element. Triggers once.
+    **mouseDown**
+        Left mouse button down over an element.
+    **mouseClick**
+        Left mouse button up over an element, after a mouseDown over the element.
+    **mouseScrollUp**
+        ..
+    **mouseScrollDown**
+        Mouse wheel scrolling.
+    **mouseDoubleClick**
+        Standard double-click.
+    **mouseStillIdle**
+        Mouse cursor positioned outside an element. Triggers every frame.
+    **mouseStillOver**
+        Mouse cursor positioned over an element. Triggers every frame.
+    **mouseStillPressed**
+        Mouse cursor positioned over an element, after a mouseDown over the element. Triggers every frame.
+    **mouseStillPressedOutside**
+        Apparently not working in the engine. Mouse cursor positioned outside an element, after a mouseDown over the element. Triggers every frame.
+    **mouseRelease**
+        Left mouse button up over an element.
+    **keyPress**
+        A raw key press.
+    **keyEnter**
+        The Return key is pressed.
+    **help**
+        On mouseover, but also marking the element as having a tooltip. Create a tooltip within the callback using the `tes3ui.createTooltipMenu.html
 .. _`function`: ../../../lua/type/function.html
 .. _`number`: ../../../lua/type/number.html
+.. _`scan code`: ../../../lua/type/scan code.html
 .. _`string`: ../../../lua/type/string.html

@@ -6,7 +6,8 @@ Fetches the core game birthsign object for a given birthsign ID. If the birthsig
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3birthsign`_.
+birthsign (`tes3birthsign`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

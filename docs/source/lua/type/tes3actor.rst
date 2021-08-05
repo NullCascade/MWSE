@@ -5,172 +5,132 @@ An Actor (not to be confused with a Mobile Actor) is an object that can be clone
 
 It is standard for creatures and NPCs to be composed of an actor and a mobile actor, linked together with a reference.
 
+This type inherits from the following parent types: `tes3physicalObject`_, `tes3object`_, `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`actorFlags`_ (`number`_)
-    Read-only. A number representing the actor flags. Truly a bit field.
+`actorFlags <tes3actor/actorFlags.html>`_ (`number`_)
+    A number representing the actor flags. Truly a bit field.
 
-`barterGold`_ (`number`_)
+`barterGold <tes3actor/barterGold.html>`_ (`number`_)
     Friendly access to actor's barter gold amount.
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`blood`_ (`number`_)
+`blood <tes3actor/blood.html>`_ (`number`_)
     Friendly access to actor's blood type.
 
-`boundingBox`_ (`tes3boundingBox`_)
+`boundingBox <tes3physicalObject/boundingBox.html>`_ (`tes3boundingBox`_)
     The bounding box for the object.
 
-`cloneCount`_ (`number`_)
-    Read-only. The number of clones that exist of this actor.
+`cloneCount <tes3actor/cloneCount.html>`_ (`number`_)
+    The number of clones that exist of this actor.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`equipment`_ (`tes3iterator`_)
-    Read-only. The items currently equipped to the actor.
+`equipment <tes3actor/equipment.html>`_ (`tes3iterator`_)
+    The items currently equipped to the actor.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`inventory`_ (`tes3iterator`_)
-    Read-only. The items currently carried by the actor.
+`inventory <tes3actor/inventory.html>`_ (`tes3iterator`_)
+    The items currently carried by the actor.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`nextInCollection`_ (`tes3object`_)
+`nextInCollection <tes3object/nextInCollection.html>`_ (`tes3object`_)
     The next object in parent collection's list.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`owningCollection`_ (`tes3referenceList`_)
+`owningCollection <tes3object/owningCollection.html>`_ (`tes3referenceList`_)
     The collection responsible for holding this object.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`previousInCollection`_ (`tes3object`_)
+`previousInCollection <tes3object/previousInCollection.html>`_ (`tes3object`_)
     The previous object in parent collection's list.
 
-`scale`_ (`number`_)
+`scale <tes3object/scale.html>`_ (`number`_)
     The object's scale.
 
-`sceneNode`_ (`niNode`_)
+`sceneNode <tes3object/sceneNode.html>`_ (`niNode`_)
     The scene graph node for this object.
 
-`sceneReference`_ (`niNode`_)
+`sceneReference <tes3object/sceneReference.html>`_ (`niNode`_)
     The scene graph reference node for this object.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`stolenList`_ (`tes3iterator`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`stolenList <tes3physicalObject/stolenList.html>`_ (`tes3iterator`_)
     A list of actors that the object has been stolen from.
 
-`supportsLuaData`_ (`boolean`_)
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3actor/actorFlags
     tes3actor/barterGold
-    tes3actor/blocked
     tes3actor/blood
-    tes3actor/boundingBox
     tes3actor/cloneCount
-    tes3actor/deleted
-    tes3actor/disabled
     tes3actor/equipment
-    tes3actor/id
     tes3actor/inventory
-    tes3actor/modified
-    tes3actor/nextInCollection
-    tes3actor/objectFlags
-    tes3actor/objectType
-    tes3actor/owningCollection
-    tes3actor/persistent
-    tes3actor/previousInCollection
-    tes3actor/scale
-    tes3actor/sceneNode
-    tes3actor/sceneReference
-    tes3actor/sourceMod
-    tes3actor/sourceless
-    tes3actor/stolenList
-    tes3actor/supportsLuaData
-
-.. _`actorFlags`: tes3actor/actorFlags.html
-.. _`barterGold`: tes3actor/barterGold.html
-.. _`blocked`: tes3actor/blocked.html
-.. _`blood`: tes3actor/blood.html
-.. _`boundingBox`: tes3actor/boundingBox.html
-.. _`cloneCount`: tes3actor/cloneCount.html
-.. _`deleted`: tes3actor/deleted.html
-.. _`disabled`: tes3actor/disabled.html
-.. _`equipment`: tes3actor/equipment.html
-.. _`id`: tes3actor/id.html
-.. _`inventory`: tes3actor/inventory.html
-.. _`modified`: tes3actor/modified.html
-.. _`nextInCollection`: tes3actor/nextInCollection.html
-.. _`objectFlags`: tes3actor/objectFlags.html
-.. _`objectType`: tes3actor/objectType.html
-.. _`owningCollection`: tes3actor/owningCollection.html
-.. _`persistent`: tes3actor/persistent.html
-.. _`previousInCollection`: tes3actor/previousInCollection.html
-.. _`scale`: tes3actor/scale.html
-.. _`sceneNode`: tes3actor/sceneNode.html
-.. _`sceneReference`: tes3actor/sceneReference.html
-.. _`sourceMod`: tes3actor/sourceMod.html
-.. _`sourceless`: tes3actor/sourceless.html
-.. _`stolenList`: tes3actor/stolenList.html
-.. _`supportsLuaData`: tes3actor/supportsLuaData.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
 
-`offersService`_ (`boolean`_)
+`offersService <tes3actor/offersService.html>`_ (`method`_)
     Checks if the actor will offer a service in dialogue. This an offer and may still be refused by dialogue checks. To also get the result of dialogue checks, use tes3.checkMerchantOffersService.
 
-`onInventoryClose`_
+`onInventoryClose <tes3actor/onInventoryClose.html>`_ (`method`_)
     A callback function invoked when an inventory is closed. Typically not used outside of specific purposes. You may find tes3.reference's onCloseInventory() to be more convenient to use.
 
-`tradesItemType`_ (`boolean`_)
+`tradesItemType <tes3actor/tradesItemType.html>`_ (`method`_)
     Checks if the actor will buy and sell items of a given object type. e.g. actor:tradesItemType(tes3.objectType.repairItem)
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3actor/__tojson
     tes3actor/offersService
     tes3actor/onInventoryClose
     tes3actor/tradesItemType
 
-.. _`__tojson`: tes3actor/__tojson.html
-.. _`offersService`: tes3actor/offersService.html
-.. _`onInventoryClose`: tes3actor/onInventoryClose.html
-.. _`tradesItemType`: tes3actor/tradesItemType.html
-
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3boundingBox`: ../../lua/type/tes3boundingBox.html
 .. _`tes3iterator`: ../../lua/type/tes3iterator.html
 .. _`tes3object`: ../../lua/type/tes3object.html
+.. _`tes3physicalObject`: ../../lua/type/tes3physicalObject.html
 .. _`tes3referenceList`: ../../lua/type/tes3referenceList.html

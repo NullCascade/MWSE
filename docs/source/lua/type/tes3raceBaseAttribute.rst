@@ -6,19 +6,19 @@ A substructure for a race, storing a base attribute value for male and female ac
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`female`_ (`number`_)
+`female <tes3raceBaseAttribute/female.html>`_ (`number`_)
     The base attribute for female actors.
 
-`male`_ (`number`_)
+`male <tes3raceBaseAttribute/male.html>`_ (`number`_)
     The base attribute for male actors.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3raceBaseAttribute/female
     tes3raceBaseAttribute/male
-
-.. _`female`: tes3raceBaseAttribute/female.html
-.. _`male`: tes3raceBaseAttribute/male.html
 
 .. _`number`: ../../lua/type/number.html

@@ -6,7 +6,8 @@ Copies a table's contents. All subtables will also be copied, as will any metata
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

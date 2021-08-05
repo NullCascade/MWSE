@@ -6,7 +6,8 @@ Quote a UTF-8 string and escape critical characters using JSON escape sequences.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+result (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

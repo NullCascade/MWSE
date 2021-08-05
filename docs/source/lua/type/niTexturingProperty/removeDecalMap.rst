@@ -6,7 +6,8 @@ Attempts to remove a decal at a given index.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. True if the decal was removed.
+removed (`boolean`_)
+    True if the decal was removed.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

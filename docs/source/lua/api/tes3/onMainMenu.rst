@@ -6,6 +6,7 @@ Returns true if the player is on the main menu, and hasn't loaded a game yet.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+onMainMenu (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

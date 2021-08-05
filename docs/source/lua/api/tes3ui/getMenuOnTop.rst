@@ -6,6 +6,7 @@ Returns the top-most, active menu.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

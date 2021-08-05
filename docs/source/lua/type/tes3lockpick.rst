@@ -3,174 +3,136 @@ tes3lockpick
 
 A core lockpick object.
 
+This type inherits from the following parent types: `tes3item`_, `tes3physicalObject`_, `tes3object`_, `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`boundingBox`_ (`tes3boundingBox`_)
+`boundingBox <tes3physicalObject/boundingBox.html>`_ (`tes3boundingBox`_)
     The bounding box for the object.
 
-`condition`_ (`number`_)
+`condition <tes3lockpick/condition.html>`_ (`number`_)
     Use tes3lockpick.maxCondition instead.
 
 The maximum condition/health of the object.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`icon`_ (`string`_)
+`icon <tes3lockpick/icon.html>`_ (`string`_)
     The path to the object's icon.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`maxCondition`_ (`number`_)
+`maxCondition <tes3lockpick/maxCondition.html>`_ (`number`_)
     The maximum condition/health of the lockpick object.
 
-`mesh`_ (`string`_)
+`mesh <tes3lockpick/mesh.html>`_ (`string`_)
     The path to the object's mesh.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`name`_ (`string`_)
+`name <tes3lockpick/name.html>`_ (`string`_)
     The player-facing name for the object.
 
-`nextInCollection`_ (`tes3object`_)
+`nextInCollection <tes3object/nextInCollection.html>`_ (`tes3object`_)
     The next object in parent collection's list.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`owningCollection`_ (`tes3referenceList`_)
+`owningCollection <tes3object/owningCollection.html>`_ (`tes3referenceList`_)
     The collection responsible for holding this object.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`previousInCollection`_ (`tes3object`_)
+`previousInCollection <tes3object/previousInCollection.html>`_ (`tes3object`_)
     The previous object in parent collection's list.
 
-`quality`_ (`number`_)
+`quality <tes3lockpick/quality.html>`_ (`number`_)
     The quality of the object, with how much of a bonus it has.
 
-`scale`_ (`number`_)
+`scale <tes3object/scale.html>`_ (`number`_)
     The object's scale.
 
-`sceneNode`_ (`niNode`_)
+`sceneNode <tes3object/sceneNode.html>`_ (`niNode`_)
     The scene graph node for this object.
 
-`sceneReference`_ (`niNode`_)
+`sceneReference <tes3object/sceneReference.html>`_ (`niNode`_)
     The scene graph reference node for this object.
 
-`script`_ (`tes3script`_)
-    Read-only. The script that runs on the object.
+`script <tes3lockpick/script.html>`_ (`tes3script`_)
+    The script that runs on the object.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`stolenList`_ (`tes3iterator`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`stolenList <tes3physicalObject/stolenList.html>`_ (`tes3iterator`_)
     A list of actors that the object has been stolen from.
 
-`supportsLuaData`_ (`boolean`_)
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
 
-`value`_ (`number`_)
+`value <tes3lockpick/value.html>`_ (`number`_)
     The value of the object.
 
-`weight`_ (`number`_)
+`weight <tes3lockpick/weight.html>`_ (`number`_)
     The weight of the object.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3lockpick/blocked
-    tes3lockpick/boundingBox
     tes3lockpick/condition
-    tes3lockpick/deleted
-    tes3lockpick/disabled
     tes3lockpick/icon
-    tes3lockpick/id
     tes3lockpick/maxCondition
     tes3lockpick/mesh
-    tes3lockpick/modified
     tes3lockpick/name
-    tes3lockpick/nextInCollection
-    tes3lockpick/objectFlags
-    tes3lockpick/objectType
-    tes3lockpick/owningCollection
-    tes3lockpick/persistent
-    tes3lockpick/previousInCollection
     tes3lockpick/quality
-    tes3lockpick/scale
-    tes3lockpick/sceneNode
-    tes3lockpick/sceneReference
     tes3lockpick/script
-    tes3lockpick/sourceMod
-    tes3lockpick/sourceless
-    tes3lockpick/stolenList
-    tes3lockpick/supportsLuaData
     tes3lockpick/value
     tes3lockpick/weight
-
-.. _`blocked`: tes3lockpick/blocked.html
-.. _`boundingBox`: tes3lockpick/boundingBox.html
-.. _`condition`: tes3lockpick/condition.html
-.. _`deleted`: tes3lockpick/deleted.html
-.. _`disabled`: tes3lockpick/disabled.html
-.. _`icon`: tes3lockpick/icon.html
-.. _`id`: tes3lockpick/id.html
-.. _`maxCondition`: tes3lockpick/maxCondition.html
-.. _`mesh`: tes3lockpick/mesh.html
-.. _`modified`: tes3lockpick/modified.html
-.. _`name`: tes3lockpick/name.html
-.. _`nextInCollection`: tes3lockpick/nextInCollection.html
-.. _`objectFlags`: tes3lockpick/objectFlags.html
-.. _`objectType`: tes3lockpick/objectType.html
-.. _`owningCollection`: tes3lockpick/owningCollection.html
-.. _`persistent`: tes3lockpick/persistent.html
-.. _`previousInCollection`: tes3lockpick/previousInCollection.html
-.. _`quality`: tes3lockpick/quality.html
-.. _`scale`: tes3lockpick/scale.html
-.. _`sceneNode`: tes3lockpick/sceneNode.html
-.. _`sceneReference`: tes3lockpick/sceneReference.html
-.. _`script`: tes3lockpick/script.html
-.. _`sourceMod`: tes3lockpick/sourceMod.html
-.. _`sourceless`: tes3lockpick/sourceless.html
-.. _`stolenList`: tes3lockpick/stolenList.html
-.. _`supportsLuaData`: tes3lockpick/supportsLuaData.html
-.. _`value`: tes3lockpick/value.html
-.. _`weight`: tes3lockpick/weight.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3lockpick/__tojson
-
-.. _`__tojson`: tes3lockpick/__tojson.html
 
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3boundingBox`: ../../lua/type/tes3boundingBox.html
+.. _`tes3item`: ../../lua/type/tes3item.html
 .. _`tes3iterator`: ../../lua/type/tes3iterator.html
 .. _`tes3object`: ../../lua/type/tes3object.html
+.. _`tes3physicalObject`: ../../lua/type/tes3physicalObject.html
 .. _`tes3referenceList`: ../../lua/type/tes3referenceList.html
+.. _`tes3script`: ../../lua/type/tes3script.html

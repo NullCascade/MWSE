@@ -3,126 +3,96 @@ tes3physicalObject
 
 Almost anything that can be represented in the Construction Set is based on this structure.
 
+This type inherits from the following parent types: `tes3object`_, `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`boundingBox`_ (`tes3boundingBox`_)
+`boundingBox <tes3physicalObject/boundingBox.html>`_ (`tes3boundingBox`_)
     The bounding box for the object.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`nextInCollection`_ (`tes3object`_)
+`nextInCollection <tes3object/nextInCollection.html>`_ (`tes3object`_)
     The next object in parent collection's list.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`owningCollection`_ (`tes3referenceList`_)
+`owningCollection <tes3object/owningCollection.html>`_ (`tes3referenceList`_)
     The collection responsible for holding this object.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`previousInCollection`_ (`tes3object`_)
+`previousInCollection <tes3object/previousInCollection.html>`_ (`tes3object`_)
     The previous object in parent collection's list.
 
-`scale`_ (`number`_)
+`scale <tes3object/scale.html>`_ (`number`_)
     The object's scale.
 
-`sceneNode`_ (`niNode`_)
+`sceneNode <tes3object/sceneNode.html>`_ (`niNode`_)
     The scene graph node for this object.
 
-`sceneReference`_ (`niNode`_)
+`sceneReference <tes3object/sceneReference.html>`_ (`niNode`_)
     The scene graph reference node for this object.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`stolenList`_ (`tes3iterator`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`stolenList <tes3physicalObject/stolenList.html>`_ (`tes3iterator`_)
     A list of actors that the object has been stolen from.
 
-`supportsLuaData`_ (`boolean`_)
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3physicalObject/blocked
     tes3physicalObject/boundingBox
-    tes3physicalObject/deleted
-    tes3physicalObject/disabled
-    tes3physicalObject/id
-    tes3physicalObject/modified
-    tes3physicalObject/nextInCollection
-    tes3physicalObject/objectFlags
-    tes3physicalObject/objectType
-    tes3physicalObject/owningCollection
-    tes3physicalObject/persistent
-    tes3physicalObject/previousInCollection
-    tes3physicalObject/scale
-    tes3physicalObject/sceneNode
-    tes3physicalObject/sceneReference
-    tes3physicalObject/sourceMod
-    tes3physicalObject/sourceless
     tes3physicalObject/stolenList
-    tes3physicalObject/supportsLuaData
-
-.. _`blocked`: tes3physicalObject/blocked.html
-.. _`boundingBox`: tes3physicalObject/boundingBox.html
-.. _`deleted`: tes3physicalObject/deleted.html
-.. _`disabled`: tes3physicalObject/disabled.html
-.. _`id`: tes3physicalObject/id.html
-.. _`modified`: tes3physicalObject/modified.html
-.. _`nextInCollection`: tes3physicalObject/nextInCollection.html
-.. _`objectFlags`: tes3physicalObject/objectFlags.html
-.. _`objectType`: tes3physicalObject/objectType.html
-.. _`owningCollection`: tes3physicalObject/owningCollection.html
-.. _`persistent`: tes3physicalObject/persistent.html
-.. _`previousInCollection`: tes3physicalObject/previousInCollection.html
-.. _`scale`: tes3physicalObject/scale.html
-.. _`sceneNode`: tes3physicalObject/sceneNode.html
-.. _`sceneReference`: tes3physicalObject/sceneReference.html
-.. _`sourceMod`: tes3physicalObject/sourceMod.html
-.. _`sourceless`: tes3physicalObject/sourceless.html
-.. _`stolenList`: tes3physicalObject/stolenList.html
-.. _`supportsLuaData`: tes3physicalObject/supportsLuaData.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3physicalObject/__tojson
-
-.. _`__tojson`: tes3physicalObject/__tojson.html
 
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3boundingBox`: ../../lua/type/tes3boundingBox.html
 .. _`tes3iterator`: ../../lua/type/tes3iterator.html
 .. _`tes3object`: ../../lua/type/tes3object.html

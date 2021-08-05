@@ -6,7 +6,8 @@ Simple check to determine if a directory exists.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. true if the directory exists.
+success (`boolean`_)
+    true if the directory exists.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

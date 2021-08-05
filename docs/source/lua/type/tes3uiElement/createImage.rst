@@ -6,7 +6,8 @@ Creates an image element from a texture file. The texture must have power-of-2 d
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

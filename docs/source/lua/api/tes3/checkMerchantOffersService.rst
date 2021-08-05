@@ -6,7 +6,8 @@ Checks if a merchant will offer a service to you, including dialogue checks like
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean, tes3DialogueInfo`_.
+offersService, refusalReply (`boolean, tes3DialogueInfo`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -19,6 +20,7 @@ reference (`tes3reference`_, `tes3mobileActor`_, `string`_)
 service (`number`_)
     Optional. The specific service to check for availability. Uses the tes3.merchantService.* constants.
 
+.. _`boolean, tes3DialogueInfo`: ../../../lua/type/boolean, tes3DialogueInfo.html
 .. _`number`: ../../../lua/type/number.html
 .. _`string`: ../../../lua/type/string.html
 .. _`tes3mobileActor`: ../../../lua/type/tes3mobileActor.html

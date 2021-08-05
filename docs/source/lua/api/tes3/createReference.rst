@@ -6,7 +6,8 @@ Similar to mwscript's PlaceAtPC or PlaceAtMe, this creates a new reference in th
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+newReference (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

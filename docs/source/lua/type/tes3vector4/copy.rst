@@ -6,6 +6,7 @@ Creates a copy of the vector.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector4`_.
+result (`tes3vector4`_)
+    No description available.
 
 .. _`tes3vector4`: ../../../lua/type/tes3vector4.html

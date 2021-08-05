@@ -6,7 +6,8 @@ Returns how many times the player killed an actor. If no actor is specified, tot
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+count (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,7 +6,8 @@ Returns an array-style table of all values in the given table, t. Optionally, it
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_. An array of all table values.
+values (`table`_)
+    An array of all table values.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

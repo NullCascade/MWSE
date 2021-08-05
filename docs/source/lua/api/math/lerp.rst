@@ -6,7 +6,8 @@ Performs linear interpolation between values v0 and v1. Returns a value that is 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

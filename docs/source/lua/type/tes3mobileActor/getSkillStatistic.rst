@@ -6,7 +6,8 @@ Fetches the statistic object of a skill with a given index. This is the way to a
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3skillStatistic`_.
+result (`tes3skillStatistic`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ skillId (`number`_)
     The index of the skill statistic to fetch.
 
 .. _`number`: ../../../lua/type/number.html
+.. _`tes3skillStatistic`: ../../../lua/type/tes3skillStatistic.html

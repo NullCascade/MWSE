@@ -6,42 +6,45 @@ A combination of a texture, a filter mode, a clamping mode, and an index to a se
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`clampMode`_ (`niTexturingPropertyClampMode`_)
+`clampMode <niTexturingPropertyMap/clampMode.html>`_ (`niTexturingPropertyClampMode`_)
     The clamp mode for the Map.
 
-`filterMode`_ (`niTexturingPropertyFilterMode`_)
+`filterMode <niTexturingPropertyMap/filterMode.html>`_ (`niTexturingPropertyFilterMode`_)
     The filter mode for the Map.
 
-`texCoordSet`_ (`number`_)
+`texCoordSet <niTexturingPropertyMap/texCoordSet.html>`_ (`number`_)
     The texture coordinate set for the Map.
 
-`texture`_ (`niTexture`_)
+`texture <niTexturingPropertyMap/texture.html>`_ (`niTexture`_)
     The texture for the Map.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     niTexturingPropertyMap/clampMode
     niTexturingPropertyMap/filterMode
     niTexturingPropertyMap/texCoordSet
     niTexturingPropertyMap/texture
 
-.. _`clampMode`: niTexturingPropertyMap/clampMode.html
-.. _`filterMode`: niTexturingPropertyMap/filterMode.html
-.. _`texCoordSet`: niTexturingPropertyMap/texCoordSet.html
-.. _`texture`: niTexturingPropertyMap/texture.html
-
 Functions
 ----------------------------------------------------------------------------------------------------
 
-`new`_
+`new <niTexturingPropertyMap/new.html>`_ (`function`_)
     Creates a new basic or bump map.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     niTexturingPropertyMap/new
 
-.. _`new`: niTexturingPropertyMap/new.html
-
+.. _`function`: ../../lua/type/function.html
+.. _`niTexture`: ../../lua/type/niTexture.html
+.. _`niTexturingPropertyClampMode`: ../../lua/type/niTexturingPropertyClampMode.html
+.. _`niTexturingPropertyFilterMode`: ../../lua/type/niTexturingPropertyFilterMode.html
 .. _`number`: ../../lua/type/number.html

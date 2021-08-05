@@ -6,7 +6,8 @@ Checks if the actor will buy and sell items of a given object type. e.g. actor:t
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ objectType (`tes3objectType`_)
     tes3.objectType.* constants can be passed here.
 
 .. _`boolean`: ../../../lua/type/boolean.html
+.. _`tes3objectType`: ../../../lua/type/tes3objectType.html

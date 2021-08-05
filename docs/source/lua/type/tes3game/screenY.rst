@@ -1,6 +1,6 @@
 screenY
 ====================================================================================================
 
-`number`_. The screen's vertical position.
+`number`_. Read-only. The screen's vertical position.
 
 .. _`number`: ../../../lua/type/number.html

@@ -6,7 +6,8 @@ Calculates the damage that would be inflicted to an actor after armor and/or res
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

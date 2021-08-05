@@ -6,7 +6,8 @@ Creates a textured horizontal divider line, as used in the magic and stat menus.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

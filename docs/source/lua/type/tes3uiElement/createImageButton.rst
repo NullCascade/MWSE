@@ -6,7 +6,8 @@ Creates an interactive button composed of images for the **idle**, **over**, and
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

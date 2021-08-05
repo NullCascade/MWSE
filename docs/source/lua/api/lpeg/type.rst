@@ -6,7 +6,8 @@ If the given value is a pattern, return the string "pattern". Otherwise return n
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+result (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,3 +18,4 @@ value (`value`_)
     The item to evaulate.
 
 .. _`string`: ../../../lua/type/string.html
+.. _`value`: ../../../lua/type/value.html

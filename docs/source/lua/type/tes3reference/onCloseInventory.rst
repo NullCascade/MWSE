@@ -6,6 +6,7 @@ A function that tells the game that an inventory has been closed, if you are sim
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

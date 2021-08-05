@@ -6,7 +6,8 @@ Creates a tooltip menu, which can be an empty menu or an item tooltip. This shou
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -18,25 +19,6 @@ item (`tes3item`_, `string`_)
 
 itemData (`tes3itemData`_)
     Optional. The item data for the item.
-
-Examples
-----------------------------------------------------------------------------------------------------
-
-Add an item tooltip to a new element
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This demonstrates adding an item tooltip to a button using the help event.
-
-.. code-block:: lua
-
-    local button = menu:createButton{text = "- Item -"}
-    local item = tes3.getObject("iron_shield")
-
-    button:register("help", function(e)
-        local tooltip = tes3ui.createTooltipMenu{item = item}
-        tooltip:createLabel{text = "Additional custom text"}
-    end)
-
 
 .. _`string`: ../../../lua/type/string.html
 .. _`tes3item`: ../../../lua/type/tes3item.html

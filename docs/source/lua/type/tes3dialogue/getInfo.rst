@@ -6,7 +6,8 @@ Fetches the info that a given actor would produce for the dialogue.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3dialogueInfo`_.
+result (`tes3dialogueInfo`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

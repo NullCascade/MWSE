@@ -6,7 +6,8 @@ Loads a source texture file and provides the niSourceTexture object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niSourceTexture`_.
+texture (`niSourceTexture`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

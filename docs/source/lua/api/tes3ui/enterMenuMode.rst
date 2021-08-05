@@ -6,7 +6,8 @@ Requests menu mode be activated on a menu with a given id.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. true if the menu was switched, or false if it was already active.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

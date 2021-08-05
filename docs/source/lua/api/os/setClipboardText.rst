@@ -6,7 +6,8 @@ Sets the current clipboard text. If nil is passed, the clipboard will be cleared
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

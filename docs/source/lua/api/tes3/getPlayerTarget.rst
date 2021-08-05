@@ -6,6 +6,7 @@ This function is used to see what the player is looking at. Unlike a real raycas
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+result (`tes3reference`_)
+    No description available.
 
 .. _`tes3reference`: ../../../lua/type/tes3reference.html

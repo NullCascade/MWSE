@@ -6,6 +6,7 @@ Creates a source texture from the current NiPixelData object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niSourceTexture`_.
+result (`niSourceTexture`_)
+    No description available.
 
 .. _`niSourceTexture`: ../../../lua/type/niSourceTexture.html

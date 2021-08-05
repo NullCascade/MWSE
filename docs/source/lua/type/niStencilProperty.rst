@@ -3,114 +3,96 @@ niStencilProperty
 
 A rendering property that controls the use of a stencil buffer when rendering. It also includes a draw-mode setting to allows the game engine to control the culling mode of a set of geometry.
 
+This type inherits from the following parent types: `niProperty`_, `niObjectNET`_, `niObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`drawMode`_ (`number`_)
+`drawMode <niStencilProperty/drawMode.html>`_ (`number`_)
     The drawing mode used to draw the object.
 
-`enabled`_ (`boolean`_)
+`enabled <niStencilProperty/enabled.html>`_ (`boolean`_)
     The value of the stencil buffer enable flag.
 
-`failAction`_ (`number`_)
+`failAction <niStencilProperty/failAction.html>`_ (`number`_)
     The action that is taken in the stencil buffer when the stencil test fails.
 
-`mask`_ (`number`_)
+`mask <niStencilProperty/mask.html>`_ (`number`_)
     The mask value of the stencil buffer.
 
-`name`_ (`string`_)
+`name <niObjectNET/name.html>`_ (`string`_)
     The human-facing name of the given object.
 
-`passAction`_ (`number`_)
+`passAction <niStencilProperty/passAction.html>`_ (`number`_)
     The action that is taken in the stencil buffer when the stencil test passes and the pixel passes the Z-buffer test.
 
-`reference`_ (`number`_)
+`reference <niStencilProperty/reference.html>`_ (`number`_)
     The stencil reference.
 
-`references`_ (`string`_)
-    Read-only. The number of references that exist for the given object. When this value hits zero, the object's memory is freed.
+`references <niObject/references.html>`_ (`string`_)
+    The number of references that exist for the given object. When this value hits zero, the object's memory is freed.
 
-`runTimeTypeInformation`_ (`niRTTI`_)
+`runTimeTypeInformation <niObject/runTimeTypeInformation.html>`_ (`niRTTI`_)
     The runtime type information for this object.
 
-`testFunc`_ (`number`_)
+`testFunc <niStencilProperty/testFunc.html>`_ (`number`_)
     The stencil buffer test function used to test the reference value against the buffer value.
 
-`type`_ (`niPropertyType`_)
+`type <niProperty/type.html>`_ (`niPropertyType`_)
     The unique class identifier number of the given rendering property.
 
-`zFailAction`_ (`number`_)
+`zFailAction <niStencilProperty/zFailAction.html>`_ (`number`_)
     The action that is taken in the stencil buffer when the stencil test passes but the pixel fails the Z-buffer test.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     niStencilProperty/drawMode
     niStencilProperty/enabled
     niStencilProperty/failAction
     niStencilProperty/mask
-    niStencilProperty/name
     niStencilProperty/passAction
     niStencilProperty/reference
-    niStencilProperty/references
-    niStencilProperty/runTimeTypeInformation
     niStencilProperty/testFunc
-    niStencilProperty/type
     niStencilProperty/zFailAction
-
-.. _`drawMode`: niStencilProperty/drawMode.html
-.. _`enabled`: niStencilProperty/enabled.html
-.. _`failAction`: niStencilProperty/failAction.html
-.. _`mask`: niStencilProperty/mask.html
-.. _`name`: niStencilProperty/name.html
-.. _`passAction`: niStencilProperty/passAction.html
-.. _`reference`: niStencilProperty/reference.html
-.. _`references`: niStencilProperty/references.html
-.. _`runTimeTypeInformation`: niStencilProperty/runTimeTypeInformation.html
-.. _`testFunc`: niStencilProperty/testFunc.html
-.. _`type`: niStencilProperty/type.html
-.. _`zFailAction`: niStencilProperty/zFailAction.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`clone`_ (`niObject`_)
+`clone <niObject/clone.html>`_ (`method`_)
     Creates a copy of this object.
 
-`isInstanceOfType`_ (`boolean`_)
+`isInstanceOfType <niObject/isInstanceOfType.html>`_ (`method`_)
     Determines if the object is of a given type, or of a type derived from the given type. Types can be found in the tes3.niType table.
 
-`isOfType`_ (`boolean`_)
+`isOfType <niObject/isOfType.html>`_ (`method`_)
     Determines if the object is of a given type. Types can be found in the tes3.niType table.
 
-`prependController`_
+`prependController <niObjectNET/prependController.html>`_ (`method`_)
     Add a controller to the object as the first controller.
 
-`removeAllControllers`_
+`removeAllControllers <niObjectNET/removeAllControllers.html>`_ (`method`_)
     Removes all controllers.
 
-`removeController`_
+`removeController <niObjectNET/removeController.html>`_ (`method`_)
     Removes a controller from the object.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    niStencilProperty/clone
-    niStencilProperty/isInstanceOfType
-    niStencilProperty/isOfType
-    niStencilProperty/prependController
-    niStencilProperty/removeAllControllers
-    niStencilProperty/removeController
-
-.. _`clone`: niStencilProperty/clone.html
-.. _`isInstanceOfType`: niStencilProperty/isInstanceOfType.html
-.. _`isOfType`: niStencilProperty/isOfType.html
-.. _`prependController`: niStencilProperty/prependController.html
-.. _`removeAllControllers`: niStencilProperty/removeAllControllers.html
-.. _`removeController`: niStencilProperty/removeController.html
 
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niObject`: ../../lua/type/niObject.html
+.. _`niObjectNET`: ../../lua/type/niObjectNET.html
+.. _`niProperty`: ../../lua/type/niProperty.html
+.. _`niPropertyType`: ../../lua/type/niPropertyType.html
 .. _`niRTTI`: ../../lua/type/niRTTI.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html

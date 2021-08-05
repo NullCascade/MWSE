@@ -6,7 +6,8 @@ Fetches the core game object for a given skill ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3skill`_.
+skill (`tes3skill`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

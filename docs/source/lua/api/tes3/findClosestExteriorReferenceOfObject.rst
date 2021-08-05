@@ -6,7 +6,8 @@ Using the same engine function used by the vanilla intervention spells, location
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+reference (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

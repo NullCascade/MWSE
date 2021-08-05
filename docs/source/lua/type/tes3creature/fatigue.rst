@@ -1,6 +1,6 @@
 fatigue
 ====================================================================================================
 
-`number`_. The actor's max fatigue.
+`number`_. Read-only. The actor's max fatigue.
 
 .. _`number`: ../../../lua/type/number.html

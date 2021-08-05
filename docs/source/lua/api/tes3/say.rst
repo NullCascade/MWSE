@@ -23,7 +23,7 @@ volume (`number`_)
     Default: ``1``. The volume to play the sound at, relative to the voice mix channel.
 
 forceSubtitle (`boolean`_)
-    Default: ``false``. If true a subtitle will be shown, even if subtitles are disabled.
+    If true a subtitle will be shown, even if subtitles are disabled.
 
 subtitle (`string`_)
     Optional. The subtitle to show if subtitles are enabled, or if forceSubtitle is set.

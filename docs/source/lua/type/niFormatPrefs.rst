@@ -6,23 +6,25 @@ A class that represents a set of preferences for texture formats. These preferen
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`alphaLayout`_ (`niTextureFormatPrefsAlphaFormat`_)
+`alphaLayout <niFormatPrefs/alphaLayout.html>`_ (`niTextureFormatPrefsAlphaFormat`_)
     The Alpha format.
 
-`mipLayout`_ (`niTextureFormatPrefsMipFlag`_)
+`mipLayout <niFormatPrefs/mipLayout.html>`_ (`niTextureFormatPrefsMipFlag`_)
     The MIP format.
 
-`pixelLayout`_ (`niTextureFormatPrefsPixelLayout`_)
+`pixelLayout <niFormatPrefs/pixelLayout.html>`_ (`niTextureFormatPrefsPixelLayout`_)
     The pixel layout.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     niFormatPrefs/alphaLayout
     niFormatPrefs/mipLayout
     niFormatPrefs/pixelLayout
 
-.. _`alphaLayout`: niFormatPrefs/alphaLayout.html
-.. _`mipLayout`: niFormatPrefs/mipLayout.html
-.. _`pixelLayout`: niFormatPrefs/pixelLayout.html
-
+.. _`niTextureFormatPrefsAlphaFormat`: ../../lua/type/niTextureFormatPrefsAlphaFormat.html
+.. _`niTextureFormatPrefsMipFlag`: ../../lua/type/niTextureFormatPrefsMipFlag.html
+.. _`niTextureFormatPrefsPixelLayout`: ../../lua/type/niTextureFormatPrefsPixelLayout.html

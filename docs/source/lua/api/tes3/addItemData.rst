@@ -6,7 +6,8 @@ Creates an item data if there is room for a new stack in a given inventory. This
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3itemData`_.
+createdData (`tes3itemData`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

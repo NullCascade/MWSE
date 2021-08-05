@@ -6,7 +6,8 @@ Gets an attached property by property type.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niProperty`_.
+result (`niProperty`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

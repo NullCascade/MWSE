@@ -6,7 +6,8 @@ Returns the lowercase identifying name of an attribute for a given numerical, 0-
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+name (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

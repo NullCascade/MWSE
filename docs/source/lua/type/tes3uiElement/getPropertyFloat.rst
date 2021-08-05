@@ -6,7 +6,8 @@ Properties are named variables attached to an element. Gets a property value wit
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -6,19 +6,19 @@ A simple pair of integers, typically used to define a range.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`max`_ (`number`_)
+`max <tes3rangeInt/max.html>`_ (`number`_)
     The maximum value in the range.
 
-`min`_ (`number`_)
+`min <tes3rangeInt/min.html>`_ (`number`_)
     The minimum value in the range.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3rangeInt/max
     tes3rangeInt/min
-
-.. _`max`: tes3rangeInt/max.html
-.. _`min`: tes3rangeInt/min.html
 
 .. _`number`: ../../lua/type/number.html

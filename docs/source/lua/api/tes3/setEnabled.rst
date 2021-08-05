@@ -6,7 +6,8 @@ Enables or disables a reference.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+success (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ reference (`tes3reference`_, `tes3mobileActor`_, `string`_)
     The reference to enable/disable.
 
 toggle (`boolean`_)
-    Default: ``false``. If true, the enabled state will be toggled.
+    If true, the enabled state will be toggled.
 
 enabled (`boolean`_)
     Default: ``true``. If not toggling, will set true to enable or false to disable.

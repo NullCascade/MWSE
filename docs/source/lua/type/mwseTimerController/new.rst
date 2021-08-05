@@ -6,7 +6,8 @@ Creates a new Timer Controller. Its initial clock is zero, unless a start time i
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`mwseTimerController`_.
+result (`mwseTimerController`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

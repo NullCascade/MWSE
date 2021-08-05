@@ -6,7 +6,8 @@ Gets the effect for the given type.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niDynamicEffect`_.
+result (`niDynamicEffect`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

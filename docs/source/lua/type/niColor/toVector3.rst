@@ -6,6 +6,7 @@ Creates a vector3 of the color object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_.
+result (`tes3vector3`_)
+    No description available.
 
 .. _`tes3vector3`: ../../../lua/type/tes3vector3.html

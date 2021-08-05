@@ -6,7 +6,8 @@ Fetches the core game object that represents a global variable.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3globalVariable`_.
+globalVariable (`tes3globalVariable`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

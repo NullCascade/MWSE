@@ -12,7 +12,8 @@ patterns that always fail.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -22,4 +23,5 @@ Accepts parameters in the following order:
 s (`string`_)
     The input string.
 
+.. _`pattern`: ../../../lua/type/pattern.html
 .. _`string`: ../../../lua/type/string.html

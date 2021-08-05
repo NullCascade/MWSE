@@ -6,6 +6,7 @@ Normalize the vector in-place, or set its components to zero if normalization is
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`bool`_.
+result (`boolean`_)
+    No description available.
 
-.. _`bool`: ../../../lua/type/boolean.html
+.. _`boolean`: ../../../lua/type/boolean.html

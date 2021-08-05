@@ -6,7 +6,8 @@ Retrieves the value of a global value, or nil if the global could not be found.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+value (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

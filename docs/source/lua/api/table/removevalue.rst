@@ -6,7 +6,8 @@ Removes a value from a given table. Returns true if the value was successfully r
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -21,3 +22,4 @@ value (`unknown`_)
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

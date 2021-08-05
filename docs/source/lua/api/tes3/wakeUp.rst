@@ -8,6 +8,7 @@ Note this function returns false if WorldController or MobilePlayer aren't initi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+wokeUp (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

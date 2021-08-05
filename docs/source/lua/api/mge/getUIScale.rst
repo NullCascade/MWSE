@@ -6,6 +6,7 @@ Returns the UI scaling used.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

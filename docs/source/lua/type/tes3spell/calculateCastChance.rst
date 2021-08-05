@@ -6,7 +6,8 @@ Calculates the chance that a caster can cast a given spell.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

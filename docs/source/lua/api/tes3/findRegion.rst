@@ -6,7 +6,8 @@ Fetches the core game region object for a given region ID. If the region with a 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3region`_.
+region (`tes3region`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

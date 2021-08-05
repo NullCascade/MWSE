@@ -12,7 +12,7 @@ reference (`tes3reference`_, `tes3mobileActor`_, `string`_)
     A reference whose owner to set.
 
 remove (`boolean`_)
-    Default: ``false``. If this parameter is set to true, reference's owner field will be removed.
+    Optional. If this parameter is set to true, reference's owner field will be removed.
 
 owner (`tes3npc`_, `tes3faction`_, `string`_)
     Assigns this NPC or a faction as the owner of the reference.

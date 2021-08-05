@@ -3,93 +3,75 @@ tes3quest
 
 A representation of a quest, with associated dialogue and info.
 
+This type inherits from the following parent types: `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`dialogue`_ (`tes3iterator`_)
-    Read-only. A collection of dialogues associated with the quest.
+`dialogue <tes3quest/dialogue.html>`_ (`tes3iterator`_)
+    A collection of dialogues associated with the quest.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`info`_ (`tes3iterator`_)
-    Read-only. A collection of dialogue info associated with the quest.
+`info <tes3quest/info.html>`_ (`tes3iterator`_)
+    A collection of dialogue info associated with the quest.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`supportsLuaData`_ (`boolean`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3quest/blocked
-    tes3quest/deleted
     tes3quest/dialogue
-    tes3quest/disabled
-    tes3quest/id
     tes3quest/info
-    tes3quest/modified
-    tes3quest/objectFlags
-    tes3quest/objectType
-    tes3quest/persistent
-    tes3quest/sourceMod
-    tes3quest/sourceless
-    tes3quest/supportsLuaData
-
-.. _`blocked`: tes3quest/blocked.html
-.. _`deleted`: tes3quest/deleted.html
-.. _`dialogue`: tes3quest/dialogue.html
-.. _`disabled`: tes3quest/disabled.html
-.. _`id`: tes3quest/id.html
-.. _`info`: tes3quest/info.html
-.. _`modified`: tes3quest/modified.html
-.. _`objectFlags`: tes3quest/objectFlags.html
-.. _`objectType`: tes3quest/objectType.html
-.. _`persistent`: tes3quest/persistent.html
-.. _`sourceMod`: tes3quest/sourceMod.html
-.. _`sourceless`: tes3quest/sourceless.html
-.. _`supportsLuaData`: tes3quest/supportsLuaData.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3quest/__tojson
-
-.. _`__tojson`: tes3quest/__tojson.html
 
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3iterator`: ../../lua/type/tes3iterator.html

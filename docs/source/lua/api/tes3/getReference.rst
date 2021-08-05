@@ -6,7 +6,8 @@ Fetches the first reference for a given base object ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+reference (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

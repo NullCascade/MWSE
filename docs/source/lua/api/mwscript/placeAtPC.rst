@@ -6,7 +6,8 @@ Wrapper for the PlaceAtPC mwscript function.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+lastPlacedReference (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

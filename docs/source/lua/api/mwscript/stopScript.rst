@@ -6,7 +6,8 @@ Wrapper for the StartCombat mwscript function.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -23,3 +24,4 @@ script (`tes3script`_, `string`_)
 .. _`string`: ../../../lua/type/string.html
 .. _`tes3mobileActor`: ../../../lua/type/tes3mobileActor.html
 .. _`tes3reference`: ../../../lua/type/tes3reference.html
+.. _`tes3script`: ../../../lua/type/tes3script.html

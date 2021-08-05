@@ -6,7 +6,8 @@ Checks to see if a given scan code is released, and was pressed last frame.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

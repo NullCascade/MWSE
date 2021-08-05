@@ -8,7 +8,8 @@ Each "node" is an object with a children table of other "nodes", each of which m
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`iterator`_.
+result (`iterator`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -21,26 +22,6 @@ t (`table`_)
 k (`unknown`_)
     Default: ``children``. The key of a table inside t object.
 
-Examples
-----------------------------------------------------------------------------------------------------
-
-Iterate over all scene nodes attached to player.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In the example below, function onLoaded() will be called when the game has been successfully loaded.
-
-For each scene nodes attached to the player, its type (node.RTTI.name) and name (node.name), will be printed to MWSE.log.
-
-.. code-block:: lua
-
-    local function onLoaded()
-        mwse.log("Player's scene graph:")
-        for node in table.traverse({tes3.player.sceneNode}) do
-            mwse.log("%s : %s", node.RTTI.name, node.name)
-        end
-    end
-
-    event.register("loaded", onLoaded)
-
-
+.. _`iterator`: ../../../lua/type/iterator.html
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

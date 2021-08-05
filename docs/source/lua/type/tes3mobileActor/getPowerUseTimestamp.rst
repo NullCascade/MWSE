@@ -6,7 +6,8 @@ Finds the timestamp a recharging power was used. Powers recharge 24 hours after 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+timestamp (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

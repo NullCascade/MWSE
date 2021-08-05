@@ -3,116 +3,118 @@ tes3cell
 
 An exterior or interior game area.
 
+This type inherits from the following parent types: `tes3baseObject`_
+
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`activators`_ (`tes3referenceList`_)
-    Read-only. One of the three reference collections for a cell.
+`activators <tes3cell/activators.html>`_ (`tes3referenceList`_)
+    One of the three reference collections for a cell.
 
-`actors`_ (`tes3referenceList`_)
-    Read-only. One of the three reference collections for a cell.
+`actors <tes3cell/actors.html>`_ (`tes3referenceList`_)
+    One of the three reference collections for a cell.
 
-`ambientColor`_ (`tes3packedColor`_)
+`ambientColor <tes3cell/ambientColor.html>`_ (`tes3packedColor`_)
     The cell's ambient color. Only available on interior cells.
 
-`behavesAsExterior`_ (`boolean`_)
+`behavesAsExterior <tes3cell/behavesAsExterior.html>`_ (`boolean`_)
     If true, the cell behaves as an exterior instead of an interior for certain properties. Only available on interior cells.
 
-`blocked`_ (`boolean`_)
+`blocked <tes3baseObject/blocked.html>`_ (`boolean`_)
     The blocked state of the object.
 
-`cellFlags`_ (`number`_)
+`cellFlags <tes3cell/cellFlags.html>`_ (`number`_)
     A numeric representation of the packed bit flags for the cell, typically accessed from other properties.
 
-`deleted`_ (`boolean`_)
-    Read-only. The deleted state of the object.
+`deleted <tes3baseObject/deleted.html>`_ (`boolean`_)
+    The deleted state of the object.
 
-`disabled`_ (`boolean`_)
-    Read-only. The disabled state of the object.
+`disabled <tes3baseObject/disabled.html>`_ (`boolean`_)
+    The disabled state of the object.
 
-`displayName`_ (`string`_)
+`displayName <tes3cell/displayName.html>`_ (`string`_)
     The name of the cell as displayed on the in-game UI. For exterior cells without an assigned name, this is the region name.
 
-`editorName`_ (`string`_)
+`editorName <tes3cell/editorName.html>`_ (`string`_)
     The name of the cell as displayed in the Construction Set. For exterior cells, this includes the cell coordinates.
 
-`fogColor`_ (`tes3packedColor`_)
+`fogColor <tes3cell/fogColor.html>`_ (`tes3packedColor`_)
     The cell's fog color. Only available on interior cells.
 
-`fogDensity`_ (`number`_)
+`fogDensity <tes3cell/fogDensity.html>`_ (`number`_)
     The cell's fog density. Only available on interior cells.
 
-`gridX`_ (`number`_)
+`gridX <tes3cell/gridX.html>`_ (`number`_)
     The cell's X grid coordinate. Only available on exterior cells.
 
-`gridY`_ (`number`_)
+`gridY <tes3cell/gridY.html>`_ (`number`_)
     The cell's Y grid coordinate. Only available on exterior cells.
 
-`hasWater`_ (`boolean`_)
+`hasWater <tes3cell/hasWater.html>`_ (`boolean`_)
     If true, the cell has water. Only applies to interior cells.
 
-`id`_ (`string`_)
-    Read-only. The unique identifier for the object.
+`id <tes3baseObject/id.html>`_ (`string`_)
+    The unique identifier for the object.
 
-`isInterior`_ (`boolean`_)
+`isInterior <tes3cell/isInterior.html>`_ (`boolean`_)
     If true, the cell is an interior.
 
-`modified`_ (`boolean`_)
+`modified <tes3baseObject/modified.html>`_ (`boolean`_)
     The modification state of the object since the last save.
 
-`name`_ (`string`_)
+`name <tes3cell/name.html>`_ (`string`_)
     The name and id of the cell. See also displayName and editorName.
 
-`objectFlags`_ (`number`_)
-    Read-only. The raw flags of the object.
+`objectFlags <tes3baseObject/objectFlags.html>`_ (`number`_)
+    The raw flags of the object.
 
-`objectType`_ (`number`_)
-    Read-only. The type of object. Maps to values in tes3.objectType.
+`objectType <tes3baseObject/objectType.html>`_ (`number`_)
+    The type of object. Maps to values in tes3.objectType.
 
-`persistent`_ (`boolean`_)
+`persistent <tes3baseObject/persistent.html>`_ (`boolean`_)
     The persistent flag of the object.
 
-`pickObjectsRoot`_ (`niNode`_)
+`pickObjectsRoot <tes3cell/pickObjectsRoot.html>`_ (`niNode`_)
     The scenegraph node containing player-interactable objects from this cell.
 
-`region`_ (`tes3region`_)
+`region <tes3cell/region.html>`_ (`tes3region`_)
     The region associated with the cell. Only available on exterior cells, or interior cells that behave as exterior cells.
 
-`restingIsIllegal`_ (`boolean`_)
+`restingIsIllegal <tes3cell/restingIsIllegal.html>`_ (`boolean`_)
     If true, the player may not rest in the cell.
 
-`sourceMod`_ (`string`_)
-    Read-only. The filename of the mod that owns this object.
-
-`sourceless`_ (`boolean`_)
+`sourceless <tes3baseObject/sourceless.html>`_ (`boolean`_)
     The soruceless flag of the object.
 
-`staticObjectsRoot`_ (`tes3region`_)
+`sourceMod <tes3baseObject/sourceMod.html>`_ (`string`_)
+    The filename of the mod that owns this object.
+
+`staticObjectsRoot <tes3cell/staticObjectsRoot.html>`_ (`tes3region`_)
     The scenegraph node containing static non-player-interactable objects from this cell.
 
-`statics`_ (`tes3referenceList`_)
-    Read-only. One of the three reference collections for a cell.
+`statics <tes3cell/statics.html>`_ (`tes3referenceList`_)
+    One of the three reference collections for a cell.
 
-`sunColor`_ (`tes3packedColor`_)
+`sunColor <tes3cell/sunColor.html>`_ (`tes3packedColor`_)
     The cell's sun color. Only available on interior cells.
 
-`supportsLuaData`_ (`boolean`_)
+`supportsLuaData <tes3baseObject/supportsLuaData.html>`_ (`boolean`_)
     If true, references of this object can store temporary or persistent lua data.
 
-`waterLevel`_ (`number`_)
+`waterLevel <tes3cell/waterLevel.html>`_ (`number`_)
     The water level in the cell. Only available on interior cells.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3cell/activators
     tes3cell/actors
     tes3cell/ambientColor
     tes3cell/behavesAsExterior
-    tes3cell/blocked
     tes3cell/cellFlags
-    tes3cell/deleted
-    tes3cell/disabled
     tes3cell/displayName
     tes3cell/editorName
     tes3cell/fogColor
@@ -120,79 +122,39 @@ Properties
     tes3cell/gridX
     tes3cell/gridY
     tes3cell/hasWater
-    tes3cell/id
     tes3cell/isInterior
-    tes3cell/modified
     tes3cell/name
-    tes3cell/objectFlags
-    tes3cell/objectType
-    tes3cell/persistent
     tes3cell/pickObjectsRoot
     tes3cell/region
     tes3cell/restingIsIllegal
-    tes3cell/sourceMod
-    tes3cell/sourceless
     tes3cell/staticObjectsRoot
     tes3cell/statics
     tes3cell/sunColor
-    tes3cell/supportsLuaData
     tes3cell/waterLevel
-
-.. _`activators`: tes3cell/activators.html
-.. _`actors`: tes3cell/actors.html
-.. _`ambientColor`: tes3cell/ambientColor.html
-.. _`behavesAsExterior`: tes3cell/behavesAsExterior.html
-.. _`blocked`: tes3cell/blocked.html
-.. _`cellFlags`: tes3cell/cellFlags.html
-.. _`deleted`: tes3cell/deleted.html
-.. _`disabled`: tes3cell/disabled.html
-.. _`displayName`: tes3cell/displayName.html
-.. _`editorName`: tes3cell/editorName.html
-.. _`fogColor`: tes3cell/fogColor.html
-.. _`fogDensity`: tes3cell/fogDensity.html
-.. _`gridX`: tes3cell/gridX.html
-.. _`gridY`: tes3cell/gridY.html
-.. _`hasWater`: tes3cell/hasWater.html
-.. _`id`: tes3cell/id.html
-.. _`isInterior`: tes3cell/isInterior.html
-.. _`modified`: tes3cell/modified.html
-.. _`name`: tes3cell/name.html
-.. _`objectFlags`: tes3cell/objectFlags.html
-.. _`objectType`: tes3cell/objectType.html
-.. _`persistent`: tes3cell/persistent.html
-.. _`pickObjectsRoot`: tes3cell/pickObjectsRoot.html
-.. _`region`: tes3cell/region.html
-.. _`restingIsIllegal`: tes3cell/restingIsIllegal.html
-.. _`sourceMod`: tes3cell/sourceMod.html
-.. _`sourceless`: tes3cell/sourceless.html
-.. _`staticObjectsRoot`: tes3cell/staticObjectsRoot.html
-.. _`statics`: tes3cell/statics.html
-.. _`sunColor`: tes3cell/sunColor.html
-.. _`supportsLuaData`: tes3cell/supportsLuaData.html
-.. _`waterLevel`: tes3cell/waterLevel.html
 
 Methods
 ----------------------------------------------------------------------------------------------------
 
-`__tojson`_ (`string`_)
+`__tojson <tes3baseObject/__tojson.html>`_ (`method`_)
     Serializes the object to json.
 
-`iterateReferences`_
+`iterateReferences <tes3cell/iterateReferences.html>`_ (`method`_)
     Used in a for loop, iterates over objects in the cell.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
-    tes3cell/__tojson
     tes3cell/iterateReferences
 
-.. _`__tojson`: tes3cell/__tojson.html
-.. _`iterateReferences`: tes3cell/iterateReferences.html
-
 .. _`boolean`: ../../lua/type/boolean.html
+.. _`method`: ../../lua/type/method.html
 .. _`niNode`: ../../lua/type/niNode.html
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html
+.. _`tes3baseObject`: ../../lua/type/tes3baseObject.html
 .. _`tes3packedColor`: ../../lua/type/tes3packedColor.html
 .. _`tes3referenceList`: ../../lua/type/tes3referenceList.html
 .. _`tes3region`: ../../lua/type/tes3region.html

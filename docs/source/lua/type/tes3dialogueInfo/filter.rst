@@ -6,7 +6,8 @@ This method filters the associated dialogue info for given arguments and returns
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

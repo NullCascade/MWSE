@@ -6,6 +6,7 @@ Forces the player's POV to third person the next simulation frame, and returns t
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+changedPOV (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

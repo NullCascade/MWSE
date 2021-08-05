@@ -6,7 +6,8 @@ Calculates the interpolated position against the target vector using the distanc
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_.
+result (`tes3vector3`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -19,4 +20,5 @@ targetPoint (`tes3vector3`_)
 distance (`float`_)
     No description available.
 
+.. _`float`: ../../../lua/type/float.html
 .. _`tes3vector3`: ../../../lua/type/tes3vector3.html

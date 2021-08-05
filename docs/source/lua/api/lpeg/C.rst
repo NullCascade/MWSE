@@ -8,7 +8,8 @@ The captured value is a string. If p has other captures, their values are return
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -18,3 +19,4 @@ Accepts parameters in the following order:
 p (`pattern`_)
     The pattern to capture against.
 
+.. _`pattern`: ../../../lua/type/pattern.html

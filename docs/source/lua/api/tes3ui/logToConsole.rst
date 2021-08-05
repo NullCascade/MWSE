@@ -12,7 +12,7 @@ text (`string`_)
     No description available.
 
 isCommand (`boolean`_)
-    Default: ``false``. No description available.
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`string`: ../../../lua/type/string.html

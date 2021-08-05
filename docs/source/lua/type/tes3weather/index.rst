@@ -1,6 +1,6 @@
 index
 ====================================================================================================
 
-`number`_. The weather's index ID.
+`number`_. Read-only. The weather's index ID.
 
 .. _`number`: ../../../lua/type/number.html

@@ -1,5 +1,6 @@
 longBlade
 ====================================================================================================
 
-`tes3skillStatistic`_. Direct access to the NPC's long blade skill statistic.
+`tes3skillStatistic`_. Read-only. Direct access to the NPC's long blade skill statistic.
 
+.. _`tes3skillStatistic`: ../../../lua/type/tes3skillStatistic.html

@@ -6,7 +6,8 @@ This function inserts given creature in the creature leveled list. True is retur
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

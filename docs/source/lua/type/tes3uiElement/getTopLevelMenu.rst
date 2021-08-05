@@ -6,6 +6,7 @@ Finds the parent menu containing the element. Useful for finding the correct men
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

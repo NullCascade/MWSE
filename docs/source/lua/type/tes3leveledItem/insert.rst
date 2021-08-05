@@ -6,7 +6,8 @@ This function inserts given item in the leveled list. True is returned if the op
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

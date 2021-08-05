@@ -6,7 +6,8 @@ Locates a root dialogue topic that can then be filtered down for a specific acto
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3dialogue`_.
+dialogue (`tes3dialogue`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ index (`number`_)
     Default: ``1``. Start index of the find.
 
 plain (`boolean`_)
-    Default: ``false``. If true, a normal search instead of a pattern search will be performed.
+    If true, a normal search instead of a pattern search will be performed.
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`number`: ../../../lua/type/number.html

@@ -6,7 +6,8 @@ Advances the game time. Can be used to simulate player resting.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+hoursPassed (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ hours (`number`_)
     How many hours to progress.
 
 resting (`boolean`_)
-    Default: ``false``. Should advancing time count as resting? If set to true invokes usual sleeping mechanics: health, fatigue and magicka restoration, and possible rest interruption. The length of the rest will be equal to hours parameter, rounded down to nearest natural number.
+    Optional. Should advancing time count as resting? If set to true invokes usual sleeping mechanics: health, fatigue and magicka restoration, and possible rest interruption. The length of the rest will be equal to hours parameter, rounded down to nearest natural number.
 
 updateEnvironment (`boolean`_)
     Default: ``true``. Controls if the weather system is updated for each hour passed.

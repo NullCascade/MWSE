@@ -6,14 +6,15 @@ Create a string representing the object. Object can be a table, a string, a numb
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+result (`string`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
 
 Accepts parameters in the following order:
 
-object (`unknown`_)
+object (`table`_)
     No description available.
 
 state (`table`_)

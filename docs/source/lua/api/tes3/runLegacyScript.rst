@@ -6,7 +6,8 @@ This function will compile and run a mwscript chunk of code. This is not ideal t
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -41,3 +42,5 @@ info (`tes3dialogueInfo`_)
 .. _`tes3dialogueInfo`: ../../../lua/type/tes3dialogueInfo.html
 .. _`tes3mobileActor`: ../../../lua/type/tes3mobileActor.html
 .. _`tes3reference`: ../../../lua/type/tes3reference.html
+.. _`tes3script`: ../../../lua/type/tes3script.html
+.. _`tes3scriptVariables`: ../../../lua/type/tes3scriptVariables.html

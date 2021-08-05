@@ -6,6 +6,7 @@ Returns a UNIX-style timestamp based on in-world simulation time since the start
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+timestamp (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

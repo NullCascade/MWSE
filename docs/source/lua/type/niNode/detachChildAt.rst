@@ -6,7 +6,8 @@ Detaches the child at the specified index from the children list of the node. Re
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niAVObject`_.
+result (`niAVObject`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

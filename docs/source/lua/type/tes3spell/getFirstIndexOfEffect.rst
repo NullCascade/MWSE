@@ -6,7 +6,8 @@ Gets the first index of an effect ID in the spell effect table.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

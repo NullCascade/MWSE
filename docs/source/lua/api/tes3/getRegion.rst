@@ -6,6 +6,7 @@ Gets the current region the player is in. This checks the player's current cell 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3region`_.
+region (`tes3region`_)
+    No description available.
 
 .. _`tes3region`: ../../../lua/type/tes3region.html

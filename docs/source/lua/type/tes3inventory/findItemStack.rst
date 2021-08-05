@@ -6,7 +6,8 @@ Searches for an item stack in the inventory.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3itemStack`_.
+result (`tes3itemStack`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

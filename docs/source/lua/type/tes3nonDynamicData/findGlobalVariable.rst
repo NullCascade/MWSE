@@ -6,7 +6,8 @@ Locates a global variable for a given ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3globalVariable`_.
+result (`tes3globalVariable`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

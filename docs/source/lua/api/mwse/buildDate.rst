@@ -5,4 +5,4 @@ mwse.buildDate
 
 Formatted as YYYYMMDD.
 
-.. _`number`: ../../lua/type/number.html
+.. _`number`: ../../../lua/type/number.html

@@ -1,5 +1,6 @@
 children
 ====================================================================================================
 
-`niAVObjectTArray`_. The children of the node.
+`niAVObjectTArray`_. Read-only. The children of the node.
 
+.. _`niAVObjectTArray`: ../../../lua/type/niAVObjectTArray.html

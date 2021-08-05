@@ -6,6 +6,7 @@ Returns a table of active cells. If indoors, the table will have only one entry.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+cells (`table`_)
+    No description available.
 
 .. _`table`: ../../../lua/type/table.html

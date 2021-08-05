@@ -1,6 +1,6 @@
 underwaterSoundState
 ====================================================================================================
 
-`bool`_. The weather's underwater sound state flag.
+`boolean`_. Read-only. The weather's underwater sound state flag.
 
-.. _`bool`: ../../../lua/type/boolean.html
+.. _`boolean`: ../../../lua/type/boolean.html

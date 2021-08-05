@@ -6,6 +6,7 @@ Selects the alchemy item with the greatest value, for a given effect ID and load
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

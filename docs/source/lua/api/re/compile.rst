@@ -9,7 +9,8 @@ extra Lua values to be used by the pattern.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -22,5 +23,6 @@ s (`string`_)
 defs (`table`_)
     Optional. Extra lua values to be used by the pattern.
 
+.. _`pattern`: ../../../lua/type/pattern.html
 .. _`string`: ../../../lua/type/string.html
 .. _`table`: ../../../lua/type/table.html

@@ -6,7 +6,8 @@ Locates a general object for a given ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3baseObject`_.
+result (`tes3baseObject`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

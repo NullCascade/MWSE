@@ -6,8 +6,12 @@ Returns both the viewport width and the viewport height. Note that this the real
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_. The width of the viewport.
+The function has more than one return value.
 
-`number`_. The height of the viewport.
+width (`number`_)
+    The width of the viewport.
+
+height (`number`_)
+    The height of the viewport.
 
 .. _`number`: ../../../lua/type/number.html

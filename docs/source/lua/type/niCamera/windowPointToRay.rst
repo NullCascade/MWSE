@@ -6,9 +6,13 @@ Given a screen space position, calculates the world position and outlook directi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_. The world point that the given screen position looks out from.
+The function has more than one return value.
 
-`tes3vector3`_. The look direction of the camera from the given origin point.
+origin (`tes3vector3`_)
+    The world point that the given screen position looks out from.
+
+direction (`tes3vector3`_)
+    The look direction of the camera from the given origin point.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

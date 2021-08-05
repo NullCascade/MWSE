@@ -6,7 +6,8 @@ Drops one or more items from a reference's inventory onto the ground at their fe
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+createdReference (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ itemData (`tes3itemData`_)
     Optional. The item data of the specific item to drop. Without this, the first matching item in the inventory will drop.
 
 matchNoItemData (`boolean`_)
-    Default: ``false``. If true, matches an item without item data. This can be used when you want to drop an item that isn't equipped (equipped items always have item data).
+    If true, matches an item without item data. This can be used when you want to drop an item that isn't equipped (equipped items always have item data).
 
 count (`number`_)
     Default: ``1``. The number of items to drop.

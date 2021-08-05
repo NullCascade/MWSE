@@ -6,7 +6,8 @@ Creates a new basic or bump map.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niTexturingPropertyMap`_. The created basic or bump map.
+map (`niTexturingPropertyMap`_)
+    The created basic or bump map.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -29,5 +30,6 @@ isBumpMap (`boolean`_)
     Default: ``false``. If true, a bump map will be created instead.
 
 .. _`boolean`: ../../../lua/type/boolean.html
+.. _`niTexture`: ../../../lua/type/niTexture.html
 .. _`niTexturingPropertyMap`: ../../../lua/type/niTexturingPropertyMap.html
 .. _`number`: ../../../lua/type/number.html

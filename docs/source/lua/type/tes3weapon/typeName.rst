@@ -1,6 +1,6 @@
 typeName
 ====================================================================================================
 
-`string`_. The player-facing name for the weapon type.
+`string`_. Read-only. The player-facing name for the weapon type.
 
 .. _`string`: ../../../lua/type/string.html

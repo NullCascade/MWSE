@@ -1,6 +1,6 @@
 walkSpeed
 ====================================================================================================
 
-`number`_. The calculated walk movement speed.
+`number`_. Read-only. The calculated walk movement speed.
 
 .. _`number`: ../../../lua/type/number.html

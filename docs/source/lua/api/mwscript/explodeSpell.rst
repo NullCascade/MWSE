@@ -6,7 +6,8 @@ Wrapper for the ExplodeSpell mwscript function.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+executed (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

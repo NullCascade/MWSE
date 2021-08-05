@@ -6,7 +6,8 @@ This function creates a new custom magic effect. The effect can be scripted thro
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3effect`_.
+effect (`tes3effect`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -132,5 +133,7 @@ onCollision (`function`_)
 .. _`number`: ../../../lua/type/number.html
 .. _`string`: ../../../lua/type/string.html
 .. _`table`: ../../../lua/type/table.html
+.. _`tes3.effect`: ../../../lua/type/tes3.effect.html
+.. _`tes3.magicSchool`: ../../../lua/type/tes3.magicSchool.html
 .. _`tes3effect`: ../../../lua/type/tes3effect.html
 .. _`tes3physicalObject`: ../../../lua/type/tes3physicalObject.html

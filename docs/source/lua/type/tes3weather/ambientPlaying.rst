@@ -1,6 +1,6 @@
 ambientPlaying
 ====================================================================================================
 
-`bool`_. The weather's ambient playing flag.
+`boolean`_. Read-only. The weather's ambient playing flag.
 
-.. _`bool`: ../../../lua/type/boolean.html
+.. _`boolean`: ../../../lua/type/boolean.html

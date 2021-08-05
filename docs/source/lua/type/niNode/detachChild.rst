@@ -6,7 +6,8 @@ Detaches the child from the children list of the node. Returns the detached chil
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niAVObject`_.
+result (`niAVObject`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

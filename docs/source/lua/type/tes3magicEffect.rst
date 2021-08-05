@@ -6,128 +6,131 @@ A core magic effect definition.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`allowEnchanting`_ (`boolean`_)
+`allowEnchanting <tes3magicEffect/allowEnchanting.html>`_ (`boolean`_)
     Access to the flag that determines if this effect can be used in enchanting.
 
-`allowSpellmaking`_ (`boolean`_)
+`allowSpellmaking <tes3magicEffect/allowSpellmaking.html>`_ (`boolean`_)
     Access to the flag that determines if this effect can be used with spellmaking.
 
-`appliesOnce`_ (`boolean`_)
+`appliesOnce <tes3magicEffect/appliesOnce.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can be used in enchanting.
 
-`areaSoundEffect`_ (`string`_)
-    Read-only. The path to the sound to play for area of effect impacts.
+`areaSoundEffect <tes3magicEffect/areaSoundEffect.html>`_ (`string`_)
+    The path to the sound to play for area of effect impacts.
 
-`areaVisualEffect`_ (`tes3physicalObject`_)
+`areaVisualEffect <tes3magicEffect/areaVisualEffect.html>`_ (`tes3physicalObject`_)
     No description available.
 
-`baseFlags`_ (`number`_)
+`baseFlags <tes3magicEffect/baseFlags.html>`_ (`number`_)
     No description available.
 
-`baseMagickaCost`_ (`number`_)
+`baseMagickaCost <tes3magicEffect/baseMagickaCost.html>`_ (`number`_)
     The base magicka cost to use in calculations.
 
-`boltSoundEffects`_ (`string`_)
-    Read-only. The path to the sound effect to play for target projectiles.
+`boltSoundEffects <tes3magicEffect/boltSoundEffects.html>`_ (`string`_)
+    The path to the sound effect to play for target projectiles.
 
-`boltVisualEffect`_ (`tes3physicalObject`_)
+`boltVisualEffect <tes3magicEffect/boltVisualEffect.html>`_ (`tes3physicalObject`_)
     No description available.
 
-`canCastSelf`_ (`boolean`_)
+`canCastSelf <tes3magicEffect/canCastSelf.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can be used with a range of self.
 
-`canCastTarget`_ (`boolean`_)
+`canCastTarget <tes3magicEffect/canCastTarget.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can be used with a range of target.
 
-`canCastTouch`_ (`boolean`_)
+`canCastTouch <tes3magicEffect/canCastTouch.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can be used with a range of touch.
 
-`castSoundEffect`_ (`string`_)
-    Read-only. The path to the sound effect to play when casting.
-
-`castVisualEffect`_ (`tes3physicalObject`_)
-    No description available.
-
-`casterLinked`_ (`boolean`_)
+`casterLinked <tes3magicEffect/casterLinked.html>`_ (`boolean`_)
     Access to the base flag.
 
-`description`_ (`string`_)
+`castSoundEffect <tes3magicEffect/castSoundEffect.html>`_ (`string`_)
+    The path to the sound effect to play when casting.
+
+`castVisualEffect <tes3magicEffect/castVisualEffect.html>`_ (`tes3physicalObject`_)
+    No description available.
+
+`description <tes3magicEffect/description.html>`_ (`string`_)
     Player-facing description of the effect.
 
-`flags`_ (`number`_)
+`flags <tes3magicEffect/flags.html>`_ (`number`_)
     Raw access to the numerical representation of flags. Typically shouldn't be used.
 
-`hasContinuousVFX`_ (`boolean`_)
+`hasContinuousVFX <tes3magicEffect/hasContinuousVFX.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect's VFX continuously plays.
 
-`hasNoDuration`_ (`boolean`_)
+`hasNoDuration <tes3magicEffect/hasNoDuration.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect doesn't use a duration.
 
-`hasNoMagnitude`_ (`boolean`_)
+`hasNoMagnitude <tes3magicEffect/hasNoMagnitude.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect doesn't make use of its magnitude.
 
-`hitSoundEffect`_ (`string`_)
-    Read-only. The path to the sound effect to play when the effect hits a target.
+`hitSoundEffect <tes3magicEffect/hitSoundEffect.html>`_ (`string`_)
+    The path to the sound effect to play when the effect hits a target.
 
-`hitVisualEffect`_ (`tes3physicalObject`_)
+`hitVisualEffect <tes3magicEffect/hitVisualEffect.html>`_ (`tes3physicalObject`_)
     No description available.
 
-`icon`_ (`string`_)
+`icon <tes3magicEffect/icon.html>`_ (`string`_)
     The sound path to the icon to use for the effect.
 
-`illegalDaedra`_ (`boolean`_)
+`illegalDaedra <tes3magicEffect/illegalDaedra.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect summons an illegal daedra. This flag isn't used.
 
-`isHarmful`_ (`boolean`_)
+`isHarmful <tes3magicEffect/isHarmful.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect is counted as a hostile action.
 
-`lightingBlue`_ (`number`_)
+`lightingBlue <tes3magicEffect/lightingBlue.html>`_ (`number`_)
     The amount of blue lighting to use when lighting projectiles.
 
-`lightingGreen`_ (`number`_)
+`lightingGreen <tes3magicEffect/lightingGreen.html>`_ (`number`_)
     The amount of green lighting to use when lighting projectiles.
 
-`lightingRed`_ (`number`_)
+`lightingRed <tes3magicEffect/lightingRed.html>`_ (`number`_)
     The amount of red lighting to use when lighting projectiles.
 
-`name`_ (`string`_)
-    Read-only. Player-facing name of the effect.
+`name <tes3magicEffect/name.html>`_ (`string`_)
+    Player-facing name of the effect.
 
-`nonRecastable`_ (`boolean`_)
+`nonRecastable <tes3magicEffect/nonRecastable.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can be refreshed by recasting.
 
-`particleTexture`_ (`boolean`_)
-    Read-only. The path to use for the particle effect texture.
+`particleTexture <tes3magicEffect/particleTexture.html>`_ (`boolean`_)
+    The path to use for the particle effect texture.
 
-`school`_ (`number`_)
+`school <tes3magicEffect/school.html>`_ (`number`_)
     The school that the effect is associated with.
 
-`size`_ (`number`_)
+`size <tes3magicEffect/size.html>`_ (`number`_)
     No description available.
 
-`sizeCap`_ (`number`_)
+`sizeCap <tes3magicEffect/sizeCap.html>`_ (`number`_)
     No description available.
 
-`skill`_ (`number`_)
-    Read-only. The skill for the associated school that the effect is associated with.
+`skill <tes3magicEffect/skill.html>`_ (`number`_)
+    The skill for the associated school that the effect is associated with.
 
-`speed`_ (`number`_)
+`speed <tes3magicEffect/speed.html>`_ (`number`_)
     No description available.
 
-`targetsAttributes`_ (`boolean`_)
+`targetsAttributes <tes3magicEffect/targetsAttributes.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect makes use of attributes.
 
-`targetsSkills`_ (`boolean`_)
+`targetsSkills <tes3magicEffect/targetsSkills.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect makes use of skills.
 
-`unreflectable`_ (`boolean`_)
+`unreflectable <tes3magicEffect/unreflectable.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect can't be reflected.
 
-`usesNegativeLighting`_ (`boolean`_)
+`usesNegativeLighting <tes3magicEffect/usesNegativeLighting.html>`_ (`boolean`_)
     Access to the base flag that determines if this effect provides negative lighting.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3magicEffect/allowEnchanting
     tes3magicEffect/allowSpellmaking
@@ -141,9 +144,9 @@ Properties
     tes3magicEffect/canCastSelf
     tes3magicEffect/canCastTarget
     tes3magicEffect/canCastTouch
+    tes3magicEffect/casterLinked
     tes3magicEffect/castSoundEffect
     tes3magicEffect/castVisualEffect
-    tes3magicEffect/casterLinked
     tes3magicEffect/description
     tes3magicEffect/flags
     tes3magicEffect/hasContinuousVFX
@@ -169,47 +172,6 @@ Properties
     tes3magicEffect/targetsSkills
     tes3magicEffect/unreflectable
     tes3magicEffect/usesNegativeLighting
-
-.. _`allowEnchanting`: tes3magicEffect/allowEnchanting.html
-.. _`allowSpellmaking`: tes3magicEffect/allowSpellmaking.html
-.. _`appliesOnce`: tes3magicEffect/appliesOnce.html
-.. _`areaSoundEffect`: tes3magicEffect/areaSoundEffect.html
-.. _`areaVisualEffect`: tes3magicEffect/areaVisualEffect.html
-.. _`baseFlags`: tes3magicEffect/baseFlags.html
-.. _`baseMagickaCost`: tes3magicEffect/baseMagickaCost.html
-.. _`boltSoundEffects`: tes3magicEffect/boltSoundEffects.html
-.. _`boltVisualEffect`: tes3magicEffect/boltVisualEffect.html
-.. _`canCastSelf`: tes3magicEffect/canCastSelf.html
-.. _`canCastTarget`: tes3magicEffect/canCastTarget.html
-.. _`canCastTouch`: tes3magicEffect/canCastTouch.html
-.. _`castSoundEffect`: tes3magicEffect/castSoundEffect.html
-.. _`castVisualEffect`: tes3magicEffect/castVisualEffect.html
-.. _`casterLinked`: tes3magicEffect/casterLinked.html
-.. _`description`: tes3magicEffect/description.html
-.. _`flags`: tes3magicEffect/flags.html
-.. _`hasContinuousVFX`: tes3magicEffect/hasContinuousVFX.html
-.. _`hasNoDuration`: tes3magicEffect/hasNoDuration.html
-.. _`hasNoMagnitude`: tes3magicEffect/hasNoMagnitude.html
-.. _`hitSoundEffect`: tes3magicEffect/hitSoundEffect.html
-.. _`hitVisualEffect`: tes3magicEffect/hitVisualEffect.html
-.. _`icon`: tes3magicEffect/icon.html
-.. _`illegalDaedra`: tes3magicEffect/illegalDaedra.html
-.. _`isHarmful`: tes3magicEffect/isHarmful.html
-.. _`lightingBlue`: tes3magicEffect/lightingBlue.html
-.. _`lightingGreen`: tes3magicEffect/lightingGreen.html
-.. _`lightingRed`: tes3magicEffect/lightingRed.html
-.. _`name`: tes3magicEffect/name.html
-.. _`nonRecastable`: tes3magicEffect/nonRecastable.html
-.. _`particleTexture`: tes3magicEffect/particleTexture.html
-.. _`school`: tes3magicEffect/school.html
-.. _`size`: tes3magicEffect/size.html
-.. _`sizeCap`: tes3magicEffect/sizeCap.html
-.. _`skill`: tes3magicEffect/skill.html
-.. _`speed`: tes3magicEffect/speed.html
-.. _`targetsAttributes`: tes3magicEffect/targetsAttributes.html
-.. _`targetsSkills`: tes3magicEffect/targetsSkills.html
-.. _`unreflectable`: tes3magicEffect/unreflectable.html
-.. _`usesNegativeLighting`: tes3magicEffect/usesNegativeLighting.html
 
 .. _`boolean`: ../../lua/type/boolean.html
 .. _`number`: ../../lua/type/number.html

@@ -6,7 +6,8 @@ Gets the number of days that have passed leading up to the start of a given mont
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+days (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

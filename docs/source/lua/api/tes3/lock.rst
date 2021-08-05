@@ -6,7 +6,8 @@ Locks an object, and optionally sets a locked reference's lock level. Returns tr
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+locked (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

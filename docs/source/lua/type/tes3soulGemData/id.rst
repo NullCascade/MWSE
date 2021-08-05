@@ -1,6 +1,6 @@
 id
 ====================================================================================================
 
-`string`_. The unique object ID.
+`string`_. Read-only. The unique object ID.
 
 .. _`string`: ../../../lua/type/string.html

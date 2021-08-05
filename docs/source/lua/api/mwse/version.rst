@@ -7,4 +7,4 @@ Formatted as AAABBBCCC, where A is the major version, BBB is the minor version, 
 
 It is usually better to use mwse.buildDate instead.
 
-.. _`number`: ../../lua/type/number.html
+.. _`number`: ../../../lua/type/number.html

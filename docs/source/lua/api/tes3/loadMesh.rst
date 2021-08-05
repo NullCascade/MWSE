@@ -6,7 +6,8 @@ Loads a mesh file and provides a scene graph object.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niNode`_.
+model (`niNode`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

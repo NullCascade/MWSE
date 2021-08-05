@@ -6,7 +6,8 @@ Returns the number of days in a given month. This may be altered if a Morrowind 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+dayCount (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

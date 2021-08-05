@@ -6,6 +6,7 @@ Returns the identifying name of a skill for a given numerical, 0-based index. E.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+name (`string`_)
+    No description available.
 
 .. _`string`: ../../../lua/type/string.html

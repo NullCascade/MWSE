@@ -6,7 +6,8 @@ Searches for active mobile actors which are within ``range`` distance from the `
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+mobileList (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

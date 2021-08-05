@@ -6,6 +6,7 @@ Serializes the object to json.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+string (`string`_)
+    No description available.
 
 .. _`string`: ../../../lua/type/string.html

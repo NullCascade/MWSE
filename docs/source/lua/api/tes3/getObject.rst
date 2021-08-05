@@ -6,7 +6,8 @@ Fetches the core game object for a given object ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3object`_.
+object (`tes3object`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

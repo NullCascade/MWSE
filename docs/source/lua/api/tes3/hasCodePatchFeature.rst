@@ -6,7 +6,8 @@ Attempts to determine if a given Morrowind Code Patch feature is enabled. This m
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_, `nil`_.
+state (`boolean`_, `nil`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

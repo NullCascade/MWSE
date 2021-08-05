@@ -6,6 +6,7 @@ Creates a copy of the matrix.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3matrix44`_.
+result (`tes3matrix44`_)
+    No description available.
 
 .. _`tes3matrix44`: ../../../lua/type/tes3matrix44.html

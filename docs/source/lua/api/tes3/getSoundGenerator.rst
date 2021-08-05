@@ -6,7 +6,8 @@ Returns a sound generator by a given creature id and type.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3soundGenerator`_.
+soundGenerator (`tes3soundGenerator`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

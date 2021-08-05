@@ -6,6 +6,7 @@ Fetches the weapon speed of the actor's currently equipped weapon, or 1.0 if no 
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

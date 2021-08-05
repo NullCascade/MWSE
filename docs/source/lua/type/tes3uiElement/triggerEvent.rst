@@ -12,3 +12,4 @@ eventID (`tes3uiEvent`_, `string`_)
     The event, or event ID.
 
 .. _`string`: ../../../lua/type/string.html
+.. _`tes3uiEvent`: ../../../lua/type/tes3uiEvent.html

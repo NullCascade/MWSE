@@ -6,7 +6,8 @@ Performs a test for a given keybind, and optionally a transition state.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

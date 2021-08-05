@@ -6,7 +6,8 @@ Gets the index of a given journal, or nil if no valid journal could be found.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+index (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

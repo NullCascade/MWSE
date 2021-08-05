@@ -6,7 +6,8 @@ Removes an item from a given reference's inventory.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+removedCount (`number`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

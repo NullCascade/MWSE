@@ -6,7 +6,8 @@ Changes a reference to werewolf form. This function works only on a reference in
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+success (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

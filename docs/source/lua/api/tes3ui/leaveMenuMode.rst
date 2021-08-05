@@ -6,7 +6,8 @@ Requests menu mode be deactivated on a menu with a given id.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

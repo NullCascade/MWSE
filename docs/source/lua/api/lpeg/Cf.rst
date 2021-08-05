@@ -17,7 +17,8 @@ accumulator becomes the captured value.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -31,3 +32,4 @@ f (`function`_)
     The function to use to fold p.
 
 .. _`function`: ../../../lua/type/function.html
+.. _`pattern`: ../../../lua/type/pattern.html

@@ -6,7 +6,8 @@ Locates the first reference for a given object ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3reference`_.
+result (`tes3reference`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

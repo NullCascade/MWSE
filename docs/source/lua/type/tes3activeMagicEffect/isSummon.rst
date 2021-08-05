@@ -1,5 +1,6 @@
 isSummon
 ====================================================================================================
 
-No description is currently available.
+`boolean`_. Read-only. No description available.
 
+.. _`boolean`: ../../../lua/type/boolean.html

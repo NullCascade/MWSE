@@ -6,7 +6,8 @@ Loads the contents of a file through json.decode. Files loaded from Data Files\M
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

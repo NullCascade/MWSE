@@ -6,6 +6,7 @@ Gets the gold count carried by the player.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
+goldCount (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

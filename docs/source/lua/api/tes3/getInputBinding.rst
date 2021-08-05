@@ -6,7 +6,8 @@ Gets the input configuration for a given keybind.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3inputConfig`_.
+inputConfig (`tes3inputConfig`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

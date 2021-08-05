@@ -6,7 +6,8 @@ Calculates the interpolated vector between this vector and another, given a tran
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_. The calculated value.
+lerpedVector (`tes3vector3`_)
+    The calculated value.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

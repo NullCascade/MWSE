@@ -14,7 +14,8 @@ Return value: on success: a table holding matching indices (e.g. { startindice,e
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`table`_.
+result (`table`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -34,3 +35,4 @@ reversed (`unknown`_)
     Optional. No description available.
 
 .. _`table`: ../../../lua/type/table.html
+.. _`unknown`: ../../../lua/type/unknown.html

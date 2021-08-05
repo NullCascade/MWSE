@@ -6,9 +6,13 @@ Creates a lockfile (called lockfile.lfs) in path if it does not exist and return
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`lfsLock`_, `nil`_. The lock object to manage, or nil in the case of an error.
+The function has more than one return value.
 
-`string`_, `nil`_. In the case of an error, a string describing the issue. In particular, if the lock exists and is not stale it returns the "File exists" message.
+success (`lfsLock`_, `nil`_)
+    The lock object to manage, or nil in the case of an error.
+
+error (`string`_, `nil`_)
+    In the case of an error, a string describing the issue. In particular, if the lock exists and is not stale it returns the "File exists" message.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

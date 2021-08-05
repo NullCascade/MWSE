@@ -6,7 +6,8 @@ This function removes an item from the leveled list. True is returned if the ope
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+result (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

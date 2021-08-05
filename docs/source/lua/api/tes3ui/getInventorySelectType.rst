@@ -6,6 +6,7 @@ Determines what sort of search is being done when performing an inventory select
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_.
+result (`string`_)
+    No description available.
 
 .. _`string`: ../../../lua/type/string.html

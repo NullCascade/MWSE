@@ -6,24 +6,24 @@ A node from a collection, which has a link to the previous and next node, as wel
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`data`_
-    Read-only. The data stored in the node. Its type depends on the specific collection.
+`data <tes3iteratorNode/data.html>`_ (`any`_)
+    The data stored in the node. Its type depends on the specific collection.
 
-`head`_ (`tes3iteratorNode`_)
-    Read-only. The previous node in the collection.
+`head <tes3iteratorNode/head.html>`_ (`tes3iteratorNode`_)
+    The previous node in the collection.
 
-`tail`_ (`tes3iteratorNode`_)
-    Read-only. The next node in the collection.
+`tail <tes3iteratorNode/tail.html>`_ (`tes3iteratorNode`_)
+    The next node in the collection.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3iteratorNode/data
     tes3iteratorNode/head
     tes3iteratorNode/tail
 
-.. _`data`: tes3iteratorNode/data.html
-.. _`head`: tes3iteratorNode/head.html
-.. _`tail`: tes3iteratorNode/tail.html
-
+.. _`any`: ../../lua/type/any.html
 .. _`tes3iteratorNode`: ../../lua/type/tes3iteratorNode.html

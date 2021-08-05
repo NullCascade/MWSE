@@ -6,7 +6,8 @@ Creates a text label. It defaults to displaying all text on a single line. To ge
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

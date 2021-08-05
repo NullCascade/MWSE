@@ -6,9 +6,13 @@ Sets the writing mode for a file.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_, `nil`_. true in case of success, or nil on an error.
+The function has more than one return value.
 
-`string`_. If succesful, this will be the previous file mode used. In the case of an error, a string describing the issue.
+success (`boolean`_, `nil`_)
+    true in case of success, or nil on an error.
+
+errorOrOldMode (`string`_)
+    If succesful, this will be the previous file mode used. In the case of an error, a string describing the issue.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

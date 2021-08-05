@@ -6,7 +6,8 @@ Returns a string where one string has been inserted into another at a given posi
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`string`_. A copy of s1 with s2 inserted into it.
+inserted (`string`_)
+    A copy of s1 with s2 inserted into it.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

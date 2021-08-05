@@ -11,7 +11,8 @@ The collision root node is used for testing, if present in the model.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+hasLineOfSight (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

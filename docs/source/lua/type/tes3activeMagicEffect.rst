@@ -6,53 +6,56 @@ An active magic effect.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`attributeId`_ (`number`_)
-    Read-only. The attribute ID (note that this may be the skill ID if the effect affects skills).
+`attributeId <tes3activeMagicEffect/attributeId.html>`_ (`number`_)
+    The attribute ID (note that this may be the skill ID if the effect affects skills).
 
-`duration`_ (`number`_)
-    Read-only. The total duration of this specific effect.
+`duration <tes3activeMagicEffect/duration.html>`_ (`number`_)
+    The total duration of this specific effect.
 
-`effectId`_ (`number`_)
-    Read-only. The magic effect ID.
+`effectId <tes3activeMagicEffect/effectId.html>`_ (`number`_)
+    The magic effect ID.
 
-`effectIndex`_ (`number`_)
-    Read-only. The index of the effect inside the magic source instance.
+`effectIndex <tes3activeMagicEffect/effectIndex.html>`_ (`number`_)
+    The index of the effect inside the magic source instance.
 
-`effectInstance`_ (`tes3magicEffectInstance`_)
-    Read-only. The magic effect instance for this effect.
+`effectInstance <tes3activeMagicEffect/effectInstance.html>`_ (`tes3magicEffectInstance`_)
+    The magic effect instance for this effect.
 
-`harmful`_ (`boolean`_)
-    Read-only. This flag that determines if this effect is counted as a hostile action.
+`harmful <tes3activeMagicEffect/harmful.html>`_ (`boolean`_)
+    This flag that determines if this effect is counted as a hostile action.
 
-`instance`_ (`tes3magicSourceInstance`_)
-    Read-only. The magic source instance for this effect.
+`instance <tes3activeMagicEffect/instance.html>`_ (`tes3magicSourceInstance`_)
+    The magic source instance for this effect.
 
-`isSummon`_ (`boolean`_)
-    Read-only. No description available.
+`isSummon <tes3activeMagicEffect/isSummon.html>`_ (`boolean`_)
+    No description available.
 
-`magnitude`_ (`number`_)
-    Read-only. The unresisted magnitude of the magic effect, that is the magnitude before resistance attributes are applied. This is always an integer number. To find the actual applied magnitude, you must check the magic effect instance.
+`magnitude <tes3activeMagicEffect/magnitude.html>`_ (`number`_)
+    The unresisted magnitude of the magic effect, that is the magnitude before resistance attributes are applied. This is always an integer number. To find the actual applied magnitude, you must check the magic effect instance.
 
-`magnitudeMin`_ (`number`_)
-    Read-only. Deprecated.
+`magnitudeMin <tes3activeMagicEffect/magnitudeMin.html>`_ (`number`_)
+    Deprecated.
 
-`mobile`_ (`tes3magicSourceInstance`_)
-    Read-only. The mobile affected by the magic effect.
+`mobile <tes3activeMagicEffect/mobile.html>`_ (`tes3magicSourceInstance`_)
+    The mobile affected by the magic effect.
 
-`next`_ (`tes3activeMagicEffect`_)
-    Read-only. Deprecated.
+`next <tes3activeMagicEffect/next.html>`_ (`tes3activeMagicEffect`_)
+    Deprecated.
 
-`previous`_ (`tes3activeMagicEffect`_)
-    Read-only. Deprecated.
+`previous <tes3activeMagicEffect/previous.html>`_ (`tes3activeMagicEffect`_)
+    Deprecated.
 
-`serial`_ (`number`_)
-    Read-only. The magic source instance serial number. See the ``instance`` and ``effectInstance`` properties to easily access the magic and effect instances.
+`serial <tes3activeMagicEffect/serial.html>`_ (`number`_)
+    The magic source instance serial number. See the ``instance`` and ``effectInstance`` properties to easily access the magic and effect instances.
 
-`skillId`_ (`number`_)
-    Read-only. The skill ID (note that this may be the attribute ID if the effect affects attributes).
+`skillId <tes3activeMagicEffect/skillId.html>`_ (`number`_)
+    The skill ID (note that this may be the attribute ID if the effect affects attributes).
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3activeMagicEffect/attributeId
     tes3activeMagicEffect/duration
@@ -69,22 +72,6 @@ Properties
     tes3activeMagicEffect/previous
     tes3activeMagicEffect/serial
     tes3activeMagicEffect/skillId
-
-.. _`attributeId`: tes3activeMagicEffect/attributeId.html
-.. _`duration`: tes3activeMagicEffect/duration.html
-.. _`effectId`: tes3activeMagicEffect/effectId.html
-.. _`effectIndex`: tes3activeMagicEffect/effectIndex.html
-.. _`effectInstance`: tes3activeMagicEffect/effectInstance.html
-.. _`harmful`: tes3activeMagicEffect/harmful.html
-.. _`instance`: tes3activeMagicEffect/instance.html
-.. _`isSummon`: tes3activeMagicEffect/isSummon.html
-.. _`magnitude`: tes3activeMagicEffect/magnitude.html
-.. _`magnitudeMin`: tes3activeMagicEffect/magnitudeMin.html
-.. _`mobile`: tes3activeMagicEffect/mobile.html
-.. _`next`: tes3activeMagicEffect/next.html
-.. _`previous`: tes3activeMagicEffect/previous.html
-.. _`serial`: tes3activeMagicEffect/serial.html
-.. _`skillId`: tes3activeMagicEffect/skillId.html
 
 .. _`boolean`: ../../lua/type/boolean.html
 .. _`number`: ../../lua/type/number.html

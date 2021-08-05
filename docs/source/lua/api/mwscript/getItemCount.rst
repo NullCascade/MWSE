@@ -3,6 +3,12 @@ mwscript.getItemCount
 
 Wrapper for the GetItemCount mwscript function.
 
+Returns
+----------------------------------------------------------------------------------------------------
+
+result (`number`_)
+    No description available.
+
 Parameters
 ----------------------------------------------------------------------------------------------------
 
@@ -14,6 +20,7 @@ reference (`tes3reference`_, `tes3mobileActor`_, `string`_)
 item (`tes3item`_, `string`_)
     No description available.
 
+.. _`number`: ../../../lua/type/number.html
 .. _`string`: ../../../lua/type/string.html
 .. _`tes3item`: ../../../lua/type/tes3item.html
 .. _`tes3mobileActor`: ../../../lua/type/tes3mobileActor.html

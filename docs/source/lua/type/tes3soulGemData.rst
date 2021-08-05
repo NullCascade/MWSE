@@ -6,32 +6,35 @@ A structure that holds (sometimes redundant) information on a soul gem.
 Properties
 ----------------------------------------------------------------------------------------------------
 
-`capacity`_ (`number`_)
-    Read-only. The capacity of the soul gem.
+`capacity <tes3soulGemData/capacity.html>`_ (`number`_)
+    The capacity of the soul gem.
 
-`id`_ (`string`_)
-    Read-only. The unique object ID.
+`id <tes3soulGemData/id.html>`_ (`string`_)
+    The unique object ID.
 
-`item`_ (`tes3misc`_)
-    Read-only. A reference back to the misc item that the soul gem represents.
+`item <tes3soulGemData/item.html>`_ (`tes3misc`_)
+    A reference back to the misc item that the soul gem represents.
 
-`mesh`_ (`string`_)
-    Read-only. The path to the object's mesh.
+`mesh <tes3soulGemData/mesh.html>`_ (`string`_)
+    The path to the object's mesh.
 
-`name`_ (`string`_)
-    Read-only. The player-facing name for the object.
+`name <tes3soulGemData/name.html>`_ (`string`_)
+    The player-facing name for the object.
 
-`texture`_ (`string`_)
-    Read-only. The path to the object's texture.
+`texture <tes3soulGemData/texture.html>`_ (`string`_)
+    The path to the object's texture.
 
-`value`_ (`number`_)
-    Read-only. The value of the object.
+`value <tes3soulGemData/value.html>`_ (`number`_)
+    The value of the object.
 
-`weight`_ (`number`_)
-    Read-only. The weight of the object.
+`weight <tes3soulGemData/weight.html>`_ (`number`_)
+    The weight of the object.
+
+
 
 .. toctree::
     :hidden:
+    :maxdepth: 1
 
     tes3soulGemData/capacity
     tes3soulGemData/id
@@ -41,15 +44,6 @@ Properties
     tes3soulGemData/texture
     tes3soulGemData/value
     tes3soulGemData/weight
-
-.. _`capacity`: tes3soulGemData/capacity.html
-.. _`id`: tes3soulGemData/id.html
-.. _`item`: tes3soulGemData/item.html
-.. _`mesh`: tes3soulGemData/mesh.html
-.. _`name`: tes3soulGemData/name.html
-.. _`texture`: tes3soulGemData/texture.html
-.. _`value`: tes3soulGemData/value.html
-.. _`weight`: tes3soulGemData/weight.html
 
 .. _`number`: ../../lua/type/number.html
 .. _`string`: ../../lua/type/string.html

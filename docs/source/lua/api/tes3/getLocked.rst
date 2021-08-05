@@ -6,7 +6,8 @@ Determines if a given reference is a locked door or container.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+isLocked (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

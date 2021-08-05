@@ -6,6 +6,7 @@ Returns true if either shift modifier key is pressed. It does not take into acco
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_. True if either shift key is pressed.
+isPressed (`boolean`_)
+    True if either shift key is pressed.
 
 .. _`boolean`: ../../../lua/type/boolean.html

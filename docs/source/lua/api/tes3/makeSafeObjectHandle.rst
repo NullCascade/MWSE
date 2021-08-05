@@ -6,11 +6,7 @@ Returns a safe handle for the object. To use the object use :getObject(). To che
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3object`_.
-
-Parameters
-----------------------------------------------------------------------------------------------------
-
-Accepts parameters in the following order:
+object (`tes3object`_)
+    No description available.
 
 .. _`tes3object`: ../../../lua/type/tes3object.html

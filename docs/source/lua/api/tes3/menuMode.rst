@@ -6,6 +6,7 @@ Returns true if the player is currently in menu mode.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+inMenuMode (`boolean`_)
+    No description available.
 
 .. _`boolean`: ../../../lua/type/boolean.html

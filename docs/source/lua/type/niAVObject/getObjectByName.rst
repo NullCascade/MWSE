@@ -6,7 +6,8 @@ Searches this node and all child nodes recursively for a node with a name that m
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`niAVObject`_.
+result (`niAVObject`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

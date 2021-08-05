@@ -6,7 +6,8 @@ Creates a timer that will finish the next frame. It defaults to the next simulat
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`mwseTimer`_.
+timer (`mwseTimer`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

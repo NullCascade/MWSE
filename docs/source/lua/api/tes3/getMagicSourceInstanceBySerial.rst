@@ -6,7 +6,8 @@ Fetches an instance of the magic source of a given serial number.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3magicSourceInstance`_.
+magicSourceInstance (`tes3magicSourceInstance`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

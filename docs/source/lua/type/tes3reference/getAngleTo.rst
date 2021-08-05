@@ -6,7 +6,8 @@ Calculates the angle from this reference's current facing to the target referenc
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_. The angle to the given reference.
+angle (`number`_)
+    The angle to the given reference.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

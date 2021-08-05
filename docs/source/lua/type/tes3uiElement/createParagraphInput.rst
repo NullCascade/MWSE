@@ -9,7 +9,8 @@ Creates a multi-line text input element, with line wrapping on. To receive input
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -19,5 +20,12 @@ Accepts parameters in the following order:
 id (`number`_)
     Optional. A registered identifier to help find this element later.
 
+.. _``tes3ui.acquireTextInput(element)``. Read the input with the ``text`` property. Write an initial value to edit by setting the ``text`` property.
+
+    Custom widget properties:
+        | `number`: ../../../lua/type/`tes3ui.acquireTextInput(element)``. Read the input with the ``text`` property. Write an initial value to edit by setting the ``text`` property.
+
+    Custom widget properties:
+        | `number.html
 .. _`number`: ../../../lua/type/number.html
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

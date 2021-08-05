@@ -26,7 +26,8 @@ string.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -36,3 +37,5 @@ Accepts parameters in the following order:
 value (`multiple`_)
     The value to convert to a pattern.
 
+.. _`multiple`: ../../../lua/type/multiple.html
+.. _`pattern`: ../../../lua/type/pattern.html

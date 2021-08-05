@@ -6,7 +6,8 @@ Creates a timer for the given Timer Controller.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`mwseTimer`_.
+timer (`mwseTimer`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

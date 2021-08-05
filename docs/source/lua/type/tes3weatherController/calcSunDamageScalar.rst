@@ -6,11 +6,7 @@ Calculates the sun damage based on the current weather.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`number`_.
-
-Parameters
-----------------------------------------------------------------------------------------------------
-
-Accepts parameters in the following order:
+result (`number`_)
+    No description available.
 
 .. _`number`: ../../../lua/type/number.html

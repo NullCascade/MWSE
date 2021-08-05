@@ -15,7 +15,8 @@ Creates a vertical slider.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3uiElement`_.
+result (`tes3uiElement`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -37,5 +38,14 @@ step (`number`_)
 jump (`number`_)
     Optional. Amount changed by clicking inside the slider area. The default is 5.
 
+.. _``element.widget.current``: Current value.
+        | `number`: ../../../lua/type/`element.widget.current``: Current value.
+        | `number.html
+.. _``element.widget.max``: Maximum value.
+        | `number`: ../../../lua/type/`element.widget.max``: Maximum value.
+        | `number.html
+.. _``element.widget.step``: Amount changed by up and down arrow buttons.
+        | `number`: ../../../lua/type/`element.widget.step``: Amount changed by up and down arrow buttons.
+        | `number.html
 .. _`number`: ../../../lua/type/number.html
 .. _`tes3uiElement`: ../../../lua/type/tes3uiElement.html

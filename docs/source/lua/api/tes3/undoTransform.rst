@@ -6,7 +6,8 @@ Changes a reference back from werewolf form to human. This function works only o
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+success (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

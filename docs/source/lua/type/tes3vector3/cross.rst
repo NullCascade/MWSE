@@ -6,7 +6,8 @@ Calculates the cross product with another vector.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3vector3`_.
+result (`tes3vector3`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------

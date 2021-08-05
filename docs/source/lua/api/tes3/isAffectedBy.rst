@@ -8,7 +8,8 @@ Note reference.object.spells:contains(spellID) will give the same output as this
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`boolean`_.
+isAffectedBy (`boolean`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -26,6 +27,7 @@ object (`tes3alchemy`_, `tes3enchantment`_, `tes3spell`_, `tes3magicEffect`_, `s
 
 .. _`boolean`: ../../../lua/type/boolean.html
 .. _`string`: ../../../lua/type/string.html
+.. _`tes3.effect`: ../../../lua/type/tes3.effect.html
 .. _`tes3alchemy`: ../../../lua/type/tes3alchemy.html
 .. _`tes3enchantment`: ../../../lua/type/tes3enchantment.html
 .. _`tes3magicEffect`: ../../../lua/type/tes3magicEffect.html

@@ -10,7 +10,8 @@ replacements.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -20,3 +21,4 @@ Accepts parameters in the following order:
 p (`pattern`_)
     The pattern to capture with.
 
+.. _`pattern`: ../../../lua/type/pattern.html

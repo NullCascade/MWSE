@@ -21,7 +21,8 @@ Any extra values returned by f become the values produced by the capture.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`pattern`_.
+result (`pattern`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
@@ -35,3 +36,4 @@ f (`function`_)
     The function to call to evaluate matches.
 
 .. _`function`: ../../../lua/type/function.html
+.. _`pattern`: ../../../lua/type/pattern.html

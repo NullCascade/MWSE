@@ -6,7 +6,8 @@ Fetches the core game Magic Effect object for a given ID.
 Returns
 ----------------------------------------------------------------------------------------------------
 
-`tes3magicEffect`_.
+magicEffect (`tes3magicEffect`_)
+    No description available.
 
 Parameters
 ----------------------------------------------------------------------------------------------------
