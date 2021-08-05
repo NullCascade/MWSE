@@ -212,23 +212,11 @@ function tes3uiElement:createSliderVertical(id, current, max, step, jump) end
 --- @return tes3uiElement result No description yet available.
 function tes3uiElement:createTextInput(id) end
 
---- Creates a selectable line of text, with configurable hover, click, and disabled colours. Can be used to create a list box by placing them in a ScrollPane. ``state`` sets the initial interaction state, documented below.
---- 
----     Custom widget properties:
----         | `number`_ ``element.widget.state``: Interaction state. 1 = normal, 2 = disabled, 4 = active. Controls which colour set to use.
----         | `table`_ (float[3]) ``element.widget.idle``: Colour for normal state, no mouse interaction.
----         | `table`_ (float[3]) ``element.widget.over``: Colour for normal state, on mouseOver.
----         | `table`_ (float[3]) ``element.widget.pressed``: Colour for normal state, on mouseDown.
----         | `table`_ (float[3]) ``element.widget.idleDisabled``: Colour for disabled state, no mouse interaction.
----         | `table`_ (float[3]) ``element.widget.overDisabled``: Colour for disabled state, on mouseOver.
----         | `table`_ (float[3]) ``element.widget.pressedDisabled``: Colour for disabled state, on mouseDown.
----         | `table`_ (float[3]) ``element.widget.idleActive``: Colour for active state, no mouse interaction.
----         | `table`_ (float[3]) ``element.widget.overActive``: Colour for active state, on mouseOver.
----         | `table`_ (float[3]) ``element.widget.pressedActive``: Colour for active state, on mouseDown.
+--- Creates a selectable line of text, with configurable hover, click, and disabled colours. Can be used to create a list box by placing them in a ScrollPane. ``state`` sets the initial interaction state.
 --- @param id number A registered identifier to help find this element later.
 --- @param text string The text to display.
 --- @param state number The initial interaction state. Defaults to normal.
---- @return tes3uiElement result No description yet available.
+--- @return tes3uiWidgetTextSelect result No description yet available.
 function tes3uiElement:createTextSelect(id, text, state) end
 
 --- Creates a styled thin border element. Any content should be created as children of this border.

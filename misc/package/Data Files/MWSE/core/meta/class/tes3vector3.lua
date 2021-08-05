@@ -55,7 +55,7 @@ function tes3vector3:lerp(toVector, transition) end
 function tes3vector3:negate() end
 
 --- Normalize the vector in-place, or set its components to zero if normalization is not possible. Returns true if the vector was successfully normalized.
---- @return bool result No description yet available.
+--- @return boolean result No description yet available.
 function tes3vector3:normalize() end
 
 --- Get a normalized copy of the vector.

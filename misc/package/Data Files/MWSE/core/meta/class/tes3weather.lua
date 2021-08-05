@@ -6,7 +6,7 @@
 --- @field ambientLoopSound tes3sound The weather's ambient looping sound.
 --- @field ambientLoopSoundId string The weather's ambient looping sound ID.
 --- @field ambientNightColor tes3vector3 The weather's ambient night color.
---- @field ambientPlaying bool The weather's ambient playing flag.
+--- @field ambientPlaying boolean The weather's ambient playing flag.
 --- @field ambientSunriseColor tes3vector3 The weather's ambient sunrise color.
 --- @field ambientSunsetColor tes3vector3 The weather's ambient sunset color.
 --- @field cloudsMaxPercent number The weather's cloud maximum percentage.
@@ -31,7 +31,7 @@
 --- @field sunSunriseColor tes3vector3 The weather's sun sunrise color.
 --- @field sunSunsetColor tes3vector3 The weather's sun sunset color.
 --- @field transitionDelta number The weather's transition delta.
---- @field underwaterSoundState bool The weather's underwater sound state flag.
+--- @field underwaterSoundState boolean The weather's underwater sound state flag.
 --- @field windSpeed number The weather's wind speed.
 tes3weather = {}
 

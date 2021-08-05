@@ -31,12 +31,11 @@ function mwse.getVirtualMemoryUsage() end
 --- @return table result No description yet available.
 function mwse.loadConfig(fileName, defaults) end
 
---- This function writes information to the MWSELog.txt file in the user's installation directory.
+--- This function writes information to the mwse.log file in the user's installation directory.
 --- 
 --- The message accepts formatting and additional parameters matching string.format's usage.
 --- @param message string No description yet available.
 --- @vararg any No description yet available.
---- @return nil result No description yet available.
 function mwse.log(message, ...) end
 
 --- Converts a TES3 object type (e.g. from tes3.objectType) into an uppercase, 4-character string.

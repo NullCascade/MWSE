@@ -23,47 +23,31 @@ local rstHeaders = {
 -- Handle link caching to optimize RTD build times.
 --
 
-local cachingLinks = -1
 local writtenLinks = {}
-local originalFileWrite = nil
-
-local originalIOOpen = io.open
-
--- Handle nested caching begin/stop
-local function beginCachingLinks()
-	cachingLinks = cachingLinks + 1
-end
-
-local function isCachingLinks()
-    return cachingLinks > -1
-end
-
-local function stopCachingLinks()
-	cachingLinks = cachingLinks - 1
-end
-
-local function isLinkCached(file, link)
-	return writtenLinks[file] and writtenLinks[file][link] == true
-end
+local modifiedIoFileMetatable = false
 
 local function cachedWrite(self, str, ...)
-	if (isCachingLinks()) then
-		writtenLinks[self] = writtenLinks[self] or {}
-		for capture in string.gmatch(str, "`.-`_") do
-			writtenLinks[self][string.sub(capture, 2, -3)] = true
-		end
+	local output = str:format(...)
+	writtenLinks[self] = writtenLinks[self] or {}
+	for capture in string.gmatch(output, "`.-`_") do
+		writtenLinks[self][string.sub(capture, 2, -3)] = true
 	end
-
-	return originalFileWrite(self, str)
+	return self:write(output)
 end
 
+local function uncachedWrite(self, str, ...)
+	return self:write(str:format(...))
+end
+
+local originalIOOpen = io.open
 function io.open(...)
 	local file = originalIOOpen(...)
 	if (file) then
-		if (not originalFileWrite) then
+		if (not modifiedIoFileMetatable) then
 			local mt = getmetatable(file)
-			originalFileWrite = mt.write
-			mt.write = cachedWrite
+			mt.cachedwrite = cachedWrite
+			mt.uncachedwrite = uncachedWrite
+			modifiedIoFileMetatable = true
 		end
 		writtenLinks[file] = writtenLinks[file] or {}
 	end
@@ -147,11 +131,11 @@ end
 --- @param results any
 --- @return table
 local function getPackageComponentsDictionary(package, field, results)
-	local results = results or {}
+	results = results or {}
 
 	local onThis = package[field]
 	if (onThis) then
-		for k, v in pairs(table.values(onThis)) do
+		for k, v in pairs(onThis) do
 			if (results[k] == nil) then
 				results[k] = v
 			end
@@ -159,8 +143,7 @@ local function getPackageComponentsDictionary(package, field, results)
 	end
 
 	if (package.inherits and classes[package.inherits]) then
-		local inheritClass = classes[package.inherits]
-		return getPackageComponentsDictionary(inheritClass, field, results)
+		return getPackageComponentsDictionary(classes[package.inherits], field, results)
 	end
 
 	return results
@@ -172,7 +155,7 @@ end
 --- @param results any
 --- @return table
 local function getPackageComponentsArray(package, field, results)
-	local results = results or {}
+	results = results or {}
 
 	local onThis = package[field]
 	if (onThis) then
@@ -184,8 +167,7 @@ local function getPackageComponentsArray(package, field, results)
 	end
 
 	if (package.inherits and classes[package.inherits]) then
-		local inheritClass = classes[package.inherits]
-		return getPackageComponentsArray(inheritClass, field, results)
+		return getPackageComponentsArray(classes[package.inherits], field, results)
 	end
 
 	return results
@@ -205,38 +187,41 @@ local function build(package, outDir)
 	-- Get the package.
 	local outPath = lfs.join(outDir, package.key .. ".rst")
 	local file = assert(io.open(outPath, "w+"))
-	beginCachingLinks()
 
 	--
-	file:write(string.format("%s\n%s\n\n", package.key, rstHeaders[1]))
-	file:write(string.format("%s\n\n", getPackageDescription(package)))
+	local isParentLibrary = package.parent and package.parent.type == "lib"
+	file:cachedwrite("%s\n%s\n\n", isParentLibrary and package.namespace or package.key, rstHeaders[1])
+	file:cachedwrite("%s\n\n", getPackageDescription(package))
 
 	if (package.type == "function" or package.type == "method") then
 		-- Show return values.
 		local returns = common.getConsistentReturnValues(package)
 		if (returns) then
-			file:write(string.format("Returns\n%s\n\n", rstHeaders[2]))
+			file:cachedwrite("Returns\n%s\n\n", rstHeaders[2])
 			if (#returns > 1) then
-				file:write("The function has more than one return value.\n\n")
+				file:cachedwrite("The function has more than one return value.\n\n")
 			end
 			for _, ret in pairs(returns) do
-				file:write(string.format("%s (%s)\n    %s\n\n", ret.name, breakoutMultipleTypes(ret.type or "any"), getArgumentDescription(ret)))
+				file:cachedwrite("%s (%s)\n    %s\n\n", ret.name, breakoutMultipleTypes(ret.type or "any"), getArgumentDescription(ret))
 			end
-			-- file:write("\n") -- TODO: Re-add this once output is matched.
+			-- file:cachedwrite("\n") -- TODO: Re-add this once output is matched.
 		end
 
 		-- Show function arguments.
 		if (package.arguments and #package.arguments > 0) then
-			file:write(string.format("Parameters\n%s\n\n", rstHeaders[2]))
+			file:cachedwrite("Parameters\n%s\n\n", rstHeaders[2])
 			if (package.arguments[1].tableParams) then
-				file:write("Accepts parameters through a table with the given keys:\n\n")
+				file:cachedwrite("Accepts parameters through a table with the given keys:\n\n")
+				for _, arg in ipairs(package.arguments[1].tableParams) do
+					file:cachedwrite("%s (%s)\n    %s\n\n", arg.name or "unnamed", breakoutMultipleTypes(arg.type or "any"), getArgumentDescription(arg))
+				end
 			else
-				file:write("Accepts parameters in the following order:\n\n")
+				file:cachedwrite("Accepts parameters in the following order:\n\n")
+				for _, arg in ipairs(package.arguments) do
+					file:cachedwrite("%s (%s)\n    %s\n\n", arg.name or "unnamed", breakoutMultipleTypes(arg.type or "any"), getArgumentDescription(arg))
+				end
 			end
-			for _, arg in pairs(package.arguments) do
-				file:write(string.format("%s (%s)\n    %s\n\n", arg.name or "unnamed", breakoutMultipleTypes(arg.type or "any"), getArgumentDescription(arg)))
-			end
-			-- file:write("\n") -- TODO: Re-add this once output is matched.
+			-- file:cachedwrite("\n") -- TODO: Re-add this once output is matched.
 		end
 	elseif (package.type == "lib" or package.type == "class") then
 		if (package.type == "class" and package.inherits) then
@@ -246,62 +231,85 @@ local function build(package, outDir)
 				table.insert(types, inherits.key)
 				inherits = classes[inherits.inherits]
 			end
-			file:write(string.format("This type inherits from the following parent types: %s\n\n", breakoutMultipleTypes(table.concat(types, "|"))))
+			file:cachedwrite("This type inherits from the following parent types: %s\n\n", breakoutMultipleTypes(table.concat(types, "|")))
 		end
 
 		--
 		local values = table.values(getPackageComponentsArray(package, "values"), sortPackagesByKey)
 		if (#values > 0) then
-			file:write(string.format("Values\n%s\n\n", rstHeaders[2]))
-			file:write(".. toctree::\n    :maxdepth: 1\n\n")
+			local subtitle = package.type == "lib" and "Values" or "Properties"
+			file:cachedwrite("%s\n%s\n\n", subtitle, rstHeaders[2])
 			for _, fn in ipairs(values) do
-				file:write(string.format("    %s/%s\n", package.key, fn.key))
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.valuetype or "any"), getArgumentDescription(fn))
 			end
-			file:write("\n")
-		end
-
-		--
-		local functions = table.values(getPackageComponentsArray(package, "functions"), sortPackagesByKey)
-		if (#functions > 0) then
-			file:write(string.format("Functions\n%s\n\n", rstHeaders[2]))
-			file:write(".. toctree::\n")
-			file:write("    :maxdepth: 1\n\n")
-			for _, fn in ipairs(functions) do
-				file:write(string.format("    %s/%s\n", package.key, fn.key))
+			file:cachedwrite("\n\n")
+			file:cachedwrite(".. toctree::\n")
+			file:cachedwrite("    :hidden:\n")
+			file:cachedwrite("    :maxdepth: 1\n\n")
+			for _, fn in ipairs(values) do
+				file:cachedwrite("    %s/%s\n", package.key, fn.key)
 			end
-			file:write("\n")
+			file:cachedwrite("\n")
 		end
 
 		--
 		local methods = table.values(getPackageComponentsArray(package, "methods"), sortPackagesByKey)
 		if (#methods > 0) then
-			file:write(string.format("Methods\n%s\n\n", rstHeaders[2]))
-			file:write(".. toctree::\n")
-			file:write("    :maxdepth: 1\n\n")
+			file:cachedwrite("Methods\n%s\n\n", rstHeaders[2])
 			for _, fn in ipairs(methods) do
-				file:write(string.format("    %s/%s\n", package.key, fn.key))
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.type or "any"), getArgumentDescription(fn))
 			end
-			file:write("\n")
+			file:cachedwrite("\n\n")
+			file:cachedwrite(".. toctree::\n")
+			file:cachedwrite("    :hidden:\n")
+			file:cachedwrite("    :maxdepth: 1\n\n")
+			for _, fn in ipairs(methods) do
+				file:cachedwrite("    %s/%s\n", package.key, fn.key)
+			end
+			file:cachedwrite("\n")
+		end
+
+		--
+		local functions = table.values(getPackageComponentsArray(package, "functions"), sortPackagesByKey)
+		if (#functions > 0) then
+			file:cachedwrite("Functions\n%s\n\n", rstHeaders[2])
+			for _, fn in ipairs(functions) do
+				file:uncachedwrite("`%s <%s/%s.html>`_", fn.key, package.key, fn.key)
+				file:cachedwrite(" (%s)\n    %s\n\n", breakoutMultipleTypes(fn.type or "any"), getArgumentDescription(fn))
+			end
+			file:cachedwrite("\n\n")
+			file:cachedwrite(".. toctree::\n")
+			file:cachedwrite("    :hidden:\n")
+			file:cachedwrite("    :maxdepth: 1\n\n")
+			for _, fn in ipairs(functions) do
+				file:cachedwrite("    %s/%s\n", package.key, fn.key)
+			end
+			file:cachedwrite("\n")
 		end
 	end
 
 	-- Write out the links we've written.
-	stopCachingLinks()
 	local linkPositionReset = string.rep("../", getParentCount(package) + 2)
 	for _, link in ipairs(table.keys(writtenLinks[file], true)) do
-		file:write(string.format(".. _`%s`: %slua/type/%s.html\n", link, linkPositionReset, link))
+		file:cachedwrite(".. _`%s`: %slua/type/%s.html\n", link, linkPositionReset, link)
 	end
 
 	-- Close up shop.
 	writtenLinks[file] = nil
 	file:close()
 
-	-- Write out children in a subdirectory.
-	local children = table.values(getPackageComponentsDictionary(package, "children"), sortPackagesByKey)
-	if (#children > 0) then
-		lfs.mkdir(lfs.join(outDir, package.key))
-		for _, child in ipairs(children) do
-			build(child, lfs.join(outDir, package.key))
+	if (package.type == "lib" or package.type == "class") then
+		-- Write out children in a subdirectory.
+		local children = table.values(getPackageComponentsDictionary(package, "children"), sortPackagesByKey)
+		if (#children > 0) then
+			lfs.mkdir(lfs.join(outDir, package.key))
+			for _, child in ipairs(children) do
+				if (child.type == "function" or child.type == "method") then
+					build(child, lfs.join(outDir, package.key))
+				end
+			end
 		end
 	end
 end

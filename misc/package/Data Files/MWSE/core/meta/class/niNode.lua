@@ -8,7 +8,7 @@ niNode = {}
 
 --- Attachs the child to the children list of the node.
 --- @param child niAmbientLight|niCamera|niCollisionSwitch|niDirectionalLight|niDynamicEffect|niGeometry|niLight|niNode|niPointLight|niSpotLight|niSwitchNode|niTriBasedGeometry|niTriShape No description yet available.
---- @param useFirstAvailable bool Use the first available space in the list. Default value is False.
+--- @param useFirstAvailable boolean Use the first available space in the list. Default value is False.
 function niNode:attachChild(child, useFirstAvailable) end
 
 --- Detaches the child from the children list of the node. Returns the detached child.
