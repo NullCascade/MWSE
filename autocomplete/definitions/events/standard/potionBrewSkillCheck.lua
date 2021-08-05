@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is triggered when the player attempts to brew a potion. It controls both the strength of the potion's effects, and if the brew is successful. These both use the player's stats, so the game combines them into one function. Because the potion effects are not determined yet, the potion data is not available. When using this event, use the example as a template for your own code.",
 	eventData = {
 		["potionStrength"] = {

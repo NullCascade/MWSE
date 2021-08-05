@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "One of the movement events, calcRunSpeed is used when calculating when the player is running, but not swimming or flying.",
 	related = { "calcMoveSpeed", "calcWalkSpeed", "calcRunSpeed", "calcFlySpeed", "calcSwimSpeed", "calcSwimRunSpeed" },
 	eventData = {

@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is used when calculating a creature's spell resistance, and allows Lua scripts to override the behavior of spell resistance by changing the resistedPercent value. This can be used to enable willpower-based resistance checks, provide specific resistances to specific spells, spells that heal instead of harm, and a variety of new mechanics.",
 	eventData = {
 		["caster"] = {

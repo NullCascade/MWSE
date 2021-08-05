@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when the potential activation target for the player changes.",
 	eventData = {
 		["current"] = {

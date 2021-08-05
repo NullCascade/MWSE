@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when a book's text is about to be displayed. By providing your own text, you can overwrite what is going to be displayed.",
 	eventData = {
 		["book"] = {

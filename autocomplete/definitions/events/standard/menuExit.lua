@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The menuExit event fires when the player leaves menu mode.",
 	related = { "menuEnter", "menuExit" },
 	eventData = {

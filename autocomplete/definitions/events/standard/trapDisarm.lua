@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a trap is being disarmed.",
 	eventData = {
 		["reference"] = {

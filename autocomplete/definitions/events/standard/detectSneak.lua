@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is invoked whenever an actor is checking if they can detect another actor sneaking.",
 	eventData = {
 		["detector"] = {

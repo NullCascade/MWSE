@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when a container is closed.",
 	eventData = {
 		["reference"] = {

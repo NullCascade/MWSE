@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is called when determining the price of traveling, and can be used to modify the given price.",
 	eventData = {
 		["mobile"] = {

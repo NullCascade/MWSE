@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The projectileHitTerrain event fires when a projectile collides with terrain.",
 	related = { "projectileHitActor", "projectileHitObject", "projectileHitTerrain", "projectileExpire" },
 	eventData = {

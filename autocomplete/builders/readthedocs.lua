@@ -64,7 +64,7 @@ common.compilePath(lfs.join(common.pathDefinitions, "namedTypes"), classes, "cla
 
 --- @type table<string, package>
 local events = {}
--- common.compilePath(lfs.join(common.pathDefinitions, "events\\standard"), events)
+-- common.compilePath(lfs.join(common.pathDefinitions, "events\\standard"), events, "event")
 
 
 --
@@ -277,6 +277,8 @@ local function build(package, outDir)
 			end
 			file:cachedwrite("\n")
 		end
+	elseif (package.type == "event") then
+		-- TODO: Flush this out if we don't don't migrate to GitHub pages.
 	end
 
 	-- Write out the links we've written.
@@ -310,4 +312,4 @@ end
 
 buildBuilder(libraries, "api")
 buildBuilder(classes, "type")
--- buildBuilder(libraries, "events")
+-- buildBuilder(events, "event")

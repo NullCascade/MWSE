@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is triggered on a collision.",
     eventData = {
         ["mobile"] = {

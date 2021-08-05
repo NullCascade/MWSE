@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a lock is being picked.",
 	eventData = {
 		["reference"] = {

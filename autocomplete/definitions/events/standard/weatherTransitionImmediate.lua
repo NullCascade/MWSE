@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The weatherChangedImmediate event occurs when the currently simulated weather is changed without transition.",
 	related = { "weatherCycled", "weatherTransitionFinished", "weatherChangedImmediate", "weatherTransitionStarted", "weatherChangedImmediate" },
 	eventData = {

@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The projectileExpire event fires just prior to a fired projectile expiring.",
 	related = { "projectileHitActor", "projectileHitObject", "projectileHitTerrain", "projectileExpire" },
 	eventData = {

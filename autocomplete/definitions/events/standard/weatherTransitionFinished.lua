@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The weatherTransitionFinished event occurs when the currently simulated weather finished transitioning to a new weather.",
 	related = { "weatherCycled", "weatherTransitionFinished", "weatherChangedImmediate", "weatherTransitionStarted", "weatherChangedImmediate" },
 	eventData = {

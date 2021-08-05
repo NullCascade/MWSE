@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is triggered when a cell is activated.",
 	related = { "cellActivated", "cellDeactivated", "cellChanged" },
     eventData = {

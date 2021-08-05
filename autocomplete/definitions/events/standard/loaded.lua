@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The loaded event fires after the game has been successfully loaded. This event is preceded by the load event.",
 	related = { "load", "loaded" },
 	eventData = {

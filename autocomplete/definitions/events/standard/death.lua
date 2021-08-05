@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event triggers when an actor dies.",
 	eventData = {
 		mobile = {

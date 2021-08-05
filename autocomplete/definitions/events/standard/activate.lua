@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is invoked whenever something is activated, typically by the player. Activation is usually done with the associated activate/use key, but may also be forced by scripts.",
 	eventData = {
 		["activator"] = {

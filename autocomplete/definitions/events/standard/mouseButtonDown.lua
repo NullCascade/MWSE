@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The mouseButtonDown event fires when a button on the mouse is pressed.",
 	eventData = {
 		["button"] = {

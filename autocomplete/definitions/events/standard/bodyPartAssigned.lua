@@ -1,4 +1,5 @@
 return {
+	type = "event",
     description = "",
 	related = { "bodyPartAssigned", "bodyPartsUpdated" },
     eventData = {

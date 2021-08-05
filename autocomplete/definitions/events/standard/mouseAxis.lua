@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The mouseAxis event fires when the mouse is moved, providing deltaX and deltaY values.",
 	eventData = {
 		["deltaX"] = {

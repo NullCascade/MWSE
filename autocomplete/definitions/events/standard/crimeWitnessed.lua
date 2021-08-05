@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a crime is witnessed by an actor.",
 	eventData = {
 		["type"] = {

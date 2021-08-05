@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is invoked whenever the player naturally gains a new level a skill. This is typically through exercise, training, or reading books.",
 	eventData = {
 		["skill"] = {

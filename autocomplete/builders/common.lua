@@ -352,10 +352,12 @@ function common.compile(folder, key, owningCollection, acceptedType)
 	end
 
 	-- Write out children.
-	for entry in lfs.dir(lfs.join(folder, key)) do
-		local extension = entry:match("[^.]+$")
-		if (extension == "lua") then
-			common.compileEntry(lfs.join(folder, key), entry:match("[^/]+$"):sub(1, -1 * (#extension + 2)), package)
+	if (acceptedType ~= "event") then
+		for entry in lfs.dir(lfs.join(folder, key)) do
+			local extension = entry:match("[^.]+$")
+			if (extension == "lua") then
+				common.compileEntry(lfs.join(folder, key), entry:match("[^/]+$"):sub(1, -1 * (#extension + 2)), package)
+			end
 		end
 	end
 

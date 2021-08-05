@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The simulate event occurs at the start of every frame, excluding when the game is paused or in menu mode.",
 	eventData = {
 		["delta"] = {

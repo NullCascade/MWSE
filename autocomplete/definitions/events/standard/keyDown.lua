@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The key event fires when a key is pressed.",
 	eventData = {
 		["keyCode"] = {

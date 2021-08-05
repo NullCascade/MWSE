@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when determining the hit chance for an actor.",
 	eventData = {
 		["attacker"] = {

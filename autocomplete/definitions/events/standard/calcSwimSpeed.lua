@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "One of the movement events, calcSwimSpeed is used when calculating the movement speed while in water.",
 	related = { "calcMoveSpeed", "calcWalkSpeed", "calcRunSpeed", "calcFlySpeed", "calcSwimSpeed", "calcSwimRunSpeed" },
 	eventData = {

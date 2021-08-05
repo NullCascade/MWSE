@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event can be used to prevent player from resting by returning false.",
     eventData = {
         ["mobile"] = {

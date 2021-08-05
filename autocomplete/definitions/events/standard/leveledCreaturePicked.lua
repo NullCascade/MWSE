@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is called after any leveled creature list is resolved. The event may be filtered by its list, and its pick can be overwritten. While this event allows for customization, the leveled list may be altered directly as well.",
 	related = { "leveledCreaturePicked", "leveledItemPicked" },
 	eventData = {

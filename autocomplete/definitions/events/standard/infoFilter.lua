@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a dialogue info object is filtered.",
 	related = { "infoGetText", "infoLinkResolve", "infoResponse", "infoFilter", "postInfoResponse" },
 	eventData = {

@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is invoked after a UI menu has been built or made visible, at the point that all menu elements contain updated data.",
 	eventData = {
 		["element"] = {

@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is called after any leveled item list is resolved.",
 	related = { "leveledCreaturePicked", "leveledItemPicked" },
     eventData = {

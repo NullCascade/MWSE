@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The uiObjectTooltip event triggers when a new tooltip is displayed for all in-world objects and items, and inventory tiles in all dialogues. The tooltip will be already be built. Tooltips for inventory tiles are built on mouseover, while tooltips for in-world objects are rebuilt every frame.",
 	eventData = {
 		["tooltip"] = {

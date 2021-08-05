@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "",
     eventData = {
         ["path"] = {

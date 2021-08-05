@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when the player gains access to a new dialogue topic.",
 	eventData = {
 		["topic"] = {

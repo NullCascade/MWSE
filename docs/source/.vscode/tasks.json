@@ -9,22 +9,27 @@
             "command": "..\\make.bat clean"
         },
         {
-            "label": "build - HTML (clean)",
-            "type": "shell",
-            "command": "..\\make.bat html",
-            "dependsOn": [
-                "clean"
-            ],
-            "problemMatcher": []
-        },
-        {
             "label": "build - HTML",
             "type": "shell",
             "command": "..\\make.bat html",
+            "group": "build"
+        },
+        {
+            "label": "Build - HTML (clean)",
+            "command": "echo",
+            "args": [
+                "Build complete!"
+            ],
+            "type": "shell",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "clean",
+                "build - HTML"
+            ],
         }
     ]
 }

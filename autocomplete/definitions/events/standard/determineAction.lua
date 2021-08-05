@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when an actor determines an action in a combat session.",
 	related = { "determinedAction" },
 	eventData = {

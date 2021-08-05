@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The journal event is invoked when a journal state progresses.",
 	eventData = {
 		index = {

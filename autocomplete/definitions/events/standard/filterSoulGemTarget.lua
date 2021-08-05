@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a soul gem target is filtered",
 	eventData = {
 		["soulGem"] = {

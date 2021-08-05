@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when an item is dropped.",
 	eventData = {
 		["reference"] = {

@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The potionBrewed event is raised when the player brews a new potion.",
 	eventData = {
 		["object"] = {

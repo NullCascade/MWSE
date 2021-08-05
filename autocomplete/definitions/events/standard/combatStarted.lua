@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The combatStarted event occurs after combat has begun between two actors.",
 	related = { "combatStart", "combatStarted", "combatStop", "combatStopped" },
 	eventData = {

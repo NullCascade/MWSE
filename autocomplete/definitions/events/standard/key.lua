@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The key event fires when a key up or key down input is detected. It is preferred that the keyDown and keyUp events are used instead.",
 	eventData = {
 		["keyCode"] = {

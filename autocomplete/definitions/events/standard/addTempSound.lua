@@ -1,4 +1,5 @@
 return {
+	type = "event",
     description = "",
 	related = { "addSound" },
     eventData = {

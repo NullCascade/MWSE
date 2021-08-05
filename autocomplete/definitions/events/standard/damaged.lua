@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The damaged event triggers after an actor has been damaged.",
 	related = { "damage", "damaged", "damageHandToHand", "damagedHandToHand" },
 	eventData = {

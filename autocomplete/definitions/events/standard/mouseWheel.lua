@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "The mouseWheel event fires when the mouse wheel is used, providing a delta value.",
 	eventData = {
 		["delta"] = {

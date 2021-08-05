@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event is raised when an item price is being determined when bartering.",
 	eventData = {
 		["item"] = {

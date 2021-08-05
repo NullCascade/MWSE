@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a SceneNode is created for a reference.",
 	eventData = {
 		["reference"] = {

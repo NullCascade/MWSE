@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when an inventory filter has been selected for an item.",
 	eventData = {
 		["item"] = {

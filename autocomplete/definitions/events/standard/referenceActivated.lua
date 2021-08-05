@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is triggered when a reference is activated.",
 	related = { "referenceActivated", "referenceDeactivated" },
     eventData = {
