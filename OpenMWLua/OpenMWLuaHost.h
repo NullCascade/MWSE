@@ -102,6 +102,13 @@ namespace mwse::openmw::host {
 		void pushStoragePackage(ScriptInstance& instance);
 		void pushCorePackage(ScriptInstance& instance);
 		void pushSelfPackage(ScriptInstance& instance);
+		void pushTypesPackage(ScriptInstance& instance);
+		void pushPlayerObject();
+		void pushRecordCollection(RecordType type);
+		void pushRecord(const RecordSnapshot& snapshot);
+		void pushEffect(const EffectSnapshot& snapshot, bool active);
+		void pushStatFunctions(lua_State* state, bool includeSkills);
+		void pushCoreGameplay();
 		void pushReadOnlyProxy(int valueIndex, bool strict);
 		void pushStorageSection(ScriptInstance& instance, bool player, std::string_view name, bool readOnly);
 		StorageSection& getStorageSection(bool player, std::string_view name);
@@ -116,6 +123,7 @@ namespace mwse::openmw::host {
 		std::string buildBridgeReport() const;
 		std::string buildReloadReport() const;
 		std::string buildFoundationReport() const;
+		std::string buildGameplayReport() const;
 		std::string copyBridgeString(StringView value, std::string_view fieldName, bool allowEmpty) const;
 		static void* allocator(void* userData, void* pointer, std::size_t oldSize, std::size_t newSize);
 		static int requireThunk(lua_State* state);
@@ -144,6 +152,23 @@ namespace mwse::openmw::host {
 		static int coreL10nFormatThunk(lua_State* state);
 		static int contentFilesIndexOfThunk(lua_State* state);
 		static int contentFilesHasThunk(lua_State* state);
+	public:
+		static int objectIndexThunk(lua_State* state);
+		static int objectNewIndexThunk(lua_State* state);
+		static int cellIndexThunk(lua_State* state);
+		static int typeObjectIsInstanceThunk(lua_State* state);
+		static int statGetterThunk(lua_State* state);
+		static int statIndexThunk(lua_State* state);
+		static int statNewIndexThunk(lua_State* state);
+		static int recordLookupThunk(lua_State* state);
+		static int activeSpellsThunk(lua_State* state);
+		static int actorSpellsThunk(lua_State* state);
+		static int actorSpellMutationThunk(lua_State* state);
+		static int birthsignThunk(lua_State* state);
+		static int charGenFinishedThunk(lua_State* state);
+		static int proxyLenThunk(lua_State* state);
+		static int compatibilityInvalidHandleProbeThunk(lua_State* state);
+	private:
 
 		LifecycleState mState = LifecycleState::Stopped;
 		InitializationConfig mConfig{};
@@ -184,6 +209,14 @@ namespace mwse::openmw::host {
 		std::vector<std::string> mDelayedDeliveries;
 		std::vector<std::string> mDiagnostics;
 		std::string mLastError;
+		int mPlayerObjectReference = LUA_NOREF;
+		int mTypesPackageReference = LUA_NOREF;
+		int mActorTypeReference = LUA_NOREF;
+		int mNpcTypeReference = LUA_NOREF;
+		int mPlayerTypeReference = LUA_NOREF;
+		std::map<std::uint64_t, int> mCellReferences;
+		std::uint32_t mGameplayCalls = 0;
+		std::uint32_t mRejectedHandles = 0;
 	};
 
 }

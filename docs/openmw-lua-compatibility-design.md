@@ -438,13 +438,31 @@ Evidence-backed implementation decisions and limitations:
 
 ### M4.2 Player and record/stat bindings
 
-- [ ] Implement stable player `GameObject` userdata.
-- [ ] Implement cells and the player cell properties needed by NCG.
-- [ ] Implement `openmw.types.Actor`, `NPC`, and `Player` detection.
-- [ ] Implement attributes, skills, level, health, spell, class, race, and birth-sign access used by NCG.
-- [ ] Ensure mutable stat proxy writes update native values correctly.
-- [ ] Implement record collections and lowercase ID lookup behavior used by NCG.
-- [ ] Validate handles on every call.
+- [x] Implement stable player `GameObject` userdata.
+- [x] Implement cells and the player cell properties needed by NCG.
+- [x] Implement `openmw.types.Actor`, `NPC`, and `Player` detection.
+- [x] Implement attributes, skills, level, health, spell, class, race, and birth-sign access used by NCG.
+- [x] Ensure mutable stat proxy writes update native values correctly.
+- [x] Implement record collections and lowercase ID lookup behavior used by NCG.
+- [x] Validate handles on every call.
+
+### Milestone 4.2 implementation record
+
+Milestone 4.2 passed the build-enabled x86 Debug in-process gate on 2026-07-13 under run ID `20260713T094355Z-28754f8fbdd245c39838fae26c446792`. Evidence is retained at `C:\Games\Morrowind\Data Files\MWSE\tmp\openmw-compat-harness\20260713T094355Z-28754f8fbdd245c39838fae26c446792`. Its `result.json` reports `passed: true`, process exit code 0, graceful shutdown, all five launcher assertions and all 22 in-game assertions passing, no remaining Morrowind process, and exact restoration of every staged file. The directory retains `build.log`, `native-tests.json`, `events.jsonl`, `MWSE.log`, `openmw-host-events.jsonl`, the exact synthetic Lua and `.omwscripts` inputs, the bridge/runtime and reload reports, the handle-generation, player/type, records/stat, and mutation/restoration reports, and the staging restoration report.
+
+Evidence-backed implementation decisions and limitations:
+
+- Bridge ABI/version 3 appends only fixed-width POD gameplay structures and callbacks. The accepted live report records `HostApi` size 64, initialization size 136, callback table size 80, object snapshot size 184, cell snapshot size 712, stat snapshot size 64, and record snapshot size 13,760. Required callbacks cover player snapshots, explicit handle validation, cells, stat reads/writes, record count/lookup, learned-spell enumeration/mutation, and active spells. ABI, structure-size, missing-callback, and capability negotiation remain strict; no Lua state, Lua value, allocator, registry reference, native pointer, or C++ object crosses the DLL boundary.
+- An opaque handle is a 64-bit slot plus a 32-bit generation and 32-bit type tag. Slot 1 is the current player; cell slots are allocated from 2 upward and deduplicated per generation. Every object, cell, stat, spell, and active-spell callback validates nonzero/bounds, expected type, current generation, current player identity, and live registry membership before dereferencing native state. Reload, player transitions, save/load transitions, initialization failure, and shutdown invalidate the generation. Wrong-type, stale, invalid, out-of-range, missing-record, and read-only cases have distinct structured statuses. Old userdata therefore fails safely and cannot resolve through a new generation.
+- Each OpenMW Lua generation interns the live player as one `GameObject` userdata and interns cells by opaque handle. Repeated contextual `openmw.self` loads in a PLAYER container return the same userdata; GLOBAL and MENU containers still cannot load `openmw.self`. A reload creates a new Lua state, allocator, userdata, handle generation, and cell cache. The live report records stable player identity, one cell identity, PLAYER-only context, type-tagged generation-scoped handles, and two deliberately rejected handles.
+- The player object exposes the real native record ID, type, current cell, and validity state. The cell snapshot exposes `id`, `name`, `displayName`, `region`, `worldSpaceId`, grid coordinates, water level/presence, sky, exterior, and quasi-exterior state. `Actor`, `NPC`, and `Player` instance detection uses the native player type mask. The loaded save's class, race, and birth sign come from resolved native pointers rather than the dynamic `PlayerSaveGame` record's empty serialized link strings.
+- The supported stat surface is the eight OpenMW attribute IDs, all 27 OpenMW skill IDs, level/current progress, and health base/current/modified/modifier/damage values. Attribute and skill reads derive OpenMW-compatible base, current, modified, modifier, and damage views from Morrowind's native statistic representation; skill progress is also exposed. Supported writes are attribute/skill base, modifier, and damage; skill progress; level current and progress; and health base, current, and modifier. Computed `modified` fields and all other fields are read-only and reject writes. The dedicated live test raised native Strength base by one, observed it independently through ordinary MWSE/native state, restored it on explicit reload, and independently observed the original value again.
+- The record surface contains enumerable/indexable attributes, skills, the live player NPC record, classes, races, birth signs, spells, and vanilla magic effects. It includes the NCG-used names, specializations, class attributes and major/minor skills, race gendered attributes/skill bonuses/spells, NPC class/race/sex, birth-sign spells, spell type/cost/flags/effects, and magic-effect cost/school/flags. Numeric enumeration preserves native order; string lookup normalizes IDs to lowercase and is ASCII case-insensitive. MWSE custom numeric effects, which have no OpenMW vanilla record ID, are preserved explicitly in spell effects as `mwse:effect:<native-id>` and are not fabricated as vanilla magic-effect records.
+- `Actor.activeSpells` exposes the loaded player's native active spell groups and effect values. `Player.spells` exposes the learned spell collection and its NCG-used `add` and `remove` mutations. All spell operations validate the player handle. The implementation does not add unsupported active-spell mutation methods or record-draft creation.
+- The harness enables a native mutation journal only under `InitializationHarnessMode`: the first original value for each touched stat field is captured, then restored in reverse order on reload, failure, or shutdown. Production OpenMW scripts write the native value directly without hidden rollback. The retained mutation and restoration evidence proves both independent observation and cleanup even when a synthetic handler fails intentionally.
+- `OpenMWLuaTests.exe` passes ABI/version and layout mismatches, missing callbacks, handle type/bounds/generation/stale rejection, stable identity, PLAYER-only self, type detection, cell mapping, case-insensitive record enumeration/lookup, every supported stat read/write, read-only rejection, spells, reload/shutdown invalidation, failure isolation, and continued native-DLL/Lua-bytecode rejection. The harness protocol test and x86 Debug MWSE/support-DLL builds also pass. The isolated LuaJIT build removes its CRT stdio export decoration only in the intermediate source copy; final PE inspection finds exactly `OpenMWLua_QueryApi` exported and only `KERNEL32.dll` imported.
+- Preserved live regressions passed against the final audited binaries under Foundation run `20260713T094432Z-668d468d481e4190aab52bd4911485a1`, Host run `20260713T094505Z-a83edc3ba1a54c61a6294f0bfbd7d636`, and exact Milestone 1 run `20260713T094538Z-d51fa49fa52c4499bb7ae17f081a84aa`. The addon transformation unit suite passed; the CSSE offline regression passed under run `20260713T094721Z-aac113428d204866925667035ff6f57b` with the source hash unchanged, and its native loader/restoration gate passed under run `20260713T094730Z-1bd24cd51ec9423bae59986815df94ca`.
+- This milestone implements the exact NCG player/record/stat subset, not general world-object bindings. Only the live player and its current cells receive handles; arbitrary objects, generic cell stores, inventory, AI, factions, equipment, magicka/fatigue stat proxies, persistence, UI/input/settings, and record creation remain unsupported. Timers and storage remain in-memory as recorded by Milestone 4.1. The next unblocked milestone is 4.3 input and engine handlers.
 
 ### M4.3 Input and engine handlers
 
@@ -906,7 +924,7 @@ Types: `LifeTime`, `StorageSection`.
 - [ ] `Actor.isDeathFinished`
 - [ ] `Actor.getPathfindingAgentBounds`
 - [ ] `Actor.isInActorsProcessingRange`
-- [ ] `Actor.objectIsInstance`
+- [x] `Actor.objectIsInstance`
 - [ ] `Actor.inventory`
 - [ ] `Actor.canMove`
 - [ ] `Actor.getRunSpeed`
@@ -933,58 +951,58 @@ Types: `LifeTime`, `StorageSection`.
 - [ ] `ActorActiveEffects.remove`
 - [ ] `ActorActiveEffects.set`
 - [ ] `ActorActiveEffects.modify`
-- [ ] `Actor.activeSpells`
+- [x] `Actor.activeSpells`
 - [ ] `ActorActiveSpells.isSpellActive`
 - [ ] `ActorActiveSpells.remove`
 - [ ] `ActorActiveSpells.add`
 - [ ] `Actor.spells`
-- [ ] `ActorSpells.add`
-- [ ] `ActorSpells.remove`
+- [x] `ActorSpells.add`
+- [x] `ActorSpells.remove`
 - [ ] `ActorSpells.clear`
 - [ ] `ActorSpells.canUsePower`
-- [ ] `DynamicStats.health`
+- [x] `DynamicStats.health`
 - [ ] `DynamicStats.magicka`
 - [ ] `DynamicStats.fatigue`
 - [ ] `AIStats.alarm`
 - [ ] `AIStats.fight`
 - [ ] `AIStats.flee`
 - [ ] `AIStats.hello`
-- [ ] `AttributeStats.strength`
-- [ ] `AttributeStats.intelligence`
-- [ ] `AttributeStats.willpower`
-- [ ] `AttributeStats.agility`
-- [ ] `AttributeStats.speed`
-- [ ] `AttributeStats.endurance`
-- [ ] `AttributeStats.personality`
-- [ ] `AttributeStats.luck`
-- [ ] `SkillStats.block`
-- [ ] `SkillStats.armorer`
-- [ ] `SkillStats.mediumarmor`
-- [ ] `SkillStats.heavyarmor`
-- [ ] `SkillStats.bluntweapon`
-- [ ] `SkillStats.longblade`
-- [ ] `SkillStats.axe`
-- [ ] `SkillStats.spear`
-- [ ] `SkillStats.athletics`
-- [ ] `SkillStats.enchant`
-- [ ] `SkillStats.destruction`
-- [ ] `SkillStats.alteration`
-- [ ] `SkillStats.illusion`
-- [ ] `SkillStats.conjuration`
-- [ ] `SkillStats.mysticism`
-- [ ] `SkillStats.restoration`
-- [ ] `SkillStats.alchemy`
-- [ ] `SkillStats.unarmored`
-- [ ] `SkillStats.security`
-- [ ] `SkillStats.sneak`
-- [ ] `SkillStats.acrobatics`
-- [ ] `SkillStats.lightarmor`
-- [ ] `SkillStats.shortblade`
-- [ ] `SkillStats.marksman`
-- [ ] `SkillStats.mercantile`
-- [ ] `SkillStats.speechcraft`
-- [ ] `SkillStats.handtohand`
-- [ ] `ActorStats.level`
+- [x] `AttributeStats.strength`
+- [x] `AttributeStats.intelligence`
+- [x] `AttributeStats.willpower`
+- [x] `AttributeStats.agility`
+- [x] `AttributeStats.speed`
+- [x] `AttributeStats.endurance`
+- [x] `AttributeStats.personality`
+- [x] `AttributeStats.luck`
+- [x] `SkillStats.block`
+- [x] `SkillStats.armorer`
+- [x] `SkillStats.mediumarmor`
+- [x] `SkillStats.heavyarmor`
+- [x] `SkillStats.bluntweapon`
+- [x] `SkillStats.longblade`
+- [x] `SkillStats.axe`
+- [x] `SkillStats.spear`
+- [x] `SkillStats.athletics`
+- [x] `SkillStats.enchant`
+- [x] `SkillStats.destruction`
+- [x] `SkillStats.alteration`
+- [x] `SkillStats.illusion`
+- [x] `SkillStats.conjuration`
+- [x] `SkillStats.mysticism`
+- [x] `SkillStats.restoration`
+- [x] `SkillStats.alchemy`
+- [x] `SkillStats.unarmored`
+- [x] `SkillStats.security`
+- [x] `SkillStats.sneak`
+- [x] `SkillStats.acrobatics`
+- [x] `SkillStats.lightarmor`
+- [x] `SkillStats.shortblade`
+- [x] `SkillStats.marksman`
+- [x] `SkillStats.mercantile`
+- [x] `SkillStats.speechcraft`
+- [x] `SkillStats.handtohand`
+- [x] `ActorStats.level`
 - [ ] `Item.objectIsInstance`
 - [ ] `Item.getEnchantmentCharge`
 - [ ] `Item.isRestocking`
@@ -995,7 +1013,7 @@ Types: `LifeTime`, `StorageSection`.
 - [ ] `Creature.objectIsInstance`
 - [ ] `Creature.record`
 - [ ] `NPC.createRecordDraft`
-- [ ] `NPC.objectIsInstance`
+- [x] `NPC.objectIsInstance`
 - [ ] `NPC.getFactions`
 - [ ] `NPC.getFactionRank`
 - [ ] `NPC.setFactionRank`
@@ -1012,15 +1030,15 @@ Types: `LifeTime`, `StorageSection`.
 - [ ] `NPC.getBaseDisposition`
 - [ ] `NPC.setBaseDisposition`
 - [ ] `NPC.modifyBaseDisposition`
-- [ ] `Classes.record`
+- [x] `Classes.record`
 - [ ] `NPC.isWerewolf`
 - [ ] `NPC.setWerewolf`
-- [ ] `NPC.record`
-- [ ] `Races.record`
-- [ ] `PLAYER.objectIsInstance`
+- [x] `NPC.record`
+- [x] `Races.record`
+- [x] `PLAYER.objectIsInstance`
 - [ ] `PLAYER.getCrimeLevel`
 - [ ] `PLAYER.setCrimeLevel`
-- [ ] `PLAYER.isCharGenFinished`
+- [x] `PLAYER.isCharGenFinished`
 - [ ] `PLAYER.isTeleportingEnabled`
 - [ ] `PLAYER.setTeleportingEnabled`
 - [ ] `PLAYER.quests`
@@ -1029,9 +1047,9 @@ Types: `LifeTime`, `StorageSection`.
 - [ ] `PLAYERQuest.addJournalEntry`
 - [ ] `PLAYER.getControlSwitch`
 - [ ] `PLAYER.setControlSwitch`
-- [ ] `PLAYER.getBirthSign`
+- [x] `PLAYER.getBirthSign`
 - [ ] `PLAYER.setBirthSign`
-- [ ] `BirthSigns.record`
+- [x] `BirthSigns.record`
 - [ ] `PLAYER.sendMenuEvent`
 - [ ] `Armor.objectIsInstance`
 - [ ] `Armor.record`

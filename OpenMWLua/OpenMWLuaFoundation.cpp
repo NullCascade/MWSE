@@ -168,6 +168,7 @@ namespace mwse::openmw::host {
 		}
 		else lua_pushvalue(mLua, valueIndex);
 		lua_setfield(mLua, -2, "__index");
+		lua_pushvalue(mLua, valueIndex); lua_pushcclosure(mLua, &proxyLenThunk, 1); lua_setfield(mLua, -2, "__len");
 		lua_pushcfunction(mLua, &readOnlyNewIndexThunk); lua_setfield(mLua, -2, "__newindex");
 		lua_pushboolean(mLua, 0); lua_setfield(mLua, -2, "__metatable");
 		lua_setmetatable(mLua, -2);
@@ -414,16 +415,17 @@ namespace mwse::openmw::host {
 		lua_newtable(mLua);const int content=lua_gettop(mLua);lua_newtable(mLua);const int list=lua_gettop(mLua);
 		if(mCallbacks.getContentFileCount!=nullptr&&mCallbacks.getContentFile!=nullptr){const auto count=mCallbacks.getContentFileCount(mCallbacks.gameUserData);for(std::uint32_t index=0;index<count;++index){StringView name{};if(mCallbacks.getContentFile(mCallbacks.gameUserData,index,&name)!=Status::Ok||name.size>MaxBridgeStringLength||(name.size!=0&&name.data==nullptr))throw std::runtime_error("native content-file enumeration returned invalid data");std::string value(name.data,name.size);std::transform(value.begin(),value.end(),value.begin(),[](unsigned char c){return static_cast<char>(std::tolower(c));});lua_pushlstring(mLua,value.data(),value.size());lua_rawseti(mLua,list,index+1);}}
 		pushReadOnlyProxy(list,false);lua_remove(mLua,list);lua_setfield(mLua,content,"list");lua_pushlightuserdata(mLua,this);lua_pushcclosure(mLua,&contentFilesIndexOfThunk,1);lua_setfield(mLua,content,"indexOf");lua_pushlightuserdata(mLua,this);lua_pushcclosure(mLua,&contentFilesHasThunk,1);lua_setfield(mLua,content,"has");pushReadOnlyProxy(content,false);lua_remove(mLua,content);lua_setfield(mLua,package,"contentFiles");
+		pushCoreGameplay();
 		pushReadOnlyProxy(package,false);lua_remove(mLua,package);
 	}
 
 	void Host::pushSelfPackage(ScriptInstance& instance) {
-		if(instance.container!="PLAYER")throw std::runtime_error("openmw.self is available only in PLAYER and local script containers");lua_newtable(mLua);lua_pushboolean(mLua,1);lua_setfield(mLua,-2,"_mwseFoundationAvailable");lua_pushcfunction(mLua,&unsupportedThunk);lua_setfield(mLua,-2,"isActive");lua_pushcfunction(mLua,&unsupportedThunk);lua_setfield(mLua,-2,"enableAI");pushReadOnlyProxy(-1,false);lua_remove(mLua,-2);
+		if(instance.container!="PLAYER")throw std::runtime_error("openmw.self is available only in PLAYER and local script containers");pushPlayerObject();
 	}
 
 	void Host::pushBuiltinPackage(ScriptInstance& instance, std::string_view name) {
-		if(name=="openmw.util")pushUtilPackage(instance);else if(name=="openmw.interfaces")pushInterfacesPackage(instance);else if(name=="openmw.async")pushAsyncPackage(instance);else if(name=="openmw.storage")pushStoragePackage(instance);else if(name=="openmw.core")pushCorePackage(instance);else if(name=="openmw.self")pushSelfPackage(instance);
-		else if(name=="openmw.compatibility"){lua_newtable(mLua);lua_pushinteger(mLua,OpenMWApiRevision);lua_setfield(mLua,-2,"apiRevision");lua_pushinteger(mLua,BridgeVersion);lua_setfield(mLua,-2,"bridgeVersion");lua_pushboolean(mLua,1);lua_setfield(mLua,-2,"foundationPackagesAvailable");lua_pushboolean(mLua,0);lua_setfield(mLua,-2,"gameplayBindingsAvailable");lua_pushcfunction(mLua,&unsupportedThunk);lua_setfield(mLua,-2,"requireGameplayBinding");lua_pushlightuserdata(mLua,this);lua_pushcclosure(mLua,&compatibilityRecordProbeThunk,1);lua_setfield(mLua,-2,"recordFoundationProbe");pushReadOnlyProxy(-1,false);lua_remove(mLua,-2);}
+		if(name=="openmw.util")pushUtilPackage(instance);else if(name=="openmw.interfaces")pushInterfacesPackage(instance);else if(name=="openmw.async")pushAsyncPackage(instance);else if(name=="openmw.storage")pushStoragePackage(instance);else if(name=="openmw.core")pushCorePackage(instance);else if(name=="openmw.self")pushSelfPackage(instance);else if(name=="openmw.types")pushTypesPackage(instance);
+		else if(name=="openmw.compatibility"){lua_newtable(mLua);lua_pushinteger(mLua,OpenMWApiRevision);lua_setfield(mLua,-2,"apiRevision");lua_pushinteger(mLua,BridgeVersion);lua_setfield(mLua,-2,"bridgeVersion");lua_pushinteger(mLua,static_cast<lua_Integer>(mRuntimeGeneration));lua_setfield(mLua,-2,"runtimeGeneration");lua_pushboolean(mLua,1);lua_setfield(mLua,-2,"foundationPackagesAvailable");lua_pushboolean(mLua,1);lua_setfield(mLua,-2,"gameplayBindingsAvailable");lua_pushlightuserdata(mLua,this);lua_pushcclosure(mLua,&compatibilityRecordProbeThunk,1);lua_setfield(mLua,-2,"recordFoundationProbe");if((mConfig.flags&InitializationHarnessMode)!=0){lua_pushlightuserdata(mLua,this);lua_pushcclosure(mLua,&compatibilityInvalidHandleProbeThunk,1);lua_setfield(mLua,-2,"probeInvalidHandles");}pushReadOnlyProxy(-1,false);lua_remove(mLua,-2);}
 		else throw std::runtime_error("unknown built-in compatibility package: "+std::string(name));
 	}
 

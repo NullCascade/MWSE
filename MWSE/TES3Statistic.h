@@ -42,6 +42,12 @@ namespace TES3 {
 		//
 
 		void setCurrent_lua(float value);
+		float getOpenMWModifier() const;
+		float getOpenMWDamage() const;
+		float getOpenMWModified() const;
+		void setOpenMWBase(float value);
+		void setOpenMWModifier(float value);
+		void setOpenMWDamage(float value);
 
 	};
 	static_assert(sizeof(Statistic) == 0xC, "TES3::Statistic failed size validation");

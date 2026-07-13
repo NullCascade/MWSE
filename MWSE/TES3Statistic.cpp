@@ -62,6 +62,32 @@ namespace TES3 {
 		setCurrentCapped(value, false);
 	}
 
+	float Statistic::getOpenMWModifier() const {
+		return std::max(0.0f, getCurrentRaw() - getBase());
+	}
+
+	float Statistic::getOpenMWDamage() const {
+		return std::max(0.0f, getBase() - getCurrentRaw());
+	}
+
+	float Statistic::getOpenMWModified() const {
+		return std::max(0.0f, getBase() - getOpenMWDamage() + getOpenMWModifier());
+	}
+
+	void Statistic::setOpenMWBase(float value) {
+		const float difference = getCurrentRaw() - getBase();
+		setBase(value);
+		setCurrentCapped(value + difference, false);
+	}
+
+	void Statistic::setOpenMWModifier(float value) {
+		setCurrentCapped(getBase() - getOpenMWDamage() + value, false);
+	}
+
+	void Statistic::setOpenMWDamage(float value) {
+		setCurrentCapped(getBase() - value + getOpenMWModifier(), false);
+	}
+
 	const auto TES3_SkillStatistic_modSkillCapped = reinterpret_cast<void(__thiscall*)(SkillStatistic*, float, bool, bool)>(0x401060);
 	void SkillStatistic::modSkillCapped(float delta, bool capAt0, bool capAt100) {
 		TES3_SkillStatistic_modSkillCapped(this, delta, capAt0, capAt100);

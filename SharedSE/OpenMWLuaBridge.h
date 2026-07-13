@@ -4,10 +4,13 @@
 
 namespace mwse::openmw {
 
-	constexpr std::uint32_t BridgeAbiVersion = 2;
-	constexpr std::uint32_t BridgeVersion = 2;
+	constexpr std::uint32_t BridgeAbiVersion = 3;
+	constexpr std::uint32_t BridgeVersion = 3;
 	constexpr std::uint32_t OpenMWApiRevision = 70;
 	constexpr std::uint32_t MaxBridgeStringLength = 32 * 1024;
+	constexpr std::uint32_t BridgeTextCapacity = 128;
+	constexpr std::uint32_t MaxRecordItems = 64;
+	constexpr std::uint32_t MaxRecordEffects = 8;
 
 	enum class Status : std::uint32_t {
 		Ok = 0,
@@ -21,6 +24,12 @@ namespace mwse::openmw {
 		LuaError = 8,
 		Unsupported = 9,
 		BufferTooSmall = 10,
+		InvalidHandle = 11,
+		StaleHandle = 12,
+		WrongHandleType = 13,
+		OutOfRange = 14,
+		NotFound = 15,
+		ReadOnly = 16,
 	};
 
 	enum class LifecycleState : std::uint32_t {
@@ -55,6 +64,9 @@ namespace mwse::openmw {
 		CapabilityFoundationStorage = 1ull << 10,
 		CapabilityFoundationCore = 1ull << 11,
 		CapabilityFoundationSelf = 1ull << 12,
+		CapabilityPlayerBindings = 1ull << 13,
+		CapabilityRecordBindings = 1ull << 14,
+		CapabilityMutableStats = 1ull << 15,
 	};
 
 	struct StringView {
@@ -66,6 +78,140 @@ namespace mwse::openmw {
 		std::uint64_t value;
 		std::uint32_t generation;
 		std::uint32_t reserved;
+	};
+
+	enum class HandleType : std::uint32_t {
+		None = 0,
+		Player = 1,
+		Cell = 2,
+	};
+
+	struct BridgeText {
+		std::uint32_t size;
+		char data[BridgeTextCapacity];
+	};
+
+	enum class ObjectType : std::uint32_t {
+		None = 0,
+		Actor = 1u << 0,
+		Npc = 1u << 1,
+		Player = 1u << 2,
+	};
+
+	struct ObjectSnapshot {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		OpaqueHandle object;
+		OpaqueHandle cell;
+		std::uint32_t typeMask;
+		std::uint32_t reserved;
+		BridgeText recordId;
+	};
+
+	enum CellPropertyFlag : std::uint32_t {
+		CellHasWater = 1u << 0,
+		CellHasSky = 1u << 1,
+		CellIsExterior = 1u << 2,
+		CellIsQuasiExterior = 1u << 3,
+		CellHasWaterLevel = 1u << 4,
+	};
+
+	struct CellSnapshot {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		OpaqueHandle handle;
+		std::uint32_t flags;
+		std::int32_t gridX;
+		std::int32_t gridY;
+		double waterLevel;
+		BridgeText id;
+		BridgeText name;
+		BridgeText displayName;
+		BridgeText region;
+		BridgeText worldSpaceId;
+	};
+
+	enum class StatKind : std::uint32_t {
+		Attribute = 1,
+		Skill = 2,
+		Level = 3,
+		Health = 4,
+	};
+
+	enum class StatField : std::uint32_t {
+		Base = 0,
+		Current = 1,
+		Modified = 2,
+		Modifier = 3,
+		Damage = 4,
+		Progress = 5,
+	};
+
+	struct StatSnapshot {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		double base;
+		double current;
+		double modified;
+		double modifier;
+		double damage;
+		double progress;
+		std::uint32_t writableMask;
+		std::uint32_t reserved;
+	};
+
+	enum class RecordType : std::uint32_t {
+		Attribute = 1,
+		Skill = 2,
+		Npc = 3,
+		Class = 4,
+		Race = 5,
+		Birthsign = 6,
+		Spell = 7,
+		MagicEffect = 8,
+	};
+
+	struct EffectSnapshot {
+		BridgeText id;
+		BridgeText affectedSkill;
+		BridgeText affectedAttribute;
+		double magnitudeMin;
+		double magnitudeMax;
+		double magnitudeThisFrame;
+		double duration;
+		double area;
+		double baseCost;
+		std::uint32_t range;
+		std::uint32_t school;
+		std::uint32_t flags;
+		std::uint32_t reserved;
+	};
+
+	struct RecordSnapshot {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		RecordType type;
+		std::uint32_t index;
+		BridgeText id;
+		BridgeText name;
+		BridgeText auxiliaryId1;
+		BridgeText auxiliaryId2;
+		std::uint32_t flags;
+		std::int32_t specialization;
+		std::int32_t value;
+		std::uint32_t itemCount[4];
+		BridgeText itemIds[MaxRecordItems];
+		double itemValues[MaxRecordItems * 2];
+		EffectSnapshot effects[MaxRecordEffects];
+	};
+
+	struct ActiveSpellSnapshot {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		BridgeText id;
+		std::uint32_t affectsBaseValues;
+		std::uint32_t effectCount;
+		EffectSnapshot effects[MaxRecordEffects];
 	};
 
 	struct LogMessage {
@@ -101,6 +247,23 @@ namespace mwse::openmw {
 	using GetGameSettingCallback = Status(__cdecl*)(void* userData, StringView name, BridgeValue* value);
 	using GetContentFileCountCallback = std::uint32_t(__cdecl*)(void* userData);
 	using GetContentFileCallback = Status(__cdecl*)(void* userData, std::uint32_t index, StringView* contentFile);
+	using GetPlayerObjectCallback = Status(__cdecl*)(void* userData, ObjectSnapshot* snapshot);
+	using ValidateHandleCallback = Status(__cdecl*)(void* userData, OpaqueHandle handle, HandleType expectedType);
+	using GetCellCallback = Status(__cdecl*)(void* userData, OpaqueHandle handle, CellSnapshot* snapshot);
+	using GetStatCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, StatKind kind,
+		std::uint32_t index, StatSnapshot* snapshot);
+	using SetStatCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, StatKind kind,
+		std::uint32_t index, StatField field, double value);
+	using GetRecordCountCallback = Status(__cdecl*)(void* userData, RecordType type, std::uint32_t* count);
+	using GetRecordCallback = Status(__cdecl*)(void* userData, RecordType type, std::uint32_t index,
+		StringView id, RecordSnapshot* snapshot);
+	using GetActorSpellCountCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, std::uint32_t* count);
+	using GetActorSpellCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, std::uint32_t index,
+		RecordSnapshot* snapshot);
+	using SetActorSpellCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, StringView id, std::uint32_t add);
+	using GetActiveSpellCountCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, std::uint32_t* count);
+	using GetActiveSpellCallback = Status(__cdecl*)(void* userData, OpaqueHandle actor, std::uint32_t index,
+		ActiveSpellSnapshot* snapshot);
 
 	struct BridgeCallbacks {
 		std::uint32_t structureSize;
@@ -111,6 +274,18 @@ namespace mwse::openmw {
 		GetContentFileCountCallback getContentFileCount;
 		GetContentFileCallback getContentFile;
 		void* gameUserData;
+		GetPlayerObjectCallback getPlayerObject;
+		ValidateHandleCallback validateHandle;
+		GetCellCallback getCell;
+		GetStatCallback getStat;
+		SetStatCallback setStat;
+		GetRecordCountCallback getRecordCount;
+		GetRecordCallback getRecord;
+		GetActorSpellCountCallback getActorSpellCount;
+		GetActorSpellCallback getActorSpell;
+		SetActorSpellCallback setActorSpell;
+		GetActiveSpellCountCallback getActiveSpellCount;
+		GetActiveSpellCallback getActiveSpell;
 	};
 
 	enum InitializationFlag : std::uint32_t {

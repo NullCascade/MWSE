@@ -347,4 +347,28 @@ namespace TES3 {
 		return std::ref(skillProgress);
 	}
 
+	int MobilePlayer::getOpenMWLevel() const {
+		return npcInstance && npcInstance->baseNPC ? npcInstance->baseNPC->level : 0;
+	}
+
+	void MobilePlayer::setOpenMWLevel(int value) {
+		if (npcInstance && npcInstance->baseNPC) npcInstance->baseNPC->level = static_cast<short>(value);
+	}
+
+	int MobilePlayer::getOpenMWLevelProgress() const {
+		return levelUpProgress;
+	}
+
+	void MobilePlayer::setOpenMWLevelProgress(int value) {
+		levelUpProgress = value;
+	}
+
+	float MobilePlayer::getOpenMWSkillProgress(int skillId) const {
+		return skillProgress[skillId];
+	}
+
+	void MobilePlayer::setOpenMWSkillProgress(int skillId, float value) {
+		skillProgress[skillId] = value;
+	}
+
 }

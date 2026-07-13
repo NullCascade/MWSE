@@ -94,6 +94,7 @@
   <ItemGroup>
 	<ClCompile Include="dllmain.cpp" />
 	<ClCompile Include="OpenMWLuaFoundation.cpp" />
+	<ClCompile Include="OpenMWLuaGameplay.cpp" />
 	<ClCompile Include="OpenMWLuaHost.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -102,9 +103,10 @@
   <ItemGroup>
     <IsolatedLuaJitSource Include="$(LuaJitSourceRoot)**\*" Exclude="$(LuaJitSourceRoot)src\*.dll;$(LuaJitSourceRoot)src\*.exe;$(LuaJitSourceRoot)src\*.lib;$(LuaJitSourceRoot)src\*.obj;$(LuaJitSourceRoot)src\*.pdb;$(LuaJitSourceRoot)src\*.exp" />
   </ItemGroup>
-  <Target Name="BuildIsolatedLuaJit" BeforeTargets="Link" Inputs="@(IsolatedLuaJitSource)" Outputs="$(IsolatedLuaJitLibrary)">
+  <Target Name="BuildIsolatedLuaJit" BeforeTargets="Link" Inputs="@(IsolatedLuaJitSource);$(MSBuildProjectFullPath)" Outputs="$(IsolatedLuaJitLibrary)">
     <MakeDir Directories="$(IsolatedLuaJitRoot)" />
     <Copy SourceFiles="@(IsolatedLuaJitSource)" DestinationFiles="@(IsolatedLuaJitSource->'$(IsolatedLuaJitRoot)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -Command &quot;$path = '$(IsolatedLuaJitRoot)src\msvcbuild.bat'; $text = [IO.File]::ReadAllText($path); $text = $text.Replace('/D_CRT_STDIO_INLINE=__declspec(dllexport)__inline', '/D_CRT_STDIO_INLINE=__inline'); [IO.File]::WriteAllText($path, $text, [Text.Encoding]::ASCII)&quot;" />
     <Exec WorkingDirectory="$(IsolatedLuaJitRoot)src" Command="call msvcbuild.bat static" />
     <Copy SourceFiles="$(IsolatedLuaJitRoot)src\lua51.lib" DestinationFiles="$(IsolatedLuaJitLibrary)" />
   </Target>

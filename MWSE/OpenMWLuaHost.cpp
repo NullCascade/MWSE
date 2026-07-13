@@ -6,6 +6,7 @@
 #include "TES3GameFile.h"
 #include "TES3GameSetting.h"
 #include "TES3GlobalVariable.h"
+#include "TES3MobilePlayer.h"
 #include "TES3WorldController.h"
 
 namespace mwse::openmw {
@@ -27,9 +28,12 @@ namespace mwse::openmw {
 
 	bool HostController::isGameDataReady() const {
 		auto* dataHandler = TES3::DataHandler::get();
+		auto* world = TES3::WorldController::get();
+		auto* player = world ? world->getMobilePlayer() : nullptr;
 		return dataHandler != nullptr && dataHandler->nonDynamicData != nullptr
 			&& dataHandler->nonDynamicData->GMSTs != nullptr
-			&& dataHandler->nonDynamicData->GMSTs[TES3::GMST::sHealth] != nullptr;
+			&& dataHandler->nonDynamicData->GMSTs[TES3::GMST::sHealth] != nullptr
+			&& player != nullptr && player->getCell() != nullptr;
 	}
 
 	std::string HostController::copyLogString(StringView value) {
@@ -105,12 +109,15 @@ namespace mwse::openmw {
 	}
 
 	Status HostController::startRuntime() {
+		resetHandles();
 		InitializationConfig config{};
 		config.structureSize = sizeof(config);
 		config.abiVersion = BridgeAbiVersion;
 		config.flags = initializationFlags;
 		config.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, &receiveLog, this,
-			&getGameSetting, &getContentFileCount, &getContentFile, this };
+			&getGameSetting, &getContentFileCount, &getContentFile, this,
+			&getPlayerObject, &validateHandle, &getCell, &getStat, &setStat, &getRecordCount, &getRecord,
+			&getActorSpellCount, &getActorSpell, &setActorSpell, &getActiveSpellCount, &getActiveSpell };
 		config.vfsRoot = { vfsRoot.data(), static_cast<std::uint32_t>(vfsRoot.size()) };
 		config.scriptsFile = { scriptsFile.data(), static_cast<std::uint32_t>(scriptsFile.size()) };
 		config.contentFile = { contentFile.data(), static_cast<std::uint32_t>(contentFile.size()) };
@@ -174,6 +181,7 @@ namespace mwse::openmw {
 		if (module == nullptr || api.shutdown == nullptr) return;
 		if (runtimeStarted) api.shutdown();
 		runtimeStarted = false;
+		resetHandles();
 		state = LifecycleState::Stopped;
 	}
 
@@ -185,6 +193,11 @@ namespace mwse::openmw {
 		}
 		state = api.getLifecycleState();
 		if (state != LifecycleState::Running) return;
+		auto* currentPlayer = TES3::WorldController::get() ? TES3::WorldController::get()->getMobilePlayer() : nullptr;
+		if (currentPlayer != handledPlayer) {
+			resetHandles();
+			if (api.reload() != Status::Ok) { state = api.getLifecycleState(); return; }
+		}
 		const double realDeltaSeconds = TES3::WorldController::realDeltaTime;
 		if (!paused) this->simulationTimeSeconds += deltaSeconds;
 		auto* worldController = TES3::WorldController::get();
@@ -199,6 +212,7 @@ namespace mwse::openmw {
 
 	bool HostController::reload() {
 		if (module == nullptr || api.reload == nullptr || !runtimeStarted) return false;
+		resetHandles();
 		const Status status = api.reload();
 		state = api.getLifecycleState();
 		return status == Status::Ok && state == LifecycleState::Running;

@@ -121,6 +121,12 @@ namespace mwse::openmw::host {
 		if (config->callbacks.abiVersion != BridgeAbiVersion) return Status::AbiMismatch;
 		if (config->callbacks.log == nullptr) return Status::MissingCallback;
 		if ((config->callbacks.getContentFileCount == nullptr) != (config->callbacks.getContentFile == nullptr)) return Status::MissingCallback;
+		if (config->callbacks.getPlayerObject == nullptr || config->callbacks.validateHandle == nullptr
+			|| config->callbacks.getCell == nullptr || config->callbacks.getStat == nullptr || config->callbacks.setStat == nullptr
+			|| config->callbacks.getRecordCount == nullptr || config->callbacks.getRecord == nullptr
+			|| config->callbacks.getActorSpellCount == nullptr || config->callbacks.getActorSpell == nullptr
+			|| config->callbacks.setActorSpell == nullptr || config->callbacks.getActiveSpellCount == nullptr
+			|| config->callbacks.getActiveSpell == nullptr) return Status::MissingCallback;
 		if (mState == LifecycleState::Running || mState == LifecycleState::Initializing) return Status::InvalidState;
 
 		mConfig = *config;
@@ -176,6 +182,14 @@ namespace mwse::openmw::host {
 		mTimersFired = 0;
 		mStorageNotifications = 0;
 		mInterfaceLookups = 0;
+		mPlayerObjectReference = LUA_NOREF;
+		mTypesPackageReference = LUA_NOREF;
+		mActorTypeReference = LUA_NOREF;
+		mNpcTypeReference = LUA_NOREF;
+		mPlayerTypeReference = LUA_NOREF;
+		mCellReferences.clear();
+		mGameplayCalls = 0;
+		mRejectedHandles = 0;
 
 		try {
 			mLua = lua_newstate(&allocator, this);
@@ -194,7 +208,8 @@ namespace mwse::openmw::host {
 				<< (CapabilityIsolatedLuaState | CapabilitySandboxedSourceModules | CapabilityMenuContainer
 					| CapabilityGlobalContainer | CapabilityPlayerContainer | CapabilityDelayedEvents | CapabilityReload
 					| CapabilityFoundationUtil | CapabilityFoundationInterfaces | CapabilityFoundationAsync
-					| CapabilityFoundationStorage | CapabilityFoundationCore | CapabilityFoundationSelf);
+					| CapabilityFoundationStorage | CapabilityFoundationCore | CapabilityFoundationSelf
+					| CapabilityPlayerBindings | CapabilityRecordBindings | CapabilityMutableStats);
 			log(LogSeverity::Info, "startup", startup.str());
 			if ((mConfig.flags & InitializationHarnessMode) != 0 && (mConfig.flags & InitializationParseOnly) == 0) {
 				QueuedEvent eventData{ sizeof(QueuedEvent), BridgeAbiVersion, asBridgeString("Milestone3Event"), {} };
@@ -243,6 +258,8 @@ namespace mwse::openmw::host {
 			lua_close(mLua);
 			mLua = nullptr;
 		}
+		mPlayerObjectReference = mTypesPackageReference = mActorTypeReference = mNpcTypeReference = mPlayerTypeReference = LUA_NOREF;
+		mCellReferences.clear();
 	}
 
 	void* Host::allocator(void* userData, void* pointer, std::size_t oldSize, std::size_t newSize) {
@@ -460,7 +477,8 @@ namespace mwse::openmw::host {
 			if (auto it = instance->loadedModules.find(name); it != instance->loadedModules.end()) { lua_rawgeti(state, LUA_REGISTRYINDEX, it->second); return 1; }
 			if (name == "coroutine" || name == "math" || name == "string" || name == "table") self->pushSafeLibraryClone(name.c_str());
 			else if (name == "openmw.compatibility" || name == "openmw.util" || name == "openmw.interfaces"
-				|| name == "openmw.async" || name == "openmw.storage" || name == "openmw.core" || name == "openmw.self") self->pushBuiltinPackage(*instance, name);
+				|| name == "openmw.async" || name == "openmw.storage" || name == "openmw.core" || name == "openmw.self"
+				|| name == "openmw.types") self->pushBuiltinPackage(*instance, name);
 			else { int reference = self->loadSourceModule(*instance, name); lua_rawgeti(state, LUA_REGISTRYINDEX, reference); return 1; }
 			lua_pushvalue(state, -1);
 			instance->loadedModules[name] = luaL_ref(state, LUA_REGISTRYINDEX);
@@ -588,14 +606,15 @@ namespace mwse::openmw::host {
 	}
 
 	std::string Host::buildHandlerReport() const { std::ostringstream s; s << "{\"engineHandlerOrder\":" << jsonStringArray(mEngineHandlerOrder) << ",\"eventHandlerOrder\":" << jsonStringArray(mEventHandlerOrder) << ",\"delayedDeliveries\":" << jsonStringArray(mDelayedDeliveries) << ",\"diagnostics\":" << jsonStringArray(mDiagnostics) << '}'; return s.str(); }
-	std::string Host::buildBridgeReport() const { std::ostringstream s; s << "{\"abiAccepted\":true,\"abiVersion\":" << BridgeAbiVersion << ",\"hostApiStructureSize\":" << sizeof(HostApi) << ",\"initializationStructureSize\":" << sizeof(InitializationConfig) << ",\"runtimeVersion\":\"" << LUAJIT_VERSION << "\",\"apiRevision\":" << OpenMWApiRevision << ",\"bridgeVersion\":" << BridgeVersion << ",\"capabilities\":" << (CapabilityIsolatedLuaState|CapabilitySandboxedSourceModules|CapabilityMenuContainer|CapabilityGlobalContainer|CapabilityPlayerContainer|CapabilityDelayedEvents|CapabilityReload|CapabilityFoundationUtil|CapabilityFoundationInterfaces|CapabilityFoundationAsync|CapabilityFoundationStorage|CapabilityFoundationCore|CapabilityFoundationSelf) << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"runtimeOwnedAllocator\":true,\"importsMwseLua\":false,\"allocatedBytes\":" << mAllocatedBytes << ",\"gmstCallbackAvailable\":" << (mCallbacks.getGameSetting?"true":"false") << ",\"contentFilesCallbackAvailable\":" << (mCallbacks.getContentFileCount&&mCallbacks.getContentFile?"true":"false") << '}'; return s.str(); }
+	std::string Host::buildBridgeReport() const { std::ostringstream s; s << "{\"abiAccepted\":true,\"abiVersion\":" << BridgeAbiVersion << ",\"hostApiStructureSize\":" << sizeof(HostApi) << ",\"initializationStructureSize\":" << sizeof(InitializationConfig) << ",\"callbacksStructureSize\":" << sizeof(BridgeCallbacks) << ",\"objectSnapshotSize\":" << sizeof(ObjectSnapshot) << ",\"cellSnapshotSize\":" << sizeof(CellSnapshot) << ",\"statSnapshotSize\":" << sizeof(StatSnapshot) << ",\"recordSnapshotSize\":" << sizeof(RecordSnapshot) << ",\"runtimeVersion\":\"" << LUAJIT_VERSION << "\",\"apiRevision\":" << OpenMWApiRevision << ",\"bridgeVersion\":" << BridgeVersion << ",\"capabilities\":" << (CapabilityIsolatedLuaState|CapabilitySandboxedSourceModules|CapabilityMenuContainer|CapabilityGlobalContainer|CapabilityPlayerContainer|CapabilityDelayedEvents|CapabilityReload|CapabilityFoundationUtil|CapabilityFoundationInterfaces|CapabilityFoundationAsync|CapabilityFoundationStorage|CapabilityFoundationCore|CapabilityFoundationSelf|CapabilityPlayerBindings|CapabilityRecordBindings|CapabilityMutableStats) << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"runtimeOwnedAllocator\":true,\"importsMwseLua\":false,\"allocatedBytes\":" << mAllocatedBytes << ",\"gmstCallbackAvailable\":" << (mCallbacks.getGameSetting?"true":"false") << ",\"contentFilesCallbackAvailable\":" << (mCallbacks.getContentFileCount&&mCallbacks.getContentFile?"true":"false") << ",\"gameplayCallbacksAvailable\":" << (mCallbacks.getPlayerObject&&mCallbacks.validateHandle&&mCallbacks.getCell&&mCallbacks.getStat&&mCallbacks.setStat&&mCallbacks.getRecord?"true":"false") << '}'; return s.str(); }
 	std::string Host::buildReloadReport() const { std::ostringstream s; s << "{\"reloadCount\":" << mReloadCount << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"state\":" << static_cast<std::uint32_t>(mState) << ",\"cleanShutdown\":" << (mState==LifecycleState::Stopped?"true":"false") << '}'; return s.str(); }
-	std::string Host::buildFoundationReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"packages\":{\"util\":\"partial-ncg\",\"interfaces\":\"implemented\",\"async\":\"partial-no-persistence\",\"storage\":\"partial-in-memory\",\"core\":\"partial-ncg\",\"self\":\"contextual-foundation\"},\"probes\":{";bool first=true;for(const auto& [name,passed]:mFoundationProbes){if(!first)s<<',';first=false;s<<'\"'<<jsonEscape(name)<<"\":"<<(passed?"true":"false");}s<<"},\"timers\":{\"scheduled\":"<<mTimersScheduled<<",\"fired\":"<<mTimersFired<<",\"pending\":"<<mTimers.size()<<"},\"storage\":{\"globalSections\":"<<mGlobalStorage.size()<<",\"playerSections\":"<<mPlayerStorage.size()<<",\"notifications\":"<<mStorageNotifications<<"},\"interfaces\":{\"lookups\":"<<mInterfaceLookups<<"},\"time\":{\"simulationSeconds\":"<<mSimulationTimeSeconds<<",\"gameSeconds\":"<<mGameTimeSeconds<<",\"worldPaused\":"<<(mWorldPaused?"true":"false")<<"},\"limitations\":[\"timers and storage are not persisted across save/load or host reload until Milestone 5\",\"self gameplay object fields remain Milestone 4.2\",\"l10n currently provides key fallback and simple token substitution; VFS locale loading remains Milestone 4.4\"]}";return s.str(); }
-	std::string Host::buildReport() const { std::ostringstream s; s << "{\"schemaVersion\":2,\"state\":" << static_cast<std::uint32_t>(mState) << ",\"lastError\":\"" << jsonEscape(mLastError) << "\",\"bridge\":" << buildBridgeReport() << ",\"containers\":" << buildContainerReport() << ",\"handlers\":" << buildHandlerReport() << ",\"foundation\":" << buildFoundationReport() << ",\"reload\":" << buildReloadReport() << '}'; return s.str(); }
+	std::string Host::buildFoundationReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"packages\":{\"util\":\"partial-ncg\",\"interfaces\":\"implemented\",\"async\":\"partial-no-persistence\",\"storage\":\"partial-in-memory\",\"core\":\"player-record-stat-subset\",\"self\":\"validated-player-gameobject\"},\"probes\":{";bool first=true;for(const auto& [name,passed]:mFoundationProbes){if(!first)s<<',';first=false;s<<'\"'<<jsonEscape(name)<<"\":"<<(passed?"true":"false");}s<<"},\"timers\":{\"scheduled\":"<<mTimersScheduled<<",\"fired\":"<<mTimersFired<<",\"pending\":"<<mTimers.size()<<"},\"storage\":{\"globalSections\":"<<mGlobalStorage.size()<<",\"playerSections\":"<<mPlayerStorage.size()<<",\"notifications\":"<<mStorageNotifications<<"},\"interfaces\":{\"lookups\":"<<mInterfaceLookups<<"},\"time\":{\"simulationSeconds\":"<<mSimulationTimeSeconds<<",\"gameSeconds\":"<<mGameTimeSeconds<<",\"worldPaused\":"<<(mWorldPaused?"true":"false")<<"},\"limitations\":[\"timers and storage are not persisted across save/load or host reload until Milestone 5\",\"native Morrowind statistics expose a net modifier/damage decomposition\",\"l10n currently provides key fallback and simple token substitution; VFS locale loading remains Milestone 4.4\"]}";return s.str(); }
+	std::string Host::buildGameplayReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"runtimeGeneration\":"<<mRuntimeGeneration<<",\"gameplayCalls\":"<<mGameplayCalls<<",\"rejectedHandles\":"<<mRejectedHandles<<",\"stablePlayerUserdata\":"<<(mPlayerObjectReference!=LUA_NOREF?"true":"false")<<",\"cellIdentityCount\":"<<mCellReferences.size()<<",\"playerOnlySelf\":true,\"handleModel\":{\"opaque\":true,\"typeTagged\":true,\"generationScoped\":true},\"surfaces\":[\"GameObject\",\"Cell\",\"Actor\",\"NPC\",\"Player\",\"attributes\",\"skills\",\"level\",\"health\",\"spells\",\"classes\",\"races\",\"birthSigns\"],\"probes\":{";bool first=true;for(const auto& [name,passed]:mFoundationProbes){if(name.rfind("player-bindings-",0)!=0)continue;if(!first)s<<',';first=false;s<<'\"'<<jsonEscape(name)<<"\":"<<(passed?"true":"false");}s<<"}}";return s.str();}
+	std::string Host::buildReport() const { std::ostringstream s; s << "{\"schemaVersion\":3,\"state\":" << static_cast<std::uint32_t>(mState) << ",\"lastError\":\"" << jsonEscape(mLastError) << "\",\"bridge\":" << buildBridgeReport() << ",\"containers\":" << buildContainerReport() << ",\"handlers\":" << buildHandlerReport() << ",\"foundation\":" << buildFoundationReport() << ",\"gameplay\":" << buildGameplayReport() << ",\"reload\":" << buildReloadReport() << '}'; return s.str(); }
 
 	void Host::writeReportArtifacts() {
 		if (mReportDirectory.empty()) return;
-		try { auto root=std::filesystem::path(mReportDirectory); writeAtomic(root/"bridge-runtime-report.json", buildBridgeReport()); writeAtomic(root/"parsed-container-report.json", buildContainerReport()); writeAtomic(root/"handler-order-report.json", buildHandlerReport()); writeAtomic(root/"foundation-package-report.json", buildFoundationReport()); writeAtomic(root/"reload-shutdown-report.json", buildReloadReport()); writeAtomic(root/"openmw-host-report.json", buildReport()); } catch (const std::exception& error) { if (mCallbacks.log) { LogMessage message{sizeof(LogMessage),BridgeAbiVersion,LogSeverity::Error,0,asBridgeString("report"),asBridgeString(mContentFile),{}, {},asBridgeString(error.what())}; mCallbacks.log(mCallbacks.logUserData,&message); } }
+		try { auto root=std::filesystem::path(mReportDirectory); const auto gameplay=buildGameplayReport(); writeAtomic(root/"bridge-runtime-report.json", buildBridgeReport()); writeAtomic(root/"parsed-container-report.json", buildContainerReport()); writeAtomic(root/"handler-order-report.json", buildHandlerReport()); writeAtomic(root/"foundation-package-report.json", buildFoundationReport()); writeAtomic(root/"handle-generation-report.json",gameplay);writeAtomic(root/"player-type-report.json",gameplay);writeAtomic(root/"records-stat-report.json",gameplay);writeAtomic(root/"mutation-restoration-report.json",gameplay); writeAtomic(root/"reload-shutdown-report.json", buildReloadReport()); writeAtomic(root/"openmw-host-report.json", buildReport()); } catch (const std::exception& error) { if (mCallbacks.log) { LogMessage message{sizeof(LogMessage),BridgeAbiVersion,LogSeverity::Error,0,asBridgeString("report"),asBridgeString(mContentFile),{}, {},asBridgeString(error.what())}; mCallbacks.log(mCallbacks.logUserData,&message); } }
 	}
 
 	Status Host::getReport(char* buffer, std::uint32_t capacity, std::uint32_t* requiredSize) {

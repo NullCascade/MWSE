@@ -478,6 +478,7 @@
   </ItemGroup>
   <ItemGroup>
 	<ClCompile Include="OpenMWLuaHost.cpp" />
+	<ClCompile Include="OpenMWLuaBindings.cpp" />
     <ClCompile Include="ArrayUtil.cpp" />
     <ClCompile Include="CrashLogLabelsMWSE.cpp" />
 	<ClCompile Include="CrashLoggerMWSE.cpp" />

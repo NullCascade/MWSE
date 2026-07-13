@@ -146,6 +146,12 @@ namespace TES3 {
 		std::reference_wrapper<int[8]> getLevelupsPerAttribute();
 		std::reference_wrapper<int[3]> getLevelupsPerSpecialization();
 		std::reference_wrapper<float[27]> getSkillProgressValues();
+		int getOpenMWLevel() const;
+		void setOpenMWLevel(int value);
+		int getOpenMWLevelProgress() const;
+		void setOpenMWLevelProgress(int value);
+		float getOpenMWSkillProgress(int skillId) const;
+		void setOpenMWSkillProgress(int skillId, float value);
 
 	};
 	static_assert(sizeof(MobilePlayer) == 0x694, "TES3::MobilePlayer failed size validation");

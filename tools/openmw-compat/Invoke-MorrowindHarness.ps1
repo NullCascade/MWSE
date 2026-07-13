@@ -4,7 +4,7 @@ param(
     [string]$MorrowindDirectory = 'C:\Games\Morrowind',
     [string]$FixtureSave = 'TestMWSE0000.ess',
     [string]$TeleportCell = 'Balmora, Guild of Mages',
-    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost', 'OpenMWLuaFoundation')][string]$Suite = 'Smoke',
+    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings')][string]$Suite = 'Smoke',
     [string]$OpenMWAddonPath = 'C:\Games\Morrowind\Data Files\ncg.omwaddon',
     [switch]$ProbeNativeAddonExtension,
     [int]$ReadyTimeoutSeconds = 45,
@@ -14,8 +14,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$isOpenMWLuaSuite = $Suite -in @('OpenMWLuaHost', 'OpenMWLuaFoundation')
-$openMWLuaScriptsName = if ($Suite -eq 'OpenMWLuaFoundation') { 'milestone4-foundation.omwscripts' } else { 'milestone3.omwscripts' }
+$isOpenMWLuaSuite = $Suite -in @('OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings')
+$openMWLuaScriptsName = if ($Suite -eq 'OpenMWLuaFoundation') { 'milestone4-foundation.omwscripts' } elseif ($Suite -eq 'OpenMWLuaPlayerBindings') { 'milestone4-player-bindings.omwscripts' } else { 'milestone3.omwscripts' }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 Import-Module (Join-Path $PSScriptRoot 'HarnessProtocol.psm1') -Force
@@ -387,6 +387,72 @@ PLAYER: foundation_player.lua
 MENU: foundation_menu.lua
 '@, $utf8NoBom)
         }
+        elseif ($Suite -eq 'OpenMWLuaPlayerBindings') {
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'player_bindings.lua'), @'
+local compat = require('openmw.compatibility')
+local core = require('openmw.core')
+local T = require('openmw.types')
+local self = require('openmw.self')
+
+compat.recordFoundationProbe('player-bindings-identity', rawequal(self, require('openmw.self')) and self.recordId ~= '')
+compat.recordFoundationProbe('player-bindings-types', self.type == T.Player and T.Actor.objectIsInstance(self)
+    and T.NPC.objectIsInstance(self) and T.Player.objectIsInstance(self))
+compat.recordFoundationProbe('player-bindings-cell', self.cell ~= nil and type(self.cell.name) == 'string'
+    and type(self.cell.isExterior) == 'boolean' and type(self.cell.hasSky) == 'boolean')
+
+local playerRecord = assert(T.Player.record(self))
+local playerClass = assert(T.NPC.classes.record(string.upper(playerRecord.class)))
+local playerRace = assert(T.NPC.races.record(string.upper(playerRecord.race)))
+local birthsignId = T.Player.getBirthSign(self)
+local birthsign = birthsignId and T.Player.birthSigns.record(string.upper(birthsignId))
+assert(#core.stats.Attribute.records == 8, 'unexpected attribute record count: ' .. #core.stats.Attribute.records)
+assert(#core.stats.Skill.records == 27, 'unexpected skill record count: ' .. #core.stats.Skill.records)
+assert(core.stats.Attribute.records.strength.id == 'strength', 'lowercase attribute lookup failed')
+assert(playerClass.id == string.lower(playerRecord.class), 'class lookup mismatch: ' .. playerClass.id .. ' / ' .. playerRecord.class)
+assert(playerRace.id == string.lower(playerRecord.race), 'race lookup mismatch: ' .. playerRace.id .. ' / ' .. playerRecord.race)
+assert(birthsignId == nil or birthsign ~= nil, 'birthsign lookup failed: ' .. tostring(birthsignId))
+compat.recordFoundationProbe('player-bindings-records', true)
+
+local strength = T.Actor.stats.attributes.strength(self)
+local block = T.NPC.stats.skills.block(self)
+local level = T.Actor.stats.level(self)
+local health = T.Actor.stats.dynamic.health(self)
+local originalStrength = strength.base
+if compat.runtimeGeneration == 1 then
+    strength.base = originalStrength + 1
+    assert(strength.base == originalStrength + 1)
+end
+compat.recordFoundationProbe('player-bindings-mutation', true)
+compat.recordFoundationProbe('player-bindings-stats', type(strength.modified) == 'number'
+    and type(block.base) == 'number' and type(level.current) == 'number'
+    and type(level.progress) == 'number' and type(health.base) == 'number'
+    and type(health.current) == 'number' and not pcall(function() strength.modified = 0 end))
+
+local spells = T.Player.spells(self)
+local activeSpells = T.Actor.activeSpells(self)
+compat.recordFoundationProbe('player-bindings-spells', type(spells) == 'table' and type(activeSpells) == 'table'
+    and core.magic.spells.record ~= nil and core.magic.EFFECT_TYPE.FortifyAttribute == 'fortifyattribute')
+local invalid = compat.probeInvalidHandles()
+compat.recordFoundationProbe('player-bindings-handle-rejection', invalid.wrongType == 13 and invalid.stale == 12)
+
+local failed = false
+return { engineHandlers = { onUpdate = function()
+    if not failed then failed = true; error('intentional Milestone 4.2 binding handler failure') end
+end } }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'player_bindings_safe.lua'), @'
+local compat = require('openmw.compatibility')
+local recorded = false
+return { engineHandlers = { onUpdate = function()
+    if not recorded then recorded = true; compat.recordFoundationProbe('player-bindings-failure-isolation', true) end
+end } }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'milestone4-player-bindings.omwscripts'), @'
+# Milestone 4.2 native player binding live fixture. Ordering is significant.
+PLAYER: player_bindings.lua
+PLAYER: player_bindings_safe.lua
+'@, $utf8NoBom)
+        }
     }
     Write-OwchAtomicJson -Path (Join-Path $runDirectory 'run.json') -Value ([ordered]@{
         protocolVersion = 1; runId = $runId; suite = $Suite; configuration = $Configuration
@@ -509,7 +575,15 @@ MENU: foundation_menu.lua
     Add-SmokeAssertion 'main-menu-detection' ($initialState.mainMenu -eq $true) $initialState.name 'mainMenu'
     Invoke-NamedProbe 'mwseInitialization' | Out-Null
 
+    $loadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
+    Send-HarnessCommand 'loadGame' @{ filename = $FixtureSave } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
+    Wait-HarnessResponse $loadedRequest $ReadyTimeoutSeconds 'fixture loaded event' | Out-Null
+    $playerProbe = Invoke-NamedProbe 'playerAndCell'
+    Add-SmokeAssertion 'known-game-state' ($playerProbe.result.value.inGame -and $playerProbe.result.value.playerValid) $playerProbe.result.value.name 'inGame'
+
     if ($Suite -eq 'OpenMWLuaHost') {
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
         Invoke-NamedProbe 'openMWLuaHostReport' | Out-Null
         Invoke-NamedProbe 'reloadOpenMWLuaHost' | Out-Null
         Send-HarnessCommand 'ping' | Out-Null
@@ -525,12 +599,18 @@ MENU: foundation_menu.lua
         Send-HarnessCommand 'ping' | Out-Null
         Invoke-NamedProbe 'openMWLuaFoundationReport' | Out-Null
     }
-
-    $loadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
-    Send-HarnessCommand 'loadGame' @{ filename = $FixtureSave } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
-    Wait-HarnessResponse $loadedRequest $ReadyTimeoutSeconds 'fixture loaded event' | Out-Null
-    $playerProbe = Invoke-NamedProbe 'playerAndCell'
-    Add-SmokeAssertion 'known-game-state' ($playerProbe.result.value.inGame -and $playerProbe.result.value.playerValid) $playerProbe.result.value.name 'inGame'
+    elseif ($Suite -eq 'OpenMWLuaPlayerBindings') {
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaPlayerBindingsReport' | Out-Null
+        Invoke-NamedProbe 'openMWLuaPlayerNativeState' @{ phase = 'mutated' } | Out-Null
+        Invoke-NamedProbe 'reloadOpenMWLuaHost' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaPlayerBindingsReport' | Out-Null
+        Invoke-NamedProbe 'openMWLuaPlayerNativeState' @{ phase = 'restored' } | Out-Null
+        Invoke-NamedProbe 'mwseInitialization' | Out-Null
+    }
 
     if ($Suite -eq 'OpenMWAddon') {
         $addonProbeArguments = @{ expectedAlias = $enabledNativeFiles[$enabledNativeFiles.Count - 1]; expectedOrdinaryFiles = @($originalGameFiles) }
@@ -538,27 +618,29 @@ MENU: foundation_menu.lua
         Add-SmokeAssertion 'ncg-content-live-before-save' ($addonProbe.result.value.aliasActive -and $addonProbe.result.value.ordinaryFilesUnchanged -and $addonProbe.result.value.gmst.value -eq 0) $addonProbe.result.value $true
     }
 
-    $cellEventRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'cellChanged' } -NoWait
-    Send-HarnessCommand 'teleport' @{ cell = $TeleportCell; position = @(0, 0, 0); forceCellChange = $true } | Out-Null
-    $cellEvent = Wait-HarnessResponse $cellEventRequest $RequestTimeoutSeconds 'native cellChanged event'
-    Add-SmokeAssertion 'native-event-observed' ($cellEvent.result.event -eq 'cellChanged') $cellEvent.result.event 'cellChanged'
+    if ($Suite -ne 'OpenMWLuaPlayerBindings') {
+        $cellEventRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'cellChanged' } -NoWait
+        Send-HarnessCommand 'teleport' @{ cell = $TeleportCell; position = @(0, 0, 0); forceCellChange = $true } | Out-Null
+        $cellEvent = Wait-HarnessResponse $cellEventRequest $RequestTimeoutSeconds 'native cellChanged event'
+        Add-SmokeAssertion 'native-event-observed' ($cellEvent.result.event -eq 'cellChanged') $cellEvent.result.event 'cellChanged'
 
-    $persistentKey = 'milestone1Smoke'
-    $persistentValue = 'persisted-' + $runId
-    Invoke-NamedProbe 'writeReferencePersistentValue' @{ key = $persistentKey; value = $persistentValue } | Out-Null
-    $savedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'saved' } -TimeoutSeconds $RequestTimeoutSeconds -NoWait
-    Invoke-NamedProbe 'saveGame' @{ file = $smokeSaveBase; name = 'OpenMW compatibility harness M1' } | Out-Null
-    Wait-HarnessResponse $savedRequest $RequestTimeoutSeconds 'smoke save event' | Out-Null
-    Invoke-NamedProbe 'writeReferencePersistentValue' @{ key = $persistentKey; value = 'mutated-after-save' } | Out-Null
-    $reloadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
-    Send-HarnessCommand 'loadGame' @{ filename = ($smokeSaveBase + '.ess') } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
-    Wait-HarnessResponse $reloadedRequest $ReadyTimeoutSeconds 'smoke reload event' | Out-Null
-    $readProbe = Invoke-NamedProbe 'readReferencePersistentValue' @{ key = $persistentKey; expected = $persistentValue }
-    Add-SmokeAssertion 'reference-persistence-save-load' ($readProbe.result.value.value -eq $persistentValue) $readProbe.result.value.value $persistentValue
+        $persistentKey = 'milestone1Smoke'
+        $persistentValue = 'persisted-' + $runId
+        Invoke-NamedProbe 'writeReferencePersistentValue' @{ key = $persistentKey; value = $persistentValue } | Out-Null
+        $savedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'saved' } -TimeoutSeconds $RequestTimeoutSeconds -NoWait
+        Invoke-NamedProbe 'saveGame' @{ file = $smokeSaveBase; name = 'OpenMW compatibility harness M1' } | Out-Null
+        Wait-HarnessResponse $savedRequest $RequestTimeoutSeconds 'smoke save event' | Out-Null
+        Invoke-NamedProbe 'writeReferencePersistentValue' @{ key = $persistentKey; value = 'mutated-after-save' } | Out-Null
+        $reloadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
+        Send-HarnessCommand 'loadGame' @{ filename = ($smokeSaveBase + '.ess') } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
+        Wait-HarnessResponse $reloadedRequest $ReadyTimeoutSeconds 'smoke reload event' | Out-Null
+        $readProbe = Invoke-NamedProbe 'readReferencePersistentValue' @{ key = $persistentKey; expected = $persistentValue }
+        Add-SmokeAssertion 'reference-persistence-save-load' ($readProbe.result.value.value -eq $persistentValue) $readProbe.result.value.value $persistentValue
 
-    if ($Suite -eq 'OpenMWAddon') {
-        $reloadedAddonProbe = Invoke-NamedProbe 'openMWAddonState' $addonProbeArguments
-        Add-SmokeAssertion 'ncg-content-live-after-reload' ($reloadedAddonProbe.result.value.aliasActive -and $reloadedAddonProbe.result.value.gmst.value -eq 0) $reloadedAddonProbe.result.value $true
+        if ($Suite -eq 'OpenMWAddon') {
+            $reloadedAddonProbe = Invoke-NamedProbe 'openMWAddonState' $addonProbeArguments
+            Add-SmokeAssertion 'ncg-content-live-after-reload' ($reloadedAddonProbe.result.value.aliasActive -and $reloadedAddonProbe.result.value.gmst.value -eq 0) $reloadedAddonProbe.result.value $true
+        }
     }
 
     if ($isOpenMWLuaSuite) {
@@ -642,12 +724,17 @@ finally {
             addonPlan = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'addon-plan.json' } else { $null }
             compatibilityReports = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'compatibility-reports' } else { $null }
             restoration = Join-Path $runDirectory 'restoration.json'
+            buildLog = if (-not $SkipBuild) { Join-Path $runDirectory 'build.log' } else { $null }
             nativeTests = if ($isOpenMWLuaSuite) { $nativeTestPath } else { $null }
             bridgeRuntimeReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'bridge-runtime-report.json' } else { $null }
             parsedContainerReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'parsed-container-report.json' } else { $null }
             handlerOrderReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'handler-order-report.json' } else { $null }
             foundationPackageReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'foundation-package-report.json' } else { $null }
             reloadShutdownReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'reload-shutdown-report.json' } else { $null }
+            handleGenerationReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'handle-generation-report.json' } else { $null }
+            playerTypeReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'player-type-report.json' } else { $null }
+            recordsStatReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'records-stat-report.json' } else { $null }
+            mutationRestorationReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'mutation-restoration-report.json' } else { $null }
             hostEvents = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'openmw-host-events.jsonl' } else { $null }
             syntheticFixture = if ($isOpenMWLuaSuite) { $syntheticVfs } else { $null }
             save = if (Test-Path -LiteralPath (Join-Path $runDirectory ($smokeSaveBase + '.ess'))) { Join-Path $runDirectory ($smokeSaveBase + '.ess') } else { $null }

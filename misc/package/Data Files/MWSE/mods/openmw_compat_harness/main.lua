@@ -16,6 +16,7 @@ local pendingEventRequests = {}
 local pendingScreenshots = {}
 local shutdownRequested = false
 local shutdownPosted = false
+local playerBindingOriginalStrength
 
 local function now()
 	return socket.gettime()
@@ -163,8 +164,8 @@ function probes.openMWLuaHostReport(request)
 
 	emitAssertion(request, "openmw-support-dll-loaded", mwse.openmwCompatibility.isLoaded() == true,
 		mwse.openmwCompatibility.isLoaded(), true)
-	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 2,
-		bridge, { abiAccepted = true, abiVersion = 2 })
+	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 3,
+		bridge, { abiAccepted = true, abiVersion = 3 })
 	emitAssertion(request, "openmw-runtime-independent", bridge.runtimeOwnedAllocator == true
 		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
 		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
@@ -241,10 +242,10 @@ function probes.openMWLuaFoundationReport(request)
 			missing[#missing + 1] = name
 		end
 	end
-	emitAssertion(request, "openmw-foundation-bridge-v2", bridge.abiAccepted == true and bridge.abiVersion == 2
-		and bridge.bridgeVersion == 2 and bridge.gmstCallbackAvailable == true
+	emitAssertion(request, "openmw-foundation-bridge-v3", bridge.abiAccepted == true and bridge.abiVersion == 3
+		and bridge.bridgeVersion == 3 and bridge.gmstCallbackAvailable == true
 		and bridge.contentFilesCallbackAvailable == true,
-		bridge, { abiVersion = 2, bridgeVersion = 2, gmstCallbackAvailable = true, contentFilesCallbackAvailable = true })
+		bridge, { abiVersion = 3, bridgeVersion = 3, gmstCallbackAvailable = true, contentFilesCallbackAvailable = true })
 	emitAssertion(request, "openmw-foundation-container-counts", containers.menuDefinitions == 1
 		and containers.globalDefinitions == 2 and containers.playerDefinitions == 1,
 		{ menu = containers.menuDefinitions, global = containers.globalDefinitions, player = containers.playerDefinitions },
@@ -264,6 +265,37 @@ function probes.openMWLuaFoundationReport(request)
 		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
 			importsMwseLua = bridge.importsMwseLua }, "independent LuaJIT runtime")
 	emitAssertion(request, "mwse-lua-functional-with-foundation-host", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return report
+end
+
+function probes.openMWLuaPlayerBindingsReport(request)
+	local report = decodeOpenMWHostReport()
+	local bridge = report.bridge or {}
+	local gameplay = report.gameplay or {}
+	local probesReport = gameplay.probes or {}
+	local required = {
+		"player-bindings-identity", "player-bindings-types", "player-bindings-cell",
+		"player-bindings-records", "player-bindings-stats", "player-bindings-spells",
+		"player-bindings-mutation", "player-bindings-handle-rejection", "player-bindings-failure-isolation",
+	}
+	local missing = {}
+	for _, name in ipairs(required) do if probesReport[name] ~= true then missing[#missing + 1] = name end end
+	emitAssertion(request, "openmw-player-bridge-v3-layouts", bridge.abiVersion == 3 and bridge.bridgeVersion == 3
+		and bridge.gameplayCallbacksAvailable == true and bridge.objectSnapshotSize > 0 and bridge.recordSnapshotSize > 0,
+		bridge, { abiVersion = 3, bridgeVersion = 3, gameplayCallbacksAvailable = true })
+	emitAssertion(request, "openmw-player-binding-probes", #missing == 0,
+		{ missing = missing, probes = probesReport }, "all Milestone 4.2 player binding probes true")
+	emitAssertion(request, "openmw-player-stable-userdata", gameplay.stablePlayerUserdata == true
+		and gameplay.playerOnlySelf == true and gameplay.cellIdentityCount >= 1,
+		gameplay, { stablePlayerUserdata = true, playerOnlySelf = true, cellIdentityCount = ">=1" })
+	emitAssertion(request, "openmw-player-invalid-handles-rejected", gameplay.rejectedHandles >= 2,
+		gameplay.rejectedHandles, ">=2")
+	emitAssertion(request, "openmw-player-runtime-independent", bridge.runtimeOwnedAllocator == true
+		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
+		{ host = bridge.runtimeVersion, mwse = _VERSION }, "independent Lua states and allocators")
+	emitAssertion(request, "mwse-lua-functional-with-player-bindings", type(mwse.buildNumber) == "number"
 		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
 		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
 	return report
@@ -302,6 +334,24 @@ function probes.playerAndCell(request)
 	local passed = state.playerValid and state.currentCell ~= nil
 	emitAssertion(request, "player-and-cell-valid", passed, state, { playerValid = true, currentCell = "non-null" })
 	return state
+end
+
+function probes.openMWLuaPlayerNativeState(request, arguments)
+	assert(tes3.mobilePlayer and tes3.player, "A loaded native player is required.")
+	local strength = tes3.mobilePlayer.strength.base
+	local phase = assert(arguments.phase, "Player binding native probe requires a phase.")
+	local passed
+	if phase == "mutated" then
+		playerBindingOriginalStrength = strength - 1
+		passed = strength == playerBindingOriginalStrength + 1
+	else
+		passed = playerBindingOriginalStrength ~= nil and strength == playerBindingOriginalStrength
+	end
+	emitAssertion(request, "openmw-player-native-" .. phase, passed,
+		{ strength = strength, original = playerBindingOriginalStrength, recordId = tes3.player.object.id,
+			cell = tes3.player.cell and tes3.player.cell.name },
+		{ strength = phase == "mutated" and "original + 1" or "original", nativePlayer = true })
+	return { strength = strength, original = playerBindingOriginalStrength, phase = phase }
 end
 
 function probes.writeReferencePersistentValue(request, arguments)
