@@ -284,6 +284,7 @@
 #include "LuaRestInterruptEvent.h"
 #include "LuaShieldBlockedEvent.h"
 #include "LuaSimulateEvent.h"
+#include "OpenMWLuaHost.h"
 #include "LuaSkillRaisedEvent.h"
 #include "LuaSpellCastedEvent.h"
 #include "LuaSpellCreatedEvent.h"
@@ -447,6 +448,17 @@ namespace mwse::lua {
 		// Create the base of API tables.
 		auto luaMWSE = luaState.create_named_table("mwse");
 		luaMWSE.create_named("activeLuaMods");
+		auto openMWCompatibility = luaMWSE.create_named("openmwCompatibility");
+		openMWCompatibility["isLoaded"] = []() { return openmw::HostController::getInstance().isLoaded(); };
+		openMWCompatibility["getLifecycleState"] = []() {
+			return static_cast<std::uint32_t>(openmw::HostController::getInstance().getLifecycleState());
+		};
+		openMWCompatibility["getReport"] = []() { return openmw::HostController::getInstance().getReport(); };
+		openMWCompatibility["reload"] = []() { return openmw::HostController::getInstance().reload(); };
+		openMWCompatibility["shutdown"] = []() {
+			openmw::HostController::getInstance().shutdown();
+			return openmw::HostController::getInstance().getLifecycleState() == openmw::LifecycleState::Stopped;
+		};
 		luaState.create_named_table("mwscript");
 
 		// Bind config.
@@ -812,6 +824,9 @@ namespace mwse::lua {
 		if (!worldController->flagMenuMode && event::SimulateEvent::getEventEnabled()) {
 			luaManager.getThreadSafeStateHandle().triggerEvent(new event::SimulateEvent(worldController->deltaTime, highResolutionTimestamp));
 		}
+
+		openmw::HostController::getInstance().update(worldController->deltaTime, highResolutionTimestamp,
+			worldController->flagMenuMode != 0);
 	}
 
 	//
@@ -6828,9 +6843,16 @@ namespace mwse::lua {
 
 		// Finally execute the scripts.
 		executeMainModScripts();
+
+		// Initialize the independent OpenMW Lua host after MWSE Lua has finished starting.
+		// Failure is intentionally non-fatal to the MWSE Lua runtime.
+		openmw::HostController::getInstance().initialize();
 	}
 
 	void LuaManager::cleanup() {
+		// The OpenMW runtime owns a separate Lua state and must shut down first.
+		openmw::HostController::getInstance().shutdown();
+
 		// Clean up our handles to our override tables. Helps to prevent a crash when
 		// closing mid-execution.
 		scriptOverrides.clear();

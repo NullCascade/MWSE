@@ -349,40 +349,40 @@ Goal: an isolated LuaJIT host loads beside MWSE Lua and runs a trivial `.omwscri
 
 ### M3.1 Solution and packaging
 
-- [ ] Add the x86 support-DLL project to `MWSE.sln`.
-- [ ] Add isolated LuaJIT dependencies without colliding with MWSE's Lua symbols.
-- [ ] Emit `openmw-lua.dll` into the package `Data Files\MWSE\core\lib` directory.
-- [ ] Load the DLL explicitly from MWSE and validate its bridge ABI.
-- [ ] Log runtime version, API revision, and bridge version at startup.
-- [ ] Ensure missing or incompatible DLLs fail without breaking MWSE Lua.
+- [x] Add the x86 support-DLL project to `MWSE.sln`.
+- [x] Add isolated LuaJIT dependencies without colliding with MWSE's Lua symbols.
+- [x] Emit `openmw-lua.dll` into the package `Data Files\MWSE\core\lib` directory.
+- [x] Load the DLL explicitly from MWSE and validate its bridge ABI.
+- [x] Log runtime version, API revision, and bridge version at startup.
+- [x] Ensure missing or incompatible DLLs fail without breaking MWSE Lua.
 
 ### M3.2 Sandbox and module loader
 
-- [ ] Create an isolated environment per script instance.
-- [ ] Expose only the documented safe Lua libraries and functions.
-- [ ] Support OpenMW's documented Lua 5.2/5.3 compatibility features through LuaJIT and compatibility libraries.
-- [ ] Implement `require` for standard libraries, built-in packages, compatibility auxiliaries, and source files.
-- [ ] Reject DLL modules and precompiled Lua bytecode.
-- [ ] Resolve module paths through the compatibility VFS with deterministic priority.
-- [ ] Include script path and context in all load/runtime errors.
+- [x] Create an isolated environment per script instance.
+- [x] Expose only the documented safe Lua libraries and functions.
+- [x] Support OpenMW's documented Lua 5.2/5.3 compatibility features through LuaJIT and compatibility libraries.
+- [x] Implement `require` for standard libraries, built-in packages, compatibility auxiliaries, and source files.
+- [x] Reject DLL modules and precompiled Lua bytecode.
+- [x] Resolve module paths through the compatibility VFS with deterministic priority.
+- [x] Include script path and context in all load/runtime errors.
 
 ### M3.3 `.omwscripts` parser
 
-- [ ] Parse comments, flags, commas, whitespace, and paths.
-- [ ] Preserve content-file and line ordering.
-- [ ] Validate mutually incompatible flags.
-- [ ] Produce actionable errors for missing scripts and unknown flags.
-- [ ] Parse the NCG file into one menu, one global, and one player definition.
+- [x] Parse comments, flags, commas, whitespace, and paths.
+- [x] Preserve content-file and line ordering.
+- [x] Validate mutually incompatible flags.
+- [x] Produce actionable errors for missing scripts and unknown flags.
+- [x] Parse the NCG file into one menu, one global, and one player definition.
 
 ### M3.4 Minimal containers
 
-- [ ] Implement menu, global, and player containers.
-- [ ] Execute a script and validate its returned table.
-- [ ] Register `interfaceName`, `interface`, `engineHandlers`, and `eventHandlers`.
-- [ ] Preserve direct engine-handler order and reverse event-handler order.
-- [ ] Implement delayed script events.
-- [ ] Isolate failure to the offending handler and continue other scripts where safe.
-- [ ] Support clean shutdown and reload.
+- [x] Implement menu, global, and player containers.
+- [x] Execute a script and validate its returned table.
+- [x] Register `interfaceName`, `interface`, `engineHandlers`, and `eventHandlers`.
+- [x] Preserve direct engine-handler order and reverse event-handler order.
+- [x] Implement delayed script events.
+- [x] Isolate failure to the offending handler and continue other scripts where safe.
+- [x] Support clean shutdown and reload.
 
 Milestone gate:
 
@@ -390,6 +390,23 @@ Milestone gate:
 MWSE Lua and the OpenMW LuaJIT host initialize in the same process. A synthetic
 .omwscripts file runs menu/global/player scripts and reports handlers through the harness.
 ```
+
+### Milestone 3 implementation record
+
+Milestone 3 passed the x86 Debug in-process gate on 2026-07-12 under run ID `20260713T031035Z-afdd65c9d4a448dcb56960f9d9a00e2a`. Its machine-readable `result.json` reports `passed: true`, process exit code 0, all launcher and game assertions passing, an explicit clean OpenMW runtime shutdown, and no remaining Morrowind process. The unchanged Milestone 1 regression then passed under run ID `20260713T031121Z-8d5ff6305cda45b7b11f5860f35c8f9d`.
+
+Evidence-backed implementation decisions and limitations:
+
+- `OpenMWLua\OpenMWLua.vcxproj` builds an x86 `openmw-lua.dll` and packages it at `Data Files\MWSE\core\lib\openmw-lua.dll`. LuaJIT 2.1 is rebuilt as a static library in an isolated intermediate source copy and linked into the support DLL. PE inspection found exactly one support-DLL export (`OpenMWLua_QueryApi`), no `lua_*` exports or imports, no `lua51.dll` import, and only `KERNEL32.dll` as a runtime dependency. MWSE continues to import its existing `lua51.dll`; the OpenMW host owns a different `lua_State`, allocator context, registry, environments, and error path.
+- The version-1 C ABI uses fixed-width POD structures, explicit `structureSize` and `abiVersion` fields, bounded pointer/length strings, a required structured-log callback, and function pointers for initialization, shutdown, lifecycle state, frame updates, delayed events, report retrieval, and reload. No Lua state, allocator, registry reference, `sol` object, table, function, or userdata crosses the DLL boundary. API revision 70 is selected for feature reporting, while gameplay packages remain explicitly unavailable until Milestone 4.
+- MWSE loads the DLL by absolute package path after normal MWSE Lua mod startup. Missing entry points, ABI/layout mismatches, missing callbacks, disabled configuration, missing DLLs, and host initialization failures leave MWSE Lua active. Startup logs the LuaJIT version, API revision, bridge/ABI versions, capability mask, lifecycle state, and status. Shutdown is invoked before MWSE Lua cleanup.
+- The host opens unsafe libraries only in its inaccessible owner state, then constructs every script environment from a safe allowlist and per-environment clones of `coroutine`, `math`, `string`, and `table`. The custom `require` searches safe libraries, the explicit `openmw.compatibility` capability package, compatibility auxiliary Lua paths, then the compatibility VFS; it accepts source text only and rejects native modules, bytecode, absolute paths, traversal, oversized names/files, and invalid handles/indices. The capability package reports gameplay bindings unavailable instead of returning plausible values.
+- The bounded `.omwscripts` parser limits the file to 1 MiB and lines to 4096 bytes; recognizes `GLOBAL`, `MENU`, `PLAYER`, `CUSTOM`, `LOAD`, and the documented TES3 record-type flags; preserves content identity, source line, and declaration order; and rejects malformed lines, missing paths/scripts, duplicate flags, unknown flags, incompatible declarations, absolute paths, and traversal. Native tests parsed `C:\Games\Morrowind\Data Files\ncg.omwscripts` into exactly one menu, one global, and one player definition without executing NCG.
+- Container instances validate a table return and register `interfaceName`, `interface`, `engineHandlers`, and `eventHandlers`. The retained live report shows three unique generation-2 environment identities with `mwseGlobalVisible: false`, interfaces `MenuFixture`, `GlobalFixture`, and `PlayerFixture`, engine order `MENU`, `GLOBAL`, `PLAYER`, reverse event order `PLAYER`, `GLOBAL`, `MENU`, and delayed delivery `1:Milestone3Event`. The intentional GLOBAL failure includes content, container, script, handler, and Lua location; the MENU handler still ran afterward.
+- Explicit reload destroyed generation 1, recreated generation 2, reran all three isolated scripts, and redelivered the deterministic event. The final named shutdown probe recorded lifecycle state 6 (`Stopped`) and `cleanShutdown: true` before Morrowind detach. MWSE Lua reported `Lua 5.1-DW` and build 65535 before reload, after reload, and after OpenMW host shutdown.
+- The standalone x86 native runner covers ABI and size negotiation, missing callbacks, parser success/rejections, the real NCG parser count, sandbox isolation, deterministic source-module loading, DLL/bytecode rejection, returned-table validation, handler order, failure isolation, delayed delivery, reload, and shutdown. The live suite retains `native-tests.json`, build log, MWSE log, host JSONL, bridge/runtime report, parsed-container report, handler-order report, reload/shutdown report, protocol events, result, save fixture, and the exact synthetic VFS inputs.
+- Restoration evidence records matching pre/post hashes for pre-existing MWSE, Lua, support-DLL, and license files; removes the temporary harness mod/config; retains the synthetic fixture only inside the unique evidence directory; and reports zero remaining Morrowind processes. The completed addon loader, cache, source-immutability, load-order, and CSSE protocols were not redesigned.
+- Milestone 3 deliberately does not execute NCG or implement the NCG-required `openmw.*` packages, persistence, UI, storage, stats, gameplay bindings, local/reference containers, or unrestricted Lua evaluation. Those surfaces remain Milestone 4 and later work.
 
 ## Milestone 4: NCG boot compatibility
 

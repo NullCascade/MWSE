@@ -147,6 +147,100 @@ function probes.mwseInitialization(request)
 	return { buildNumber = mwse.buildNumber, luaVersion = _VERSION }
 end
 
+local function decodeOpenMWHostReport()
+	assert(mwse.openmwCompatibility, "MWSE OpenMW compatibility bridge is unavailable.")
+	local encoded = mwse.openmwCompatibility.getReport()
+	assert(type(encoded) == "string" and #encoded > 0, "OpenMW host returned no report.")
+	return json.decode(encoded)
+end
+
+function probes.openMWLuaHostReport(request)
+	local report = decodeOpenMWHostReport()
+	local bridge = report.bridge or {}
+	local containers = report.containers or {}
+	local handlers = report.handlers or {}
+	local instances = containers.instances or {}
+
+	emitAssertion(request, "openmw-support-dll-loaded", mwse.openmwCompatibility.isLoaded() == true,
+		mwse.openmwCompatibility.isLoaded(), true)
+	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 1,
+		bridge, { abiAccepted = true, abiVersion = 1 })
+	emitAssertion(request, "openmw-runtime-independent", bridge.runtimeOwnedAllocator == true
+		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
+		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
+			importsMwseLua = bridge.importsMwseLua }, "independent LuaJIT runtime")
+	emitAssertion(request, "openmw-container-counts", containers.menuDefinitions == 1
+		and containers.globalDefinitions == 1 and containers.playerDefinitions == 1,
+		{ menu = containers.menuDefinitions, global = containers.globalDefinitions, player = containers.playerDefinitions },
+		{ menu = 1, global = 1, player = 1 })
+
+	local environments = {}
+	local interfaces = {}
+	local isolated = #instances == 3
+	for _, instance in ipairs(instances) do
+		isolated = isolated and environments[instance.environmentId] == nil and instance.mwseGlobalVisible == false
+		environments[instance.environmentId] = true
+		interfaces[instance.interfaceName] = instance.hasInterface
+	end
+	emitAssertion(request, "openmw-distinct-script-environments", isolated, instances,
+		"three unique environments with no MWSE global")
+	emitAssertion(request, "openmw-interfaces-registered", interfaces.MenuFixture == true
+		and interfaces.GlobalFixture == true and interfaces.PlayerFixture == true,
+		interfaces, { MenuFixture = true, GlobalFixture = true, PlayerFixture = true })
+
+	local engine = handlers.engineHandlerOrder or {}
+	local directOrder = #engine >= 3 and string.find(engine[1], "MENU:menu.lua:onUpdate", 1, true)
+		and string.find(engine[2], "GLOBAL:global.lua:onUpdate", 1, true)
+		and string.find(engine[3], "PLAYER:player.lua:onUpdate", 1, true)
+	emitAssertion(request, "openmw-engine-handler-direct-order", directOrder ~= nil,
+		{ engine[1], engine[2], engine[3] }, { "MENU", "GLOBAL", "PLAYER" })
+
+	local events = handlers.eventHandlerOrder or {}
+	local reverseOrder = #events >= 3 and string.find(events[1], "PLAYER:player.lua:Milestone3Event", 1, true)
+		and string.find(events[2], "GLOBAL:global.lua:Milestone3Event", 1, true)
+		and string.find(events[3], "MENU:menu.lua:Milestone3Event", 1, true)
+	emitAssertion(request, "openmw-event-handler-reverse-order", reverseOrder ~= nil,
+		{ events[1], events[2], events[3] }, { "PLAYER", "GLOBAL", "MENU" })
+	emitAssertion(request, "openmw-delayed-event-delivered", #(handlers.delayedDeliveries or {}) >= 1,
+		handlers.delayedDeliveries, "one or more deterministic delayed deliveries")
+	local failureIsolated = #(handlers.diagnostics or {}) >= 1 and #events >= 3
+	emitAssertion(request, "openmw-handler-failure-isolated", failureIsolated,
+		{ diagnostics = handlers.diagnostics, handlersAfterFailure = events[3] },
+		"structured failure plus continued handler delivery")
+	emitAssertion(request, "mwse-lua-functional-with-openmw-host", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return report
+end
+
+function probes.reloadOpenMWLuaHost(request)
+	local before = decodeOpenMWHostReport()
+	local reloaded = mwse.openmwCompatibility.reload()
+	local after = decodeOpenMWHostReport()
+	local passed = reloaded == true and after.bridge.runtimeGeneration == before.bridge.runtimeGeneration + 1
+		and after.reload.reloadCount == before.reload.reloadCount + 1
+	emitAssertion(request, "openmw-explicit-reload", passed,
+		{ reloaded = reloaded, before = before.reload, after = after.reload },
+		"runtime generation and reload count incremented")
+	emitAssertion(request, "mwse-lua-functional-after-openmw-reload", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return after
+end
+
+function probes.shutdownOpenMWLuaHost(request)
+	assert(mwse.openmwCompatibility, "MWSE OpenMW compatibility bridge is unavailable.")
+	local stopped = mwse.openmwCompatibility.shutdown()
+	local report = decodeOpenMWHostReport()
+	local passed = stopped == true and report.reload.state == 6 and report.reload.cleanShutdown == true
+	emitAssertion(request, "openmw-clean-runtime-shutdown", passed,
+		{ stopped = stopped, reload = report.reload }, { state = 6, cleanShutdown = true })
+	emitAssertion(request, "mwse-lua-functional-after-openmw-shutdown", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return report
+end
+
 function probes.playerAndCell(request)
 	local state = gameState()
 	local passed = state.playerValid and state.currentCell ~= nil

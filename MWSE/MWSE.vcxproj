@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+	<ClInclude Include="OpenMWLuaHost.h" />
     <ClInclude Include="ArrayUtil.h" />
     <ClInclude Include="BitUtil.h" />
     <ClInclude Include="CrashLogFormatter.hpp" />
@@ -476,6 +477,7 @@
     <ClInclude Include="yamlloader.hpp" />
   </ItemGroup>
   <ItemGroup>
+	<ClCompile Include="OpenMWLuaHost.cpp" />
     <ClCompile Include="ArrayUtil.cpp" />
     <ClCompile Include="CrashLogLabelsMWSE.cpp" />
 	<ClCompile Include="CrashLoggerMWSE.cpp" />

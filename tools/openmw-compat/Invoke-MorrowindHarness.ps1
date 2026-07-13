@@ -4,7 +4,7 @@ param(
     [string]$MorrowindDirectory = 'C:\Games\Morrowind',
     [string]$FixtureSave = 'TestMWSE0000.ess',
     [string]$TeleportCell = 'Balmora, Guild of Mages',
-    [ValidateSet('Smoke', 'OpenMWAddon')][string]$Suite = 'Smoke',
+    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost')][string]$Suite = 'Smoke',
     [string]$OpenMWAddonPath = 'C:\Games\Morrowind\Data Files\ncg.omwaddon',
     [switch]$ProbeNativeAddonExtension,
     [int]$ReadyTimeoutSeconds = 45,
@@ -46,6 +46,10 @@ $restoredIniHash = $null
 $loadOrderRestored = $null
 $originalGameFiles = @()
 $enabledNativeFiles = [Collections.Generic.List[string]]::new()
+$openMWEnvironmentNames = @('MWSE_OPENMW_LUA_VFS_ROOT', 'MWSE_OPENMW_LUA_SCRIPTS_FILE', 'MWSE_OPENMW_LUA_CONTENT_FILE', 'MWSE_OPENMW_LUA_REPORT_DIRECTORY', 'MWSE_OPENMW_LUA_HARNESS', 'MWSE_OPENMW_LUA_DISABLED')
+$originalOpenMWEnvironment = @{}
+$syntheticVfs = Join-Path $runDirectory 'synthetic-vfs'
+$nativeTestPath = Join-Path $runDirectory 'native-tests.json'
 
 function Assert-UnderRoot([string]$Path, [string]$Root) {
     $resolvedPath = [IO.Path]::GetFullPath($Path)
@@ -62,6 +66,8 @@ function Backup-Target([string]$Target) {
         Backup = Join-Path $backupRoot ([Guid]::NewGuid().ToString('N'))
         Existed = Test-Path -LiteralPath $Target
         IsDirectory = Test-Path -LiteralPath $Target -PathType Container
+        OriginalSha256 = if (Test-Path -LiteralPath $Target -PathType Leaf) { (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash.ToLowerInvariant() } else { $null }
+        SkipRestore = $false
     }
     if ($entry.Existed) {
         [IO.Directory]::CreateDirectory($backupRoot) | Out-Null
@@ -77,6 +83,14 @@ function Backup-Target([string]$Target) {
 
 function Stage-File([string]$Source, [string]$Target) {
     if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) { throw "Required staging source is missing: $Source" }
+    if (Test-Path -LiteralPath $Target -PathType Leaf) {
+        $sourceHash = (Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()
+        $targetHash = (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($sourceHash -eq $targetHash) {
+            $script:staged += [pscustomobject]@{ Target = $Target; Backup = $null; Existed = $true; IsDirectory = $false; OriginalSha256 = $targetHash; SkipRestore = $true }
+            return
+        }
+    }
     Backup-Target $Target
     [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($Target)) | Out-Null
     Copy-Item -LiteralPath $Source -Destination $Target -Force
@@ -84,6 +98,7 @@ function Stage-File([string]$Source, [string]$Target) {
 
 function Restore-StagedFiles {
     foreach ($entry in @($script:staged)[($script:staged.Count - 1)..0]) {
+        if ($entry.SkipRestore) { continue }
         Assert-UnderRoot $entry.Target $morrowindRoot
         if (Test-Path -LiteralPath $entry.Target) {
             Remove-Item -LiteralPath $entry.Target -Recurse -Force
@@ -246,9 +261,52 @@ try {
 
     [IO.Directory]::CreateDirectory($runDirectory) | Out-Null
     [IO.Directory]::CreateDirectory((Join-Path $runDirectory 'screenshots')) | Out-Null
+    if ($Suite -eq 'OpenMWLuaHost') {
+        [IO.Directory]::CreateDirectory((Join-Path $syntheticVfs 'fixture')) | Out-Null
+        $utf8NoBom = [Text.UTF8Encoding]::new($false)
+        [IO.File]::WriteAllText((Join-Path $syntheticVfs 'fixture\shared.lua'), 'return { value = 42 }' + "`n", $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $syntheticVfs 'menu.lua'), @'
+local shared = require('fixture.shared')
+if rawget(_G, 'environmentSentinel') ~= nil then error('MENU sandbox leaked') end
+environmentSentinel = 'MENU'
+return {
+    interfaceName = 'MenuFixture',
+    interface = { value = shared.value },
+    engineHandlers = { onUpdate = function(dt) assert(type(dt) == 'number') end },
+    eventHandlers = { Milestone3Event = function(data) assert(type(data) == 'string') end },
+}
+'@, $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $syntheticVfs 'global.lua'), @'
+if rawget(_G, 'environmentSentinel') ~= nil then error('GLOBAL sandbox leaked') end
+environmentSentinel = 'GLOBAL'
+return {
+    interfaceName = 'GlobalFixture',
+    interface = {},
+    engineHandlers = { onUpdate = function(dt) end },
+    eventHandlers = { Milestone3Event = function(data) error('intentional Milestone 3 handler failure') end },
+}
+'@, $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $syntheticVfs 'player.lua'), @'
+if rawget(_G, 'environmentSentinel') ~= nil then error('PLAYER sandbox leaked') end
+environmentSentinel = 'PLAYER'
+return {
+    interfaceName = 'PlayerFixture',
+    interface = {},
+    engineHandlers = { onUpdate = function(dt) end },
+    eventHandlers = { Milestone3Event = function(data) end },
+}
+'@, $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $syntheticVfs 'milestone3.omwscripts'), @'
+# Milestone 3 live fixture. Ordering is significant.
+MENU: menu.lua
+GLOBAL: global.lua
+PLAYER: player.lua
+'@, $utf8NoBom)
+    }
     Write-OwchAtomicJson -Path (Join-Path $runDirectory 'run.json') -Value ([ordered]@{
         protocolVersion = 1; runId = $runId; suite = $Suite; configuration = $Configuration
         repository = $repoRoot; morrowindDirectory = $morrowindRoot; fixtureSave = $FixtureSave; openMWAddonPath = if ($Suite -eq 'OpenMWAddon') { $OpenMWAddonPath } else { $null }
+        openMWLuaScripts = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $syntheticVfs 'milestone3.omwscripts' } else { $null }
         startedAt = $startedAt.ToString('o')
     })
 
@@ -295,11 +353,22 @@ try {
         if (-not $msbuild) { throw 'MSBuild could not be located with vswhere.' }
         $buildStage = Join-Path $runDirectory 'build-stage'
         [IO.Directory]::CreateDirectory($buildStage) | Out-Null
+        $buildLog = Join-Path $runDirectory 'build.log'
+        if ($Suite -eq 'OpenMWLuaHost') {
+            $hostBuildArguments = @(
+                (Join-Path $repoRoot 'OpenMWLuaTests\OpenMWLuaTests.vcxproj'), '/t:Build', "/p:Configuration=$Configuration", '/p:Platform=Win32',
+                "/p:SolutionDir=$repoRoot/", '/nr:false'
+            )
+            & $msbuild @hostBuildArguments 2>&1 | Tee-Object -FilePath $buildLog
+            if ($LASTEXITCODE -ne 0) { throw "OpenMW Lua host/test build failed with exit code $LASTEXITCODE. See $buildLog" }
+            & (Join-Path $repoRoot "build\$Configuration\OpenMWLuaTests.exe") (Join-Path $repoRoot "build\$Configuration\openmw-lua.dll") 'C:\Games\Morrowind\Data Files\ncg.omwscripts' 2>&1 | Tee-Object -FilePath $nativeTestPath
+            if ($LASTEXITCODE -ne 0) { throw "OpenMW Lua native tests failed with exit code $LASTEXITCODE. See $nativeTestPath" }
+        }
         $buildArguments = @(
             (Join-Path $repoRoot 'MWSE\MWSE.vcxproj'), '/t:Build', "/p:Configuration=$Configuration", '/p:Platform=Win32',
             "/p:SolutionDir=$repoRoot/", "/p:MorrowindDir=$buildStage/", '/p:PostBuildEventUseInBuild=false', '/nr:false'
         )
-        & $msbuild @buildArguments 2>&1 | Tee-Object -FilePath (Join-Path $runDirectory 'build.log')
+        & $msbuild @buildArguments 2>&1 | Tee-Object -FilePath $buildLog -Append
         if ($LASTEXITCODE -ne 0) { throw "MWSE build failed with exit code $LASTEXITCODE. See $(Join-Path $runDirectory 'build.log')" }
     }
 
@@ -310,6 +379,17 @@ try {
     }
     if (Test-Path -LiteralPath (Join-Path $buildOutput 'lua51.dll')) {
         Stage-File (Join-Path $buildOutput 'lua51.dll') (Join-Path $morrowindRoot 'lua51.dll')
+    }
+    if ($Suite -eq 'OpenMWLuaHost') {
+        Stage-File (Join-Path $buildOutput 'openmw-lua.dll') (Join-Path $morrowindRoot 'Data Files\MWSE\core\lib\openmw-lua.dll')
+        Stage-File (Join-Path $repoRoot 'misc\package\Data Files\MWSE\core\lib\openmw-lua-LICENSE.txt') (Join-Path $morrowindRoot 'Data Files\MWSE\core\lib\openmw-lua-LICENSE.txt')
+        foreach ($name in $openMWEnvironmentNames) { $originalOpenMWEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_VFS_ROOT', $syntheticVfs, 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_SCRIPTS_FILE', 'milestone3.omwscripts', 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_CONTENT_FILE', 'milestone3.omwscripts', 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_REPORT_DIRECTORY', $runDirectory, 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_HARNESS', '1', 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_DISABLED', $null, 'Process')
     }
 
     foreach ($requiredCoreFile in @('Data Files\MWSE\core\initialize.lua', 'Data Files\MWSE\core\startLuaMods.lua', 'Data Files\MWSE\core\lib\dkjson.lua', 'Data Files\MWSE\core\lib\lfs.dll')) {
@@ -343,6 +423,14 @@ try {
     $initialState = (Send-HarnessCommand 'getState').result
     Add-SmokeAssertion 'main-menu-detection' ($initialState.mainMenu -eq $true) $initialState.name 'mainMenu'
     Invoke-NamedProbe 'mwseInitialization' | Out-Null
+
+    if ($Suite -eq 'OpenMWLuaHost') {
+        Invoke-NamedProbe 'openMWLuaHostReport' | Out-Null
+        Invoke-NamedProbe 'reloadOpenMWLuaHost' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaHostReport' | Out-Null
+    }
 
     $loadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
     Send-HarnessCommand 'loadGame' @{ filename = $FixtureSave } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
@@ -379,6 +467,9 @@ try {
         Add-SmokeAssertion 'ncg-content-live-after-reload' ($reloadedAddonProbe.result.value.aliasActive -and $reloadedAddonProbe.result.value.gmst.value -eq 0) $reloadedAddonProbe.result.value $true
     }
 
+    if ($Suite -eq 'OpenMWLuaHost') {
+        Invoke-NamedProbe 'shutdownOpenMWLuaHost' | Out-Null
+    }
     Send-HarnessCommand 'shutdown' -TimeoutSeconds 10 | Out-Null
     if (-not $process.HasExited) {
         $closeRequested = $process.CloseMainWindow()
@@ -406,18 +497,36 @@ finally {
         Remove-Item -LiteralPath $smokeSavePath -Force -ErrorAction SilentlyContinue
     }
     if ($staged.Count -gt 0) { Restore-StagedFiles }
+    foreach ($name in $openMWEnvironmentNames) {
+        if ($originalOpenMWEnvironment.ContainsKey($name)) {
+            [Environment]::SetEnvironmentVariable($name, $originalOpenMWEnvironment[$name], 'Process')
+        }
+    }
+    $restoredStagedFiles = @($staged | ForEach-Object {
+        $exists = Test-Path -LiteralPath $_.Target
+        $hash = if ($exists -and (Test-Path -LiteralPath $_.Target -PathType Leaf)) { (Get-FileHash -LiteralPath $_.Target -Algorithm SHA256).Hash.ToLowerInvariant() } else { $null }
+        [ordered]@{ target = $_.Target; originallyExisted = $_.Existed; originalSha256 = $_.OriginalSha256; restoredExists = $exists; restoredSha256 = $hash; restored = if ($_.Existed) { $exists -and ($_.IsDirectory -or $hash -eq $_.OriginalSha256) } else { -not $exists } }
+    })
+    $stagingRestored = @($restoredStagedFiles | Where-Object { -not $_.restored }).Count -eq 0
     if ($null -ne $originalIniHash) {
         $restoredIniHash = (Get-FileHash -LiteralPath (Join-Path $morrowindRoot 'Morrowind.ini') -Algorithm SHA256).Hash.ToLowerInvariant()
         $loadOrderRestored = $restoredIniHash -eq $originalIniHash
         $remainingAliases = @($addonPreparations | Where-Object { Test-Path -LiteralPath (Join-Path $morrowindRoot ('Data Files\' + $_.aliasName)) } | ForEach-Object aliasName)
-        Write-OwchAtomicJson -Path (Join-Path $runDirectory 'restoration.json') -Value ([ordered]@{
-            originalMorrowindIniSha256 = $originalIniHash; restoredMorrowindIniSha256 = $restoredIniHash
-            loadOrderRestored = $loadOrderRestored; temporaryAliasesRemaining = $remainingAliases
-            harnessConfigurationRestored = -not (Test-Path -LiteralPath (Join-Path $morrowindRoot 'Data Files\MWSE\config\openmw_compat_harness.json'))
-        })
         if (-not $loadOrderRestored -or $remainingAliases.Count -gt 0) {
             $failure = "Temporary OpenMW addon state was not fully restored. Morrowind.ini restored: $loadOrderRestored; remaining aliases: $($remainingAliases -join ', ')"
         }
+    }
+    $remainingMorrowindProcesses = @(Get-Process -Name 'Morrowind' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
+    Write-OwchAtomicJson -Path (Join-Path $runDirectory 'restoration.json') -Value ([ordered]@{
+        originalMorrowindIniSha256 = $originalIniHash; restoredMorrowindIniSha256 = $restoredIniHash
+        loadOrderRestored = $loadOrderRestored; temporaryAliasesRemaining = if ($null -ne $originalIniHash) { $remainingAliases } else { @() }
+        harnessConfigurationRestored = -not (Test-Path -LiteralPath (Join-Path $morrowindRoot 'Data Files\MWSE\config\openmw_compat_harness.json'))
+        stagedFiles = $restoredStagedFiles; stagedFilesRestored = $stagingRestored
+        syntheticFixtureRetained = if ($Suite -eq 'OpenMWLuaHost') { Test-Path -LiteralPath (Join-Path $syntheticVfs 'milestone3.omwscripts') } else { $null }
+        remainingMorrowindProcesses = $remainingMorrowindProcesses
+    })
+    if (-not $stagingRestored -or $remainingMorrowindProcesses.Count -gt 0) {
+        $failure = "Temporary staged files or Morrowind process state was not fully restored. stagedFilesRestored=$stagingRestored; remainingProcesses=$($remainingMorrowindProcesses -join ',')"
     }
     $harnessDirectory = Join-Path $morrowindRoot 'Data Files\MWSE\mods\openmw_compat_harness'
     if ((Test-Path -LiteralPath $harnessDirectory -PathType Container) -and @(Get-ChildItem -LiteralPath $harnessDirectory -Force).Count -eq 0) {
@@ -438,7 +547,14 @@ finally {
             runDirectory = $runDirectory; events = $eventsPath; result = $resultPath; mwseLog = (Join-Path $runDirectory 'MWSE.log')
             addonPlan = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'addon-plan.json' } else { $null }
             compatibilityReports = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'compatibility-reports' } else { $null }
-            restoration = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'restoration.json' } else { $null }
+            restoration = Join-Path $runDirectory 'restoration.json'
+            nativeTests = if ($Suite -eq 'OpenMWLuaHost') { $nativeTestPath } else { $null }
+            bridgeRuntimeReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'bridge-runtime-report.json' } else { $null }
+            parsedContainerReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'parsed-container-report.json' } else { $null }
+            handlerOrderReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'handler-order-report.json' } else { $null }
+            reloadShutdownReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'reload-shutdown-report.json' } else { $null }
+            hostEvents = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'openmw-host-events.jsonl' } else { $null }
+            syntheticFixture = if ($Suite -eq 'OpenMWLuaHost') { $syntheticVfs } else { $null }
             save = if (Test-Path -LiteralPath (Join-Path $runDirectory ($smokeSaveBase + '.ess'))) { Join-Path $runDirectory ($smokeSaveBase + '.ess') } else { $null }
         }
     }

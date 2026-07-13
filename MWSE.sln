@@ -18,6 +18,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SharedSE", "SharedSE\Shared
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSSE", "CSSE\CSSE.vcxproj", "{50562D0F-55B1-49EA-BDBE-D6922BE5957D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenMWLua", "OpenMWLua\OpenMWLua.vcxproj", "{F7150B14-46E1-4C14-BF34-4A58D73D0AD8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenMWLuaTests", "OpenMWLuaTests\OpenMWLuaTests.vcxproj", "{BE965973-F38B-4440-BA90-3D70BFAC4355}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -44,6 +48,14 @@ Global
 		{50562D0F-55B1-49EA-BDBE-D6922BE5957D}.Debug|x86.Build.0 = Debug|Win32
 		{50562D0F-55B1-49EA-BDBE-D6922BE5957D}.Release|x86.ActiveCfg = Release|Win32
 		{50562D0F-55B1-49EA-BDBE-D6922BE5957D}.Release|x86.Build.0 = Release|Win32
+		{F7150B14-46E1-4C14-BF34-4A58D73D0AD8}.Debug|x86.ActiveCfg = Debug|Win32
+		{F7150B14-46E1-4C14-BF34-4A58D73D0AD8}.Debug|x86.Build.0 = Debug|Win32
+		{F7150B14-46E1-4C14-BF34-4A58D73D0AD8}.Release|x86.ActiveCfg = Release|Win32
+		{F7150B14-46E1-4C14-BF34-4A58D73D0AD8}.Release|x86.Build.0 = Release|Win32
+		{BE965973-F38B-4440-BA90-3D70BFAC4355}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE965973-F38B-4440-BA90-3D70BFAC4355}.Debug|x86.Build.0 = Debug|Win32
+		{BE965973-F38B-4440-BA90-3D70BFAC4355}.Release|x86.ActiveCfg = Release|Win32
+		{BE965973-F38B-4440-BA90-3D70BFAC4355}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
