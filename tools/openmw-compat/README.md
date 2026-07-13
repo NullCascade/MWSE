@@ -25,4 +25,31 @@ To validate protocol utilities without launching the game:
 .\tools\openmw-compat\tests\Test-HarnessProtocol.ps1
 ```
 
+Run the Milestone 2 NCG addon gate with an explicit, test-only enablement:
+
+```powershell
+.\tools\openmw-compat\Invoke-MorrowindHarness.ps1 `
+    -MorrowindDirectory 'C:\Games\Morrowind' `
+    -Configuration Debug `
+    -FixtureSave 'TestMWSE0000.ess' `
+    -Suite OpenMWAddon `
+    -OpenMWAddonPath 'C:\Games\Morrowind\Data Files\ncg.omwaddon'
+```
+
+The addon suite inspects every byte before launch, resolves masters case-insensitively, creates content-addressed `.esp` cache aliases, temporarily stages those aliases and `[Game Files]` entries, and restores the original files in `finally`. Compatibility reports, the cache identity, active INI snapshot, events, save, and byte-for-byte restoration evidence remain in the run directory. `-ProbeNativeAddonExtension` is a diagnostic mode used to prove whether the original extension is accepted; it is not the normal passing gate.
+
+The offline addon tests do not launch Morrowind:
+
+```powershell
+.\tools\openmw-compat\tests\Test-OpenMWAddon.ps1
+```
+
+For a normal user session, copy `openmw-addon-loader.example.json` to `Data Files\MWSE\config\openmw-addon-loader.json`, edit `enabledAddons`, then launch through:
+
+```powershell
+.\tools\openmw-compat\Start-MorrowindWithOpenMWAddons.ps1 -MorrowindDirectory 'C:\Games\Morrowind'
+```
+
+Explicit `-AddonPath` values override the config list. The wrapper waits for the game to exit and restores the original INI and any pre-existing alias files. Prepared aliases and machine-readable reports remain under `Data Files\MWSE\tmp\openmw-addon-cache`; session results remain under `Data Files\MWSE\tmp\openmw-addon-sessions`.
+
 To extend the harness, add a narrowly named function to `probes` in `misc\package\Data Files\MWSE\mods\openmw_compat_harness\main.lua`, emit at least one `assertion`, then call it through `evalNamedProbe`. Add orchestration to the launcher or a future suite file. Do not add unrestricted evaluation: probe names and event names are explicit allowlists. See [protocol.md](protocol.md) for envelope and timeout rules.

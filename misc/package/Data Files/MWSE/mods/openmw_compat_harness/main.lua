@@ -183,6 +183,47 @@ function probes.saveGame(request, arguments)
 	return { file = file, name = name, saved = saved }
 end
 
+function probes.openMWAddonState(request, arguments)
+	local expectedAlias = assert(arguments.expectedAlias, "Probe argument 'expectedAlias' is required.")
+	local expectedOrdinaryFiles = arguments.expectedOrdinaryFiles or {}
+	local activeFiles = {}
+	local activeByName = {}
+	for _, gameFile in ipairs(tes3.dataHandler.nonDynamicData.activeMods) do
+		activeFiles[#activeFiles + 1] = gameFile.filename
+		activeByName[string.lower(gameFile.filename)] = true
+	end
+
+	local aliasActive = activeByName[string.lower(expectedAlias)] == true
+	emitAssertion(request, "openmw-addon-native-alias-active", aliasActive, activeFiles, expectedAlias)
+	local ordinaryUnchanged = true
+	local missingOrdinary = {}
+	for _, filename in ipairs(expectedOrdinaryFiles) do
+		if not activeByName[string.lower(filename)] then
+			ordinaryUnchanged = false
+			missingOrdinary[#missingOrdinary + 1] = filename
+		end
+	end
+	emitAssertion(request, "ordinary-content-files-unchanged", ordinaryUnchanged, missingOrdinary, {})
+
+	local majorMultiplier = assert(tes3.findGMST("iLevelupMajorMult"), "iLevelupMajorMult was not found.")
+	local majorValue = majorMultiplier.value
+	emitAssertion(request, "ncg-gmst-live-value", majorValue == 0, majorValue, 0)
+
+	local block = assert(tes3.getSkill(tes3.skill.block), "Block skill record was not found.")
+	local description = block.description
+	local expectedDescriptionText = "Develops your agility and endurance a good amount each"
+	local skillChanged = type(description) == "string" and string.find(description, expectedDescriptionText, 1, true) ~= nil
+	emitAssertion(request, "ncg-skill-description-live-value", skillChanged, description, expectedDescriptionText)
+
+	return {
+		activeFiles = activeFiles,
+		aliasActive = aliasActive,
+		ordinaryFilesUnchanged = ordinaryUnchanged,
+		gmst = { id = majorMultiplier.id, value = majorValue },
+		skill = { id = block.id, description = description },
+	}
+end
+
 local allowedEvents = {
 	cellChanged = tes3.event.cellChanged,
 	initialized = tes3.event.initialized,

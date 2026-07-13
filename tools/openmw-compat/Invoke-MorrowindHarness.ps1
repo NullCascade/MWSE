@@ -4,7 +4,9 @@ param(
     [string]$MorrowindDirectory = 'C:\Games\Morrowind',
     [string]$FixtureSave = 'TestMWSE0000.ess',
     [string]$TeleportCell = 'Balmora, Guild of Mages',
-    [ValidateSet('Smoke')][string]$Suite = 'Smoke',
+    [ValidateSet('Smoke', 'OpenMWAddon')][string]$Suite = 'Smoke',
+    [string]$OpenMWAddonPath = 'C:\Games\Morrowind\Data Files\ncg.omwaddon',
+    [switch]$ProbeNativeAddonExtension,
     [int]$ReadyTimeoutSeconds = 45,
     [int]$RequestTimeoutSeconds = 20,
     [switch]$SkipBuild
@@ -15,6 +17,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 Import-Module (Join-Path $PSScriptRoot 'HarnessProtocol.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'OpenMWAddon.psm1') -Force
 $morrowindRoot = [IO.Path]::GetFullPath($MorrowindDirectory).TrimEnd('\')
 $executable = Join-Path $morrowindRoot 'Morrowind.exe'
 $fixturePath = Join-Path (Join-Path $morrowindRoot 'Saves') $FixtureSave
@@ -37,6 +40,12 @@ $startedAt = [DateTime]::UtcNow
 $failure = $null
 $exitCode = $null
 $shutdownGraceful = $false
+$addonPreparations = [Collections.Generic.List[object]]::new()
+$originalIniHash = $null
+$restoredIniHash = $null
+$loadOrderRestored = $null
+$originalGameFiles = @()
+$enabledNativeFiles = [Collections.Generic.List[string]]::new()
 
 function Assert-UnderRoot([string]$Path, [string]$Root) {
     $resolvedPath = [IO.Path]::GetFullPath($Path)
@@ -84,6 +93,32 @@ function Restore-StagedFiles {
             Copy-Item -LiteralPath $entry.Backup -Destination $entry.Target -Recurse:$entry.IsDirectory
         }
     }
+}
+
+function Enable-TemporaryGameFiles([string[]]$Filenames) {
+    $iniPath = Join-Path $morrowindRoot 'Morrowind.ini'
+    if (-not (Test-Path -LiteralPath $iniPath -PathType Leaf)) { throw "Morrowind.ini was not found: $iniPath" }
+    $script:originalIniHash = (Get-FileHash -LiteralPath $iniPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $raw = [IO.File]::ReadAllText($iniPath)
+    $matches = [regex]::Matches($raw, '(?m)^GameFile(?<index>\d+)=(?<name>[^\r\n]*)')
+    $script:originalGameFiles = @($matches | ForEach-Object { $_.Groups['name'].Value })
+    $nextIndex = if ($matches.Count -gt 0) { 1 + ($matches | ForEach-Object { [int]$_.Groups['index'].Value } | Measure-Object -Maximum).Maximum } else { 0 }
+    $newline = if ($raw.Contains("`r`n")) { "`r`n" } else { "`n" }
+    $sectionPattern = '(?ms)(?<header>^\[Game Files\]\r?\n)(?<body>.*?)(?=^\[|\z)'
+    $section = [regex]::Match($raw, $sectionPattern)
+    if (-not $section.Success) { throw 'Morrowind.ini does not contain a [Game Files] section.' }
+    $body = $section.Groups['body'].Value
+    if ($body.Length -gt 0 -and -not $body.EndsWith("`n")) { $body += $newline }
+    foreach ($filename in $Filenames) {
+        if ($script:originalGameFiles -icontains $filename) { continue }
+        $body += "GameFile$nextIndex=$filename$newline"
+        $nextIndex++
+    }
+    Backup-Target $iniPath
+    $replacement = $section.Groups['header'].Value + $body
+    $updated = $raw.Substring(0, $section.Index) + $replacement + $raw.Substring($section.Index + $section.Length)
+    [IO.File]::WriteAllText($iniPath, $updated, [Text.Encoding]::GetEncoding(1252))
+    [IO.File]::WriteAllText((Join-Path $runDirectory 'Morrowind.ini.active'), $updated, [Text.Encoding]::GetEncoding(1252))
 }
 
 function Get-NewHarnessEvents {
@@ -213,9 +248,45 @@ try {
     [IO.Directory]::CreateDirectory((Join-Path $runDirectory 'screenshots')) | Out-Null
     Write-OwchAtomicJson -Path (Join-Path $runDirectory 'run.json') -Value ([ordered]@{
         protocolVersion = 1; runId = $runId; suite = $Suite; configuration = $Configuration
-        repository = $repoRoot; morrowindDirectory = $morrowindRoot; fixtureSave = $FixtureSave
+        repository = $repoRoot; morrowindDirectory = $morrowindRoot; fixtureSave = $FixtureSave; openMWAddonPath = if ($Suite -eq 'OpenMWAddon') { $OpenMWAddonPath } else { $null }
         startedAt = $startedAt.ToString('o')
     })
+
+    if ($Suite -eq 'OpenMWAddon') {
+        $dataDirectory = Join-Path $morrowindRoot 'Data Files'
+        $discovery = Get-OpenMWAddonDiscovery -DataDirectory $dataDirectory -EnabledAddonPaths @($OpenMWAddonPath)
+        if ($discovery.orderedAddons.Count -eq 0) { throw 'OpenMW addon suite did not discover an enabled addon.' }
+        $primaryInspection = @($discovery.orderedAddons | Where-Object { $_.source.path -ieq [IO.Path]::GetFullPath($OpenMWAddonPath) })[0]
+        if ($primaryInspection.masters.Count -ne 3 -or $primaryInspection.recordCounts.GMST -ne 8 -or $primaryInspection.recordCounts.SKIL -ne 27) {
+            throw "NCG fixture structure mismatch: masters=$($primaryInspection.masters.Count), GMST=$($primaryInspection.recordCounts.GMST), SKIL=$($primaryInspection.recordCounts.SKIL)."
+        }
+        $cacheRoot = Join-Path $morrowindRoot 'Data Files\MWSE\tmp\openmw-addon-cache'
+        $aliasMap = @{}
+        $reportsDirectory = Join-Path $runDirectory 'compatibility-reports'
+        [IO.Directory]::CreateDirectory($reportsDirectory) | Out-Null
+        foreach ($inspection in $discovery.orderedAddons) {
+            $preparation = New-OpenMWAddonNativeFile -Inspection $inspection -CacheRoot $cacheRoot -DependencyAliases $aliasMap
+            $aliasMap[$inspection.source.filename] = $preparation.aliasName
+            $sourceDirectory = [IO.Path]::GetDirectoryName($inspection.source.path).TrimEnd('\')
+            if ($ProbeNativeAddonExtension -and $inspection.classification -eq 'direct-load' -and $sourceDirectory -ieq $dataDirectory.TrimEnd('\')) {
+                $enabledNativeFiles.Add($inspection.source.filename)
+            }
+            else {
+                Stage-File $preparation.nativePath (Join-Path $dataDirectory $preparation.aliasName)
+                $enabledNativeFiles.Add($preparation.aliasName)
+            }
+            Copy-Item -LiteralPath $preparation.reportPath -Destination (Join-Path $reportsDirectory ($inspection.source.filename + '.json')) -Force
+            $addonPreparations.Add($preparation)
+        }
+        Enable-TemporaryGameFiles @($enabledNativeFiles)
+        Write-OwchAtomicJson -Path (Join-Path $runDirectory 'addon-plan.json') -Value ([ordered]@{
+            schemaVersion = 1; enablement = $discovery.enablement; sourceIdentities = @($discovery.orderedAddons | ForEach-Object source)
+            nativeExtensionProbe = $ProbeNativeAddonExtension.IsPresent
+            enabledNativeFiles = @($enabledNativeFiles)
+            nativeAliases = @($addonPreparations | ForEach-Object { [ordered]@{ source = $_.report.source.filename; alias = $_.aliasName; cacheKey = $_.cacheKey; cachePath = $_.nativePath } })
+            originalGameFiles = $originalGameFiles
+        })
+    }
 
     if (-not $SkipBuild) {
         $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -279,6 +350,12 @@ try {
     $playerProbe = Invoke-NamedProbe 'playerAndCell'
     Add-SmokeAssertion 'known-game-state' ($playerProbe.result.value.inGame -and $playerProbe.result.value.playerValid) $playerProbe.result.value.name 'inGame'
 
+    if ($Suite -eq 'OpenMWAddon') {
+        $addonProbeArguments = @{ expectedAlias = $enabledNativeFiles[$enabledNativeFiles.Count - 1]; expectedOrdinaryFiles = @($originalGameFiles) }
+        $addonProbe = Invoke-NamedProbe 'openMWAddonState' $addonProbeArguments
+        Add-SmokeAssertion 'ncg-content-live-before-save' ($addonProbe.result.value.aliasActive -and $addonProbe.result.value.ordinaryFilesUnchanged -and $addonProbe.result.value.gmst.value -eq 0) $addonProbe.result.value $true
+    }
+
     $cellEventRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'cellChanged' } -NoWait
     Send-HarnessCommand 'teleport' @{ cell = $TeleportCell; position = @(0, 0, 0); forceCellChange = $true } | Out-Null
     $cellEvent = Wait-HarnessResponse $cellEventRequest $RequestTimeoutSeconds 'native cellChanged event'
@@ -296,6 +373,11 @@ try {
     Wait-HarnessResponse $reloadedRequest $ReadyTimeoutSeconds 'smoke reload event' | Out-Null
     $readProbe = Invoke-NamedProbe 'readReferencePersistentValue' @{ key = $persistentKey; expected = $persistentValue }
     Add-SmokeAssertion 'reference-persistence-save-load' ($readProbe.result.value.value -eq $persistentValue) $readProbe.result.value.value $persistentValue
+
+    if ($Suite -eq 'OpenMWAddon') {
+        $reloadedAddonProbe = Invoke-NamedProbe 'openMWAddonState' $addonProbeArguments
+        Add-SmokeAssertion 'ncg-content-live-after-reload' ($reloadedAddonProbe.result.value.aliasActive -and $reloadedAddonProbe.result.value.gmst.value -eq 0) $reloadedAddonProbe.result.value $true
+    }
 
     Send-HarnessCommand 'shutdown' -TimeoutSeconds 10 | Out-Null
     if (-not $process.HasExited) {
@@ -324,6 +406,19 @@ finally {
         Remove-Item -LiteralPath $smokeSavePath -Force -ErrorAction SilentlyContinue
     }
     if ($staged.Count -gt 0) { Restore-StagedFiles }
+    if ($null -ne $originalIniHash) {
+        $restoredIniHash = (Get-FileHash -LiteralPath (Join-Path $morrowindRoot 'Morrowind.ini') -Algorithm SHA256).Hash.ToLowerInvariant()
+        $loadOrderRestored = $restoredIniHash -eq $originalIniHash
+        $remainingAliases = @($addonPreparations | Where-Object { Test-Path -LiteralPath (Join-Path $morrowindRoot ('Data Files\' + $_.aliasName)) } | ForEach-Object aliasName)
+        Write-OwchAtomicJson -Path (Join-Path $runDirectory 'restoration.json') -Value ([ordered]@{
+            originalMorrowindIniSha256 = $originalIniHash; restoredMorrowindIniSha256 = $restoredIniHash
+            loadOrderRestored = $loadOrderRestored; temporaryAliasesRemaining = $remainingAliases
+            harnessConfigurationRestored = -not (Test-Path -LiteralPath (Join-Path $morrowindRoot 'Data Files\MWSE\config\openmw_compat_harness.json'))
+        })
+        if (-not $loadOrderRestored -or $remainingAliases.Count -gt 0) {
+            $failure = "Temporary OpenMW addon state was not fully restored. Morrowind.ini restored: $loadOrderRestored; remaining aliases: $($remainingAliases -join ', ')"
+        }
+    }
     $harnessDirectory = Join-Path $morrowindRoot 'Data Files\MWSE\mods\openmw_compat_harness'
     if ((Test-Path -LiteralPath $harnessDirectory -PathType Container) -and @(Get-ChildItem -LiteralPath $harnessDirectory -Force).Count -eq 0) {
         Remove-Item -LiteralPath $harnessDirectory -Force
@@ -338,7 +433,14 @@ finally {
         startedAt = $startedAt.ToString('o'); finishedAt = [DateTime]::UtcNow.ToString('o')
         processExitCode = $exitCode; gracefulShutdown = $shutdownGraceful; failure = $failure
         launcherAssertions = @($assertions); gameAssertions = $gameAssertions
-        artifacts = [ordered]@{ runDirectory = $runDirectory; events = $eventsPath; result = $resultPath; mwseLog = (Join-Path $runDirectory 'MWSE.log') }
+        addon = if ($Suite -eq 'OpenMWAddon') { [ordered]@{ source = $OpenMWAddonPath; preparations = @($addonPreparations | ForEach-Object { $_.report }); loadOrderRestored = $loadOrderRestored; originalIniSha256 = $originalIniHash; restoredIniSha256 = $restoredIniHash } } else { $null }
+        artifacts = [ordered]@{
+            runDirectory = $runDirectory; events = $eventsPath; result = $resultPath; mwseLog = (Join-Path $runDirectory 'MWSE.log')
+            addonPlan = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'addon-plan.json' } else { $null }
+            compatibilityReports = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'compatibility-reports' } else { $null }
+            restoration = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'restoration.json' } else { $null }
+            save = if (Test-Path -LiteralPath (Join-Path $runDirectory ($smokeSaveBase + '.ess'))) { Join-Path $runDirectory ($smokeSaveBase + '.ess') } else { $null }
+        }
     }
     Write-OwchAtomicJson -Path $resultPath -Value $result
     Write-Output ($result | ConvertTo-Json -Depth 30)

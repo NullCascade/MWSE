@@ -264,41 +264,41 @@ Goal: `ncg.omwaddon` is discovered, selected, loaded, and reflected in game data
 
 ### M2.1 Content inspector
 
-- [ ] Implement a bounded TES3 record/subrecord inspector independent of the native loader.
-- [ ] Read `TES3/HEDR`, optional `FORM`, `MAST/DATA`, record flags, and top-level record names.
-- [ ] Validate record boundaries and reject truncation or overflow.
-- [ ] Classify files as direct-load, transformable, unsupported, or malformed.
-- [ ] Inventory OpenMW-only records and unsupported format versions.
-- [ ] Add unit fixtures for format 0, format 1 with `FORM`, malformed sizes, unknown records, and dependency chains.
+- [x] Implement a bounded TES3 record/subrecord inspector independent of the native loader.
+- [x] Read `TES3/HEDR`, optional `FORM`, `MAST/DATA`, record flags, and top-level record names.
+- [x] Validate record boundaries and reject truncation or overflow.
+- [x] Classify files as direct-load, transformable, unsupported, or malformed.
+- [x] Inventory OpenMW-only records and unsupported format versions.
+- [x] Add unit fixtures for format 0, format 1 with `FORM`, malformed sizes, unknown records, and dependency chains.
 
 ### M2.2 Discovery and load-order integration
 
-- [ ] Discover `.omwaddon` files without changing ordinary `.esm`/`.esp` behavior.
-- [ ] Define how addons are enabled for Morrowind tests and normal use.
-- [ ] Resolve addon masters and addon-to-addon dependencies case-insensitively.
-- [ ] Detect duplicate filenames and cyclic or missing dependencies.
-- [ ] Preserve the original addon filename for diagnostics and source-content identity.
-- [ ] Ensure savegame/load-order warnings show useful names.
+- [x] Discover `.omwaddon` files without changing ordinary `.esm`/`.esp` behavior.
+- [x] Define how addons are enabled for Morrowind tests and normal use.
+- [x] Resolve addon masters and addon-to-addon dependencies case-insensitively.
+- [x] Detect duplicate filenames and cyclic or missing dependencies.
+- [x] Preserve the original addon filename for diagnostics and source-content identity.
+- [x] Ensure savegame/load-order warnings show useful names.
 
 ### M2.3 Native-compatible transformation
 
-- [ ] Direct-load format-0 files when safe.
-- [ ] For format-1 content, remove or adapt the `FORM` subrecord without corrupting `TES3` record sizes.
-- [ ] Rewrite dependency names only when native resolution requires a cached alias.
-- [ ] Cache transformed files by source path, size, modification time, and content hash.
-- [ ] Never overwrite the source `.omwaddon`.
-- [ ] Reject OpenMW-only records whose omission would change mod behavior.
-- [ ] Produce a compatibility report listing every transformation and ignored feature.
+- [x] Direct-load format-0 files when safe.
+- [x] For format-1 content, remove or adapt the `FORM` subrecord without corrupting `TES3` record sizes.
+- [x] Rewrite dependency names only when native resolution requires a cached alias.
+- [x] Cache transformed files by source path, size, modification time, and content hash.
+- [x] Never overwrite the source `.omwaddon`.
+- [x] Reject OpenMW-only records whose omission would change mod behavior.
+- [x] Produce a compatibility report listing every transformation and ignored feature.
 
 ### M2.4 NCG addon integration test
 
-- [ ] Load `ncg.omwaddon` from a configurable fixture path.
-- [ ] Assert the three declared masters resolve.
-- [ ] Assert all eight expected `GMST` records are present or modified as expected.
-- [ ] Assert all twenty-seven `SKIL` records load without record-boundary errors.
-- [ ] Query representative NCG GMST and skill-description values through the harness.
-- [ ] Save and reload a game with the addon active.
-- [ ] Confirm ordinary ESP/ESM loading remains unchanged.
+- [x] Load `ncg.omwaddon` from a configurable fixture path.
+- [x] Assert the three declared masters resolve.
+- [x] Assert all eight expected `GMST` records are present or modified as expected.
+- [x] Assert all twenty-seven `SKIL` records load without record-boundary errors.
+- [x] Query representative NCG GMST and skill-description values through the harness.
+- [x] Save and reload a game with the addon active.
+- [x] Confirm ordinary ESP/ESM loading remains unchanged.
 
 Milestone gate:
 
@@ -306,6 +306,19 @@ Milestone gate:
 The automated harness launches Morrowind with ncg.omwaddon active and proves,
 through game-memory queries, that its GMST and SKIL changes were loaded.
 ```
+
+### Milestone 2 implementation record
+
+Milestone 2 passed on 2026-07-12 under build-enabled run ID `20260713T022608Z-e077f4be2f114afaa0d78d28d273862e`. Its `result.json` reports `passed: true`, process exit code 0, all launcher and in-game assertions passing, and byte-identical restoration of `Morrowind.ini` (`722bc9a0f1e4bf83cc7d56c1c00df04f20a9a9835d0cbef45c05ef1695ec5f9f` before and after). The live probe found the identity-preserving native alias `ncg.omwaddon-c67a7850d2c89833.esp`, preserved all five pre-existing ESMs, read `iLevelupMajorMult` as `0`, and read the NCG Block description text before save and after reload.
+
+Evidence-backed decisions and limitations:
+
+- The independent PowerShell inspector bounds the whole input to 256 MiB by default and validates every top-level record and TES3-header subrecord using widened offsets before reading. It supports TES3 HEDR versions 1.2/1.3 and OpenMW format versions 0/1. Unknown, OpenMW-only, malformed, and newer-format content is rejected rather than omitted.
+- Format-0 content bytes are copied unchanged when an extension alias is required. Format-1 transformation removes the 12-byte `FORM` subrecord and rewrites the enclosing TES3 size. Addon master names are rewritten only when the referenced addon has a native alias.
+- Native direct-extension evidence is retained under failed diagnostic run `20260713T022235Z-29fbf98abdaf496ca1a8645878da04ec`: `GameFileN=ncg.omwaddon` was ignored, the addon was absent from `activeMods`, and the queried values remained vanilla. Native loading therefore requires a cached `.esp` alias even for otherwise direct-load-safe format-0 content.
+- Cache identity includes normalized source path, source size, modification time, and SHA-256 content hash. The source is never modified. Compatibility reports preserve the source path and exact original filename; native aliases retain the original `.omwaddon` name visibly so save/load warnings remain actionable.
+- Tests opt in with `-Suite OpenMWAddon -OpenMWAddonPath <path>`. Normal users opt in through `Data Files\MWSE\config\openmw-addon-loader.json` and `Start-MorrowindWithOpenMWAddons.ps1`. Both mechanisms restore temporary aliases and `Morrowind.ini`; cached outputs and reports remain under `Data Files\MWSE\tmp\openmw-addon-cache`.
+- The final retained run contains `result.json`, `events.jsonl`, `MWSE.log`, `build.log`, `addon-plan.json`, the active INI snapshot, per-addon compatibility reports, `restoration.json`, and the save/reload fixture. No OpenMW Lua DLL or runtime work was started.
 
 ### M2.5 Construction Set follow-up
 
