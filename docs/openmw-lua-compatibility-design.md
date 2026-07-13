@@ -1,0 +1,1247 @@
+# OpenMW Content and Lua Compatibility Design
+
+Status: design and execution plan  
+Primary integration fixture: `C:\Games\Morrowind\Data Files\ncg.omwaddon`  
+Primary script fixture: `C:\Games\Morrowind\Data Files\ncg.omwscripts`  
+OpenMW source reference: `E:\Projects\Morrowind\openmw`  
+Target process: 32-bit `Morrowind.exe`
+
+## Objective
+
+Add two independent capabilities to MWSE:
+
+1. Load compatible OpenMW `.omwaddon` content in the original Morrowind engine.
+2. Run a reasonable majority of gameplay-oriented OpenMW Lua mods through a dedicated OpenMW Lua compatibility runtime.
+
+MWSE Lua and OpenMW Lua are separate hosts. OpenMW scripts must not execute inside the MWSE Lua state and must not receive MWSE Lua tables, functions, or userdata. Both hosts may consume the same native engine hooks through a shared C++ event broker.
+
+The compatibility target is behavioral usefulness, not a reimplementation of the OpenMW engine. APIs with meaningful Morrowind or MGE equivalents should work. APIs that depend on OpenMW-only rendering, physics, navigation, multiplayer, ESM4, or engine internals must report explicit limitations.
+
+## Confirmed fixture facts
+
+`ncg.omwaddon` is 11,218 bytes and is a classic TES3-format version-0 content file. It contains:
+
+- one `TES3` header;
+- eight `GMST` records;
+- twenty-seven `SKIL` records;
+- masters `Morrowind.esm`, `Tribunal.esm`, and `Bloodmoon.esm`;
+- no OpenMW `FORM` header subrecord;
+- no OpenMW-only top-level records.
+
+Its only immediate native-loader incompatibility is expected to be discovery and filename handling for the `.omwaddon` extension. It is therefore a good first content-loading fixture.
+
+`ncg.omwscripts` contains:
+
+```text
+MENU: scripts/NCG/ui/renderers.lua
+GLOBAL: scripts/NCG/global.lua
+PLAYER: scripts/NCG/player.lua
+```
+
+The NCG scripts currently require these OpenMW packages:
+
+- `openmw.async`
+- `openmw.core`
+- `openmw.input`
+- `openmw.interfaces`
+- `openmw.self`
+- `openmw.storage`
+- `openmw.types`
+- `openmw.ui`
+- `openmw.util`
+- `openmw.world`
+
+NCG probes or uses the interfaces `Activation`, `AI`, `Constants`, `Controls`, `MarksmansEye`, `MWUI`, `Settings`, `SkillFramework`, `SkillProgression`, `StatsWindow`, `Templates`, `TooltipBuilders`, and several UI helper functions. Optional foreign-mod interfaces may remain absent, but the native OpenMW interfaces needed by NCG must be adapted or stubbed with correct feature-detection behavior.
+
+## Non-goals
+
+- Expanding MWSE Lua until OpenMW Lua scripts happen to run in it.
+- Passing Lua values between the MWSE and OpenMW Lua states.
+- Running OpenMW's built-in AI, player-controller, combat-controller, or engine-replacement scripts.
+- Exact MyGUI rendering or pixel-identical OpenMW UI.
+- OpenMW multiplayer behavior.
+- ESM4 game support.
+- Exact OpenMW navmesh, physics, or renderer behavior.
+- Silently accepting unsupported APIs and returning plausible but incorrect values.
+
+## Architecture
+
+```text
+                         Morrowind.exe
+                               |
+                    native engine/event bridge
+                      /                    \
+             MWSE Lua host          OpenMW Lua host
+             Lua 5.1-DW             LuaJIT 2.1 / 5.1
+                  |                         |
+          tes3.*, tes3ui.*, mge.*       openmw.*
+```
+
+### OpenMW Lua support DLL
+
+Add a new x86 C++ project to `MWSE.sln`. Its package output is:
+
+```text
+Data Files\MWSE\core\lib\openmw-lua.dll
+```
+
+The support DLL owns:
+
+- its LuaJIT runtime and symbols;
+- sandbox creation;
+- the OpenMW-specific `require` loader;
+- script containers and handler registries;
+- OpenMW Lua userdata and value types;
+- serialization, timers, storage, interfaces, and delayed events;
+- bindings for `openmw.*` packages.
+
+The MWSE DLL owns or exposes through a versioned native bridge:
+
+- process and game lifecycle notifications;
+- safe access to TES3 records, references, mobiles, cells, UI, audio, input, and MGE;
+- stable native object identifiers and handle validation;
+- save/load attachment points;
+- shared native event hooks.
+
+No `sol::object`, `lua_State*`, Lua registry reference, or Lua allocator may cross the DLL boundary. Bridge data consists of POD values, opaque native handles, callbacks, and serialized byte/string data.
+
+### Native bridge requirements
+
+The first bridge version must provide:
+
+- ABI version and structure-size validation;
+- structured logging callback;
+- current lifecycle state;
+- frame, simulation-time, and game-time callbacks;
+- input callbacks and current input state;
+- save, saved, load, and loaded callbacks;
+- player and active-reference lookup;
+- record and reference lookup by stable identity;
+- safe property read/write operations needed by NCG;
+- message-box and basic UI entry points;
+- graceful runtime shutdown before MWSE detaches.
+
+All opaque handles must be invalidatable. Every operation that dereferences a handle must validate it and return a structured error rather than trusting an old pointer.
+
+### Script containers
+
+The host recognizes the `.omwscripts` flags `GLOBAL`, `MENU`, `PLAYER`, `CUSTOM`, `LOAD`, and all documented record-type flags. Each script instance has:
+
+- an isolated environment;
+- context-appropriate packages;
+- its own returned interface and handlers;
+- its own serializable state and reliable timers;
+- deterministic load order;
+- a diagnostic identity containing content file, script path, context, and attached object where applicable.
+
+Local containers are created lazily for active references. Inactive local state remains serialized without retaining a live Lua environment. Inventory-stack merging is a declared compatibility limitation because native Morrowind does not always preserve OpenMW's per-item identity.
+
+### Persistence
+
+The OpenMW host implements its own serializer for the documented serializable graph. It must reject cycles, aliased tables, functions, and unsupported userdata with a path to the bad value.
+
+Persist:
+
+- global, menu, and player script `onSave` data;
+- local script path, initialization data, and `onSave` data keyed by stable reference identity;
+- reliable timers;
+- global and player storage sections;
+- compatibility runtime version and migration metadata.
+
+The serialized result may be stored as reserved binary strings in MWSE reference Lua data, or in a dedicated save record if size or lifecycle testing shows reference data is unsuitable. Lua values themselves never cross runtimes.
+
+### API compatibility policy
+
+Every public API member has one status:
+
+- **Unstarted**: no implementation.
+- **Stubbed**: symbol exists and produces an explicit unsupported/capability result.
+- **Partial**: useful documented subset works and limitations are tested.
+- **Implemented**: documented Morrowind-relevant behavior is covered.
+- **Not applicable**: inherently OpenMW-only, with rationale.
+
+Do not mark an API implemented merely because the symbol exists. Each implemented or partial member requires at least one automated unit or integration assertion.
+
+Expose the OpenMW `core.API_REVISION` required by the selected compatibility baseline. Also expose an MWSE-specific capability table for diagnostics without requiring mods to use it.
+
+## Agent execution rules
+
+Each task below is intended to be independently assignable after its dependencies are complete.
+
+An agent completing a task must:
+
+1. Read this document and the referenced OpenMW API source for its assigned surface.
+2. Preserve the separation between Lua runtimes.
+3. Add or update tests in the same change.
+4. Provide a reproducible command or harness request that demonstrates the result.
+5. Record unsupported behavior explicitly.
+6. Update the milestone task and API checklists in this document.
+7. Avoid unrelated refactors and generated documentation edits.
+
+An integration task is not complete when it merely builds. It must pass its stated gate through the automated Morrowind harness.
+
+## Milestone 1: Automated Morrowind test harness
+
+Goal: agents can build, launch, command, observe, and terminate Morrowind without manually operating the UI.
+
+### M1.1 Harness protocol
+
+- [ ] Define a versioned JSON request/response protocol.
+- [ ] Assign each run and request a unique ID.
+- [ ] Define `ready`, `heartbeat`, `response`, `assertion`, `log`, `fatal`, and `shutdown` messages.
+- [ ] Use append-only JSON Lines for process output so partial writes are detectable.
+- [ ] Write commands atomically through a temporary file followed by rename.
+- [ ] Include game state in relevant messages: main menu, loading, in game, paused, current cell, player validity.
+- [ ] Bound every request with a timeout and return a diagnostic snapshot on timeout.
+
+Proposed runtime directory:
+
+```text
+Data Files\MWSE\tmp\openmw-compat-harness\
+    command.json
+    events.jsonl
+    ready.json
+    run.json
+    screenshots\
+```
+
+### M1.2 MWSE Lua harness mod
+
+- [ ] Add a packaged MWSE Lua test mod at `misc\package\Data Files\MWSE\mods\openmw_compat_harness\main.lua` dedicated to external automation.
+- [ ] Poll for commands without blocking the simulation thread.
+- [ ] Implement `ping`, `getState`, `evalNamedProbe`, `loadGame`, `newGame`, `teleport`, `waitForEvent`, `screenshot`, and `shutdown` commands.
+- [ ] Implement named probes rather than unrestricted Lua evaluation for normal tests.
+- [ ] Catch errors and return traceback, current game state, and recent MWSE log lines.
+- [ ] Emit heartbeat messages while Morrowind remains responsive.
+- [ ] Disable the harness by default outside explicit test launches.
+
+### M1.3 Command-line launcher
+
+- [ ] Add a repository PowerShell launcher under `tools/openmw-compat/`.
+- [ ] Locate MSBuild with `vswhere` and build the requested x86 configuration.
+- [ ] Stage only the required build outputs and harness files.
+- [ ] Create a fresh run directory and configuration.
+- [ ] Launch `Morrowind.exe` with the Morrowind directory as its working directory.
+- [ ] Wait for the ready handshake and fail clearly if MWSE or the harness did not initialize.
+- [ ] Send a selected test suite and stream structured results.
+- [ ] Request graceful shutdown, then report process exit code and retained artifacts.
+- [ ] Never edit the user's normal load order permanently; back up and restore any temporary configuration.
+
+### M1.4 Harness smoke suite
+
+- [ ] Verify MWSE initialization.
+- [ ] Verify main-menu detection.
+- [ ] Start or load a deterministic game fixture.
+- [ ] Verify player and current-cell access.
+- [ ] Trigger and observe one native event.
+- [ ] Write and read one reference-persistent value across save/load.
+- [ ] Shut down without leaving Morrowind running.
+
+Milestone gate:
+
+```text
+One command builds MWSE, launches Morrowind, reaches a known game state,
+executes named probes, captures structured logs, and exits with a machine-readable result.
+```
+
+## Milestone 2: `.omwaddon` loading
+
+Goal: `ncg.omwaddon` is discovered, selected, loaded, and reflected in game data.
+
+### M2.1 Content inspector
+
+- [ ] Implement a bounded TES3 record/subrecord inspector independent of the native loader.
+- [ ] Read `TES3/HEDR`, optional `FORM`, `MAST/DATA`, record flags, and top-level record names.
+- [ ] Validate record boundaries and reject truncation or overflow.
+- [ ] Classify files as direct-load, transformable, unsupported, or malformed.
+- [ ] Inventory OpenMW-only records and unsupported format versions.
+- [ ] Add unit fixtures for format 0, format 1 with `FORM`, malformed sizes, unknown records, and dependency chains.
+
+### M2.2 Discovery and load-order integration
+
+- [ ] Discover `.omwaddon` files without changing ordinary `.esm`/`.esp` behavior.
+- [ ] Define how addons are enabled for Morrowind tests and normal use.
+- [ ] Resolve addon masters and addon-to-addon dependencies case-insensitively.
+- [ ] Detect duplicate filenames and cyclic or missing dependencies.
+- [ ] Preserve the original addon filename for diagnostics and source-content identity.
+- [ ] Ensure savegame/load-order warnings show useful names.
+
+### M2.3 Native-compatible transformation
+
+- [ ] Direct-load format-0 files when safe.
+- [ ] For format-1 content, remove or adapt the `FORM` subrecord without corrupting `TES3` record sizes.
+- [ ] Rewrite dependency names only when native resolution requires a cached alias.
+- [ ] Cache transformed files by source path, size, modification time, and content hash.
+- [ ] Never overwrite the source `.omwaddon`.
+- [ ] Reject OpenMW-only records whose omission would change mod behavior.
+- [ ] Produce a compatibility report listing every transformation and ignored feature.
+
+### M2.4 NCG addon integration test
+
+- [ ] Load `ncg.omwaddon` from a configurable fixture path.
+- [ ] Assert the three declared masters resolve.
+- [ ] Assert all eight expected `GMST` records are present or modified as expected.
+- [ ] Assert all twenty-seven `SKIL` records load without record-boundary errors.
+- [ ] Query representative NCG GMST and skill-description values through the harness.
+- [ ] Save and reload a game with the addon active.
+- [ ] Confirm ordinary ESP/ESM loading remains unchanged.
+
+Milestone gate:
+
+```text
+The automated harness launches Morrowind with ncg.omwaddon active and proves,
+through game-memory queries, that its GMST and SKIL changes were loaded.
+```
+
+### M2.5 Construction Set follow-up
+
+- [ ] Reuse the inspector and transformation policy in CSSE.
+- [ ] Display `.omwaddon` files in the Data Files dialog.
+- [ ] Initially treat addon inputs as read-only and save edits to an ESP.
+- [ ] Warn before operations that would discard unsupported OpenMW records.
+- [ ] Add a CSSE-specific headless or harness-assisted loading test.
+
+This follow-up is not a dependency for the OpenMW Lua runtime.
+
+## Milestone 3: OpenMW Lua DLL and host skeleton
+
+Goal: an isolated LuaJIT host loads beside MWSE Lua and runs a trivial `.omwscripts` fixture.
+
+### M3.1 Solution and packaging
+
+- [ ] Add the x86 support-DLL project to `MWSE.sln`.
+- [ ] Add isolated LuaJIT dependencies without colliding with MWSE's Lua symbols.
+- [ ] Emit `openmw-lua.dll` into the package `Data Files\MWSE\core\lib` directory.
+- [ ] Load the DLL explicitly from MWSE and validate its bridge ABI.
+- [ ] Log runtime version, API revision, and bridge version at startup.
+- [ ] Ensure missing or incompatible DLLs fail without breaking MWSE Lua.
+
+### M3.2 Sandbox and module loader
+
+- [ ] Create an isolated environment per script instance.
+- [ ] Expose only the documented safe Lua libraries and functions.
+- [ ] Support OpenMW's documented Lua 5.2/5.3 compatibility features through LuaJIT and compatibility libraries.
+- [ ] Implement `require` for standard libraries, built-in packages, compatibility auxiliaries, and source files.
+- [ ] Reject DLL modules and precompiled Lua bytecode.
+- [ ] Resolve module paths through the compatibility VFS with deterministic priority.
+- [ ] Include script path and context in all load/runtime errors.
+
+### M3.3 `.omwscripts` parser
+
+- [ ] Parse comments, flags, commas, whitespace, and paths.
+- [ ] Preserve content-file and line ordering.
+- [ ] Validate mutually incompatible flags.
+- [ ] Produce actionable errors for missing scripts and unknown flags.
+- [ ] Parse the NCG file into one menu, one global, and one player definition.
+
+### M3.4 Minimal containers
+
+- [ ] Implement menu, global, and player containers.
+- [ ] Execute a script and validate its returned table.
+- [ ] Register `interfaceName`, `interface`, `engineHandlers`, and `eventHandlers`.
+- [ ] Preserve direct engine-handler order and reverse event-handler order.
+- [ ] Implement delayed script events.
+- [ ] Isolate failure to the offending handler and continue other scripts where safe.
+- [ ] Support clean shutdown and reload.
+
+Milestone gate:
+
+```text
+MWSE Lua and the OpenMW LuaJIT host initialize in the same process. A synthetic
+.omwscripts file runs menu/global/player scripts and reports handlers through the harness.
+```
+
+## Milestone 4: NCG boot compatibility
+
+Goal: all three NCG scripts load and reach their initialization handlers without missing-package or syntax errors.
+
+### M4.1 Foundation packages
+
+- [ ] Implement the NCG-required subset of `openmw.util`.
+- [ ] Implement `openmw.interfaces` and mod-defined interface registration/lookup.
+- [ ] Implement simulation and game-time `openmw.async` timers plus `async.callback`.
+- [ ] Implement global and player `openmw.storage` sections and subscriptions.
+- [ ] Implement the NCG-required subset of `openmw.core`.
+- [ ] Implement `openmw.self` for the player container.
+
+### M4.2 Player and record/stat bindings
+
+- [ ] Implement stable player `GameObject` userdata.
+- [ ] Implement cells and the player cell properties needed by NCG.
+- [ ] Implement `openmw.types.Actor`, `NPC`, and `Player` detection.
+- [ ] Implement attributes, skills, level, health, spell, class, race, and birth-sign access used by NCG.
+- [ ] Ensure mutable stat proxy writes update native values correctly.
+- [ ] Implement record collections and lowercase ID lookup behavior used by NCG.
+- [ ] Validate handles on every call.
+
+### M4.3 Input and engine handlers
+
+- [ ] Implement action registration and action handlers used by NCG.
+- [ ] Map `onFrame`, `onUpdate`, `onInit`, `onActive`, `onLoad`, and `onSave`.
+- [ ] Map NCG-relevant `UiModeChanged`, `Died`, and skill-level events.
+- [ ] Implement global events and player-local events with OpenMW ordering and one-frame delay.
+- [ ] Confirm optional third-party interfaces remain safely detectable as absent.
+
+### M4.4 NCG settings and UI baseline
+
+- [ ] Provide the built-in `Settings` interface subset used by NCG.
+- [ ] Provide `Controls` feature detection expected by NCG.
+- [ ] Implement `ui.showMessage`.
+- [ ] Implement the NCG-required `ui.create`, content, element update/destroy, text, image, container, and flex subset.
+- [ ] Provide the MWUI/template constants NCG needs, or a compatibility adapter with equivalent results.
+- [ ] Implement localization lookup sufficient for NCG's `core.l10n` calls.
+- [ ] Warn once for unsupported cosmetic layout properties.
+
+Milestone gate:
+
+```text
+NCG's menu, global, and player scripts all load; their onInit/onActive handlers run;
+the settings surface is registered; and no required module or built-in interface is missing.
+```
+
+## Milestone 5: NCG functional behavior and persistence
+
+Goal: NCG performs its core leveling behavior and survives save/load.
+
+### M5.1 Serializer
+
+- [ ] Serialize nil, booleans, numbers, strings, supported value userdata, object handles, and tables.
+- [ ] Detect cycles and shared table references.
+- [ ] Report the data path to unsupported values.
+- [ ] Version serialized data and support migrations.
+- [ ] Fuzz or property-test malformed serialized input.
+
+### M5.2 Script and storage persistence
+
+- [ ] Call each script's `onSave` and restore through `onLoad`.
+- [ ] Persist reliable timers and registered callback names.
+- [ ] Persist global and player storage sections.
+- [ ] Prevent state from leaking between savegames or new games.
+- [ ] Handle mid-game installation where no prior script data exists.
+- [ ] Handle removal or renaming of a script between save and load.
+
+### M5.3 NCG behavioral assertions
+
+- [ ] NCG initializes a player profile.
+- [ ] Attribute and skill state can be read through OpenMW-compatible proxies.
+- [ ] Raising a skill triggers NCG's progression path.
+- [ ] NCG updates attribute growth and level progress.
+- [ ] Health recalculation produces native Morrowind health changes.
+- [ ] Player death updates the expected storage value.
+- [ ] NCG messages and logs appear through the compatibility UI.
+- [ ] Save, exit, relaunch, and load restore NCG state.
+- [ ] Existing MWSE Lua mods and persistent timers still work in the same run.
+
+Milestone gate:
+
+```text
+The harness performs a deterministic NCG progression scenario, saves, restarts
+Morrowind, reloads, and verifies the same NCG state and native player statistics.
+```
+
+## Milestone 6: General gameplay-mod compatibility
+
+Goal: extend from the NCG vertical slice to common OpenMW gameplay patterns.
+
+### M6.1 Local script containers
+
+- [ ] Implement documented record-type autostart flags.
+- [ ] Create local containers lazily for active references.
+- [ ] Implement `onActive`, `onInactive`, `onActivated`, `onConsume`, and `onTeleported`.
+- [ ] Implement dynamic `CUSTOM` attach, query, and detach.
+- [ ] Persist local state by stable reference identity.
+- [ ] Handle reference deletion and invalidation.
+- [ ] Document inventory-stack identity limitations with tests.
+
+### M6.2 World and nearby access
+
+- [ ] Implement object lookup by form/reference identity.
+- [ ] Implement active-cell object lists and filters.
+- [ ] Implement cell lookup and basic world mutation.
+- [ ] Implement raycasts through native collision where meaningful.
+- [ ] Classify navmesh/pathfinding APIs as partial or not applicable unless a native equivalent is added.
+
+### M6.3 Broader packages
+
+- [ ] Implement common audio APIs.
+- [ ] Implement common animation APIs.
+- [ ] Implement camera mappings, using MGE only where required.
+- [ ] Implement VFS file access and archive behavior.
+- [ ] Expand declarative UI coverage based on real mod fixtures.
+- [ ] Map postprocessing only where MGE provides a defensible equivalent.
+
+### M6.4 Compatibility corpus
+
+- [ ] Establish a redistributable or locally configured corpus of representative OpenMW mods.
+- [ ] Add a static scanner that reports required packages, members, handlers, interfaces, and Lua syntax features.
+- [ ] Generate a per-mod capability report before launch.
+- [ ] Add one deterministic harness scenario per supported mod.
+- [ ] Use corpus failures to prioritize API work rather than implementing the appendix in arbitrary order.
+
+Milestone gate:
+
+```text
+The compatibility corpus runs through the automated harness with a published
+per-mod status and no silent unsupported-API fallbacks.
+```
+
+## Milestone 7: Hardening and release requirements
+
+- [ ] Crash containment for Lua panics and C++ exceptions.
+- [ ] Per-script instruction and memory budgets with useful diagnostics.
+- [ ] Deterministic cleanup on new game, load, return to menu, reload, and process shutdown.
+- [ ] Stable bridge ABI validation.
+- [ ] Malformed addon, script, VFS, and save-data tests.
+- [ ] Load-order and dependency diagnostics.
+- [ ] User-facing compatibility report and log locations.
+- [ ] Documentation for installing `.omwaddon` and `.omwscripts` content.
+- [ ] Documentation for API status and known semantic differences.
+- [ ] Release packaging includes the support DLL and no test harness unless explicitly enabled.
+- [ ] License review before incorporating any OpenMW implementation or auxiliary Lua source; prefer clean-room implementation from documented behavior.
+
+## Global success conditions
+
+1. MWSE Lua behavior and ABI remain unchanged for existing mods.
+2. Failure to load the OpenMW support DLL does not prevent normal MWSE startup.
+3. Unsupported OpenMW APIs fail explicitly and identify script, context, and member.
+4. No OpenMW Lua value crosses into the MWSE Lua state or vice versa.
+5. All native object handles are validated before use.
+6. `.omwaddon` sources are never overwritten by runtime transformation.
+7. Automated Morrowind integration tests are reproducible from one command.
+8. NCG content changes and Lua behavior are verified from game state rather than log text alone.
+9. Save/load tests include a full process restart.
+10. Every checked API member has an associated test or an explicit not-applicable rationale.
+
+## API tracking inventory
+
+Source of truth: `E:\Projects\Morrowind\openmw\files\lua_api\openmw\*.lua` as inspected for this design. Re-run the inventory when updating the targeted OpenMW revision.
+
+The inspected source contains 569 function declarations representing 567 unique callable names, 192 type declarations representing 187 unique type names, and 1,512 field declarations. The checklist below contains every unique callable name and every unique type name. Overloaded declarations share one callable checklist item and require coverage for every documented overload.
+
+- [ ] Add `tools\openmw-compat\generate-api-inventory.ps1` to regenerate or validate this appendix from an explicitly configured OpenMW checkout.
+- [ ] Make inventory validation report added, removed, and changed declarations without editing the document silently.
+
+Checkbox meaning in this appendix:
+
+- `[ ]` unstarted or not yet verified;
+- `[x]` implemented or deliberately classified, with tests and any limitation recorded beside it.
+
+Types and public fields are tracked after the callable-member list. A type is not complete until its documented fields, constants, mutability, indexing behavior, and callable members are covered or individually classified.
+
+### `openmw.ambient`
+
+- [ ] `ambient.playSound`
+- [ ] `ambient.playSoundFile`
+- [ ] `ambient.stopSound`
+- [ ] `ambient.stopSoundFile`
+- [ ] `ambient.isSoundPlaying`
+- [ ] `ambient.isSoundFilePlaying`
+- [ ] `ambient.streamMusic`
+- [ ] `ambient.stopMusic`
+- [ ] `ambient.isMusicPlaying`
+- [ ] `ambient.say`
+- [ ] `ambient.stopSay`
+- [ ] `Sound.isSayActive`
+
+### `openmw.animation`
+
+- [ ] `animation.hasAnimation`
+- [ ] `animation.skipAnimationThisFrame`
+- [ ] `animation.getTextKeyTime`
+- [ ] `animation.isPlaying`
+- [ ] `animation.getCurrentTime`
+- [ ] `animation.isLoopingAnimation`
+- [ ] `animation.cancel`
+- [ ] `animation.setLoopingEnabled`
+- [ ] `animation.getCompletion`
+- [ ] `animation.getLoopCount`
+- [ ] `animation.getSpeed`
+- [ ] `animation.setSpeed`
+- [ ] `animation.clearAnimationQueue`
+- [ ] `animation.playQueued`
+- [ ] `animation.playBlended`
+- [ ] `animation.hasGroup`
+- [ ] `animation.hasBone`
+- [ ] `animation.getActiveGroup`
+- [ ] `animation.addVfx`
+- [ ] `animation.removeVfx`
+- [ ] `animation.removeAllVfx`
+
+### `openmw.async`
+
+- [ ] `async.registerTimerCallback`
+- [ ] `async.newSimulationTimer`
+- [ ] `async.newGameTimer`
+- [ ] `async.newUnsavableSimulationTimer`
+- [ ] `async.newUnsavableGameTimer`
+- [ ] `async.callback`
+
+### `openmw.camera`
+
+- [ ] `camera.getMode`
+- [ ] `camera.getQueuedMode`
+- [ ] `camera.setMode`
+- [ ] `camera.allowCharacterDeferredRotation`
+- [ ] `camera.showCrosshair`
+- [ ] `camera.getTrackedPosition`
+- [ ] `camera.getPosition`
+- [ ] `camera.getPitch`
+- [ ] `camera.setPitch`
+- [ ] `camera.getYaw`
+- [ ] `camera.setYaw`
+- [ ] `camera.getRoll`
+- [ ] `camera.setRoll`
+- [ ] `camera.getExtraPitch`
+- [ ] `camera.setExtraPitch`
+- [ ] `camera.getExtraYaw`
+- [ ] `camera.setExtraYaw`
+- [ ] `camera.getExtraRoll`
+- [ ] `camera.setExtraRoll`
+- [ ] `camera.setProjectionOffset`
+- [ ] `camera.getProjectionOffset`
+- [ ] `camera.setStaticPosition`
+- [ ] `camera.getFirstPersonOffset`
+- [ ] `camera.setFirstPersonOffset`
+- [ ] `camera.getFocalPreferredOffset`
+- [ ] `camera.setFocalPreferredOffset`
+- [ ] `camera.getThirdPersonDistance`
+- [ ] `camera.setPreferredThirdPersonDistance`
+- [ ] `camera.getFocalTransitionSpeed`
+- [ ] `camera.setFocalTransitionSpeed`
+- [ ] `camera.instantTransition`
+- [ ] `camera.getCollisionType`
+- [ ] `camera.setCollisionType`
+- [ ] `camera.getBaseFieldOfView`
+- [ ] `camera.getFieldOfView`
+- [ ] `camera.setFieldOfView`
+- [ ] `camera.getBaseViewDistance`
+- [ ] `camera.getViewDistance`
+- [ ] `camera.setViewDistance`
+- [ ] `camera.getViewTransform`
+- [ ] `camera.viewportToWorldVector`
+- [ ] `camera.worldToViewportVector`
+
+Types: `MODE`.
+
+### `openmw.content`
+
+- [ ] `GMSTContent.getFallbacks`
+
+### `openmw.core`
+
+- [ ] `core.quit`
+- [ ] `core.sendGlobalEvent`
+- [ ] `core.getSimulationTime`
+- [ ] `core.getSimulationTimeScale`
+- [ ] `core.getGameTime`
+- [ ] `core.getGameTimeScale`
+- [ ] `core.isWorldPaused`
+- [ ] `core.getRealTime`
+- [ ] `core.getRealFrameDuration`
+- [ ] `core.getGMST`
+- [ ] `core.getGameDifficulty`
+- [ ] `core.l10n`
+- [ ] `ContentFiles.indexOf`
+- [ ] `ContentFiles.has`
+- [ ] `core.getFormId`
+- [ ] `GameObject.isValid`
+- [ ] `GameObject.sendEvent`
+- [ ] `GameObject.activateBy`
+- [ ] `GameObject.addScript`
+- [ ] `GameObject.hasScript`
+- [ ] `GameObject.removeScript`
+- [ ] `GameObject.setScale`
+- [ ] `GameObject.teleport`
+- [ ] `GameObject.moveInto`
+- [ ] `GameObject.remove`
+- [ ] `GameObject.split`
+- [ ] `GameObject.getBoundingBox`
+- [ ] `Cell.hasTag`
+- [ ] `Cell.isInSameSpace`
+- [ ] `Cell.getAll`
+- [ ] `PathGrid.getPoints`
+- [ ] `Inventory.countOf`
+- [ ] `Inventory.getAll`
+- [ ] `Inventory.find`
+- [ ] `Inventory.resolve`
+- [ ] `Inventory.isResolved`
+- [ ] `Inventory.findAll`
+- [ ] `Land.getHeightAt`
+- [ ] `Land.getTextureAt`
+- [ ] `Spells.createRecordDraft`
+- [ ] `Enchantments.createRecordDraft`
+- [ ] `Sound.isEnabled`
+- [ ] `Sound.playSound3d`
+- [ ] `Sound.playSoundFile3d`
+- [ ] `Sound.stopSound3d`
+- [ ] `Sound.stopSoundFile3d`
+- [ ] `Sound.isSoundPlaying`
+- [ ] `Sound.isSoundFilePlaying`
+- [ ] `Sound.say`
+- [ ] `Sound.stopSay`
+- [ ] `Sound.isSayActive`
+- [ ] `Attribute.record`
+- [ ] `Skill.record`
+- [ ] `RegionRecord.setProbability`
+- [ ] `RegionRecord.resetProbability`
+- [ ] `Weather.getCurrent`
+- [ ] `Weather.getNext`
+- [ ] `Weather.getTransition`
+- [ ] `Weather.changeWeather`
+- [ ] `Weather.getCurrentSunLightDirection`
+- [ ] `Weather.getCurrentSunVisibility`
+- [ ] `Weather.getCurrentSunPercentage`
+- [ ] `Weather.getCurrentWindSpeed`
+- [ ] `Weather.getCurrentStormDirection`
+
+Types: `ActiveEffect`, `ActiveSpell`, `ActiveSpellEffect`, `Attribute`, `AttributeRecord`, `Cell`, `ContentFiles`, `DialogueConditionOperator`, `DialogueConditionType`, `DialogueInfoCondition`, `DialogueRecord`, `DialogueRecordInfo`, `Enchantment`, `EnchantmentType`, `FactionRank`, `FactionRecord`, `GameObject`, `Inventory`, `MagicEffect`, `MagicEffectId`, `MagicEffectWithParams`, `MagicSchoolData`, `MWScriptRecord`, `ObjectList`, `ObjectOwner`, `PathGrid`, `PathGridPoint`, `RegionRecord`, `RegionSoundRef`, `Skill`, `SkillRecord`, `SoundRecord`, `Spell`, `SpellRange`, `SpellType`, `TeleportOptions`, `TimeOfDayInterpolatorColor`, `TimeOfDayInterpolatorFloat`, `WeatherRecord`.
+
+### `openmw.debug`
+
+- [ ] `Debug.toggleRenderMode`
+- [ ] `Debug.toggleGodMode`
+- [ ] `Debug.isGodMode`
+- [ ] `Debug.toggleAI`
+- [ ] `Debug.isAIEnabled`
+- [ ] `Debug.toggleCollision`
+- [ ] `Debug.isCollisionEnabled`
+- [ ] `Debug.toggleMWScript`
+- [ ] `Debug.isMWScriptEnabled`
+- [ ] `Debug.reloadLua`
+- [ ] `Debug.setNavMeshRenderMode`
+- [ ] `Debug.setShaderHotReloadEnabled`
+- [ ] `Debug.triggerShaderReload`
+
+Types: `NAV_MESH_RENDER_MODE`, `RENDER_MODE`.
+
+### `openmw.input`
+
+- [ ] `input.isIdle`
+- [ ] `input.isActionPressed`
+- [ ] `input.isKeyPressed`
+- [ ] `input.isControllerButtonPressed`
+- [ ] `input.isShiftPressed`
+- [ ] `input.isCtrlPressed`
+- [ ] `input.isAltPressed`
+- [ ] `input.isSuperPressed`
+- [ ] `input.isMouseButtonPressed`
+- [ ] `input.getMouseMoveX`
+- [ ] `input.getMouseMoveY`
+- [ ] `input.getAxisValue`
+- [ ] `input.getKeyName`
+- [ ] `input.getControlSwitch`
+- [ ] `input.setControlSwitch`
+- [ ] `input.registerAction`
+- [ ] `input.bindAction`
+- [ ] `input.registerActionHandler`
+- [ ] `input.getBooleanActionValue`
+- [ ] `input.getNumberActionValue`
+- [ ] `input.getRangeActionValue`
+- [ ] `input.registerTrigger`
+- [ ] `input.registerTriggerHandler`
+- [ ] `input.activateTrigger`
+
+Types: `ACTION`, `ACTION_TYPE`, `ActionInfo`, `ActionType`, `CONTROL_SWITCH`, `CONTROLLER_AXIS`, `CONTROLLER_BUTTON`, `ControlSwitch`, `KEY`, `KeyboardEvent`, `KeyCode`, `TouchEvent`, `TriggerInfo`.
+
+### `openmw.interfaces`
+
+- [ ] `interfaces.__index`
+
+### `openmw.markup`
+
+- [ ] `markup.decodeYaml`
+- [ ] `markup.loadYaml`
+
+### `openmw.menu`
+
+- [ ] `menu.getState`
+- [ ] `menu.newGame`
+- [ ] `menu.loadGame`
+- [ ] `menu.deleteGame`
+- [ ] `menu.getCurrentSaveDir`
+- [ ] `menu.saveGame`
+- [ ] `menu.getSaves`
+- [ ] `menu.getAllSaves`
+- [ ] `menu.quit`
+
+Types: `SaveInfo`, `STATE`.
+
+### `openmw.nearby`
+
+- [ ] `nearby.getObjectByFormId`
+- [ ] `nearby.castRay`
+- [ ] `nearby.castRenderingRay`
+- [ ] `nearby.asyncCastRenderingRay`
+- [ ] `nearby.findPath`
+- [ ] `nearby.findRandomPointAroundCircle`
+- [ ] `nearby.castNavigationRay`
+- [ ] `nearby.findNearestNavMeshPosition`
+
+Types: `AgentBounds`, `AreaCosts`, `CastRayOptions`, `CastRenderingRayOptions`, `COLLISION_SHAPE_TYPE`, `COLLISION_TYPE`, `FIND_PATH_STATUS`, `FindNearestNavMeshPositionOptions`, `FindPathOptions`, `NAVIGATOR_FLAGS`, `NavMeshOptions`, `RayCastingResult`.
+
+### `openmw.postprocessing`
+
+- [ ] `postprocessing.load`
+- [ ] `postprocessing.getChain`
+- [ ] `Shader.enable`
+- [ ] `Shader.disable`
+- [ ] `Shader.isEnabled`
+- [ ] `Shader.setBool`
+- [ ] `Shader.setInt`
+- [ ] `Shader.setFloat`
+- [ ] `Shader.setVector2`
+- [ ] `Shader.setVector3`
+- [ ] `Shader.setVector4`
+- [ ] `Shader.setIntArray`
+- [ ] `Shader.setFloatArray`
+- [ ] `Shader.setVector2Array`
+- [ ] `Shader.setVector3Array`
+- [ ] `Shader.setVector4Array`
+
+Types: `Shader`.
+
+### `openmw.self`
+
+- [ ] `Self.isActive`
+- [ ] `Self.enableAI`
+
+Types: `ActorControls`, `ATTACK_TYPE`.
+
+### `openmw.storage`
+
+- [ ] `storage.globalSection`
+- [ ] `storage.playerSection`
+- [ ] `storage.allGlobalSections`
+- [ ] `storage.allPlayerSections`
+- [ ] `StorageSection.get`
+- [ ] `StorageSection.getCopy`
+- [ ] `StorageSection.subscribe`
+- [ ] `StorageSection.asTable`
+- [ ] `StorageSection.reset`
+- [ ] `StorageSection.removeOnExit`
+- [ ] `StorageSection.setLifeTime`
+- [ ] `StorageSection.set`
+
+Types: `LifeTime`, `StorageSection`.
+
+### `openmw.types`
+
+- [ ] `Actor.getEncumbrance`
+- [ ] `Actor.getCapacity`
+- [ ] `Actor.getBarterGold`
+- [ ] `Actor.setBarterGold`
+- [ ] `Actor.isDead`
+- [ ] `Actor.isDeathFinished`
+- [ ] `Actor.getPathfindingAgentBounds`
+- [ ] `Actor.isInActorsProcessingRange`
+- [ ] `Actor.objectIsInstance`
+- [ ] `Actor.inventory`
+- [ ] `Actor.canMove`
+- [ ] `Actor.getRunSpeed`
+- [ ] `Actor.getWalkSpeed`
+- [ ] `Actor.getCurrentSpeed`
+- [ ] `Actor.isOnGround`
+- [ ] `Actor.isSwimming`
+- [ ] `Actor.getStance`
+- [ ] `Actor.setStance`
+- [ ] `Actor.setKnockedDown`
+- [ ] `Actor.getKnockedDown`
+- [ ] `Actor.setHitRecovery`
+- [ ] `Actor.getHitRecovery`
+- [ ] `Actor.hasEquipped`
+- [ ] `Actor.getEquipment`
+- [ ] `Actor.setEquipment`
+- [ ] `Actor.getSelectedSpell`
+- [ ] `Actor.setSelectedSpell`
+- [ ] `Actor.clearSelectedCastable`
+- [ ] `Actor.getSelectedEnchantedItem`
+- [ ] `Actor.setSelectedEnchantedItem`
+- [ ] `Actor.activeEffects`
+- [ ] `ActorActiveEffects.getEffect`
+- [ ] `ActorActiveEffects.remove`
+- [ ] `ActorActiveEffects.set`
+- [ ] `ActorActiveEffects.modify`
+- [ ] `Actor.activeSpells`
+- [ ] `ActorActiveSpells.isSpellActive`
+- [ ] `ActorActiveSpells.remove`
+- [ ] `ActorActiveSpells.add`
+- [ ] `Actor.spells`
+- [ ] `ActorSpells.add`
+- [ ] `ActorSpells.remove`
+- [ ] `ActorSpells.clear`
+- [ ] `ActorSpells.canUsePower`
+- [ ] `DynamicStats.health`
+- [ ] `DynamicStats.magicka`
+- [ ] `DynamicStats.fatigue`
+- [ ] `AIStats.alarm`
+- [ ] `AIStats.fight`
+- [ ] `AIStats.flee`
+- [ ] `AIStats.hello`
+- [ ] `AttributeStats.strength`
+- [ ] `AttributeStats.intelligence`
+- [ ] `AttributeStats.willpower`
+- [ ] `AttributeStats.agility`
+- [ ] `AttributeStats.speed`
+- [ ] `AttributeStats.endurance`
+- [ ] `AttributeStats.personality`
+- [ ] `AttributeStats.luck`
+- [ ] `SkillStats.block`
+- [ ] `SkillStats.armorer`
+- [ ] `SkillStats.mediumarmor`
+- [ ] `SkillStats.heavyarmor`
+- [ ] `SkillStats.bluntweapon`
+- [ ] `SkillStats.longblade`
+- [ ] `SkillStats.axe`
+- [ ] `SkillStats.spear`
+- [ ] `SkillStats.athletics`
+- [ ] `SkillStats.enchant`
+- [ ] `SkillStats.destruction`
+- [ ] `SkillStats.alteration`
+- [ ] `SkillStats.illusion`
+- [ ] `SkillStats.conjuration`
+- [ ] `SkillStats.mysticism`
+- [ ] `SkillStats.restoration`
+- [ ] `SkillStats.alchemy`
+- [ ] `SkillStats.unarmored`
+- [ ] `SkillStats.security`
+- [ ] `SkillStats.sneak`
+- [ ] `SkillStats.acrobatics`
+- [ ] `SkillStats.lightarmor`
+- [ ] `SkillStats.shortblade`
+- [ ] `SkillStats.marksman`
+- [ ] `SkillStats.mercantile`
+- [ ] `SkillStats.speechcraft`
+- [ ] `SkillStats.handtohand`
+- [ ] `ActorStats.level`
+- [ ] `Item.objectIsInstance`
+- [ ] `Item.getEnchantmentCharge`
+- [ ] `Item.isRestocking`
+- [ ] `Item.setEnchantmentCharge`
+- [ ] `Item.isCarriable`
+- [ ] `Item.itemData`
+- [ ] `Creature.createRecordDraft`
+- [ ] `Creature.objectIsInstance`
+- [ ] `Creature.record`
+- [ ] `NPC.createRecordDraft`
+- [ ] `NPC.objectIsInstance`
+- [ ] `NPC.getFactions`
+- [ ] `NPC.getFactionRank`
+- [ ] `NPC.setFactionRank`
+- [ ] `NPC.modifyFactionRank`
+- [ ] `NPC.joinFaction`
+- [ ] `NPC.leaveFaction`
+- [ ] `NPC.getFactionReputation`
+- [ ] `NPC.setFactionReputation`
+- [ ] `NPC.modifyFactionReputation`
+- [ ] `NPC.expel`
+- [ ] `NPC.clearExpelled`
+- [ ] `NPC.isExpelled`
+- [ ] `NPC.getDisposition`
+- [ ] `NPC.getBaseDisposition`
+- [ ] `NPC.setBaseDisposition`
+- [ ] `NPC.modifyBaseDisposition`
+- [ ] `Classes.record`
+- [ ] `NPC.isWerewolf`
+- [ ] `NPC.setWerewolf`
+- [ ] `NPC.record`
+- [ ] `Races.record`
+- [ ] `PLAYER.objectIsInstance`
+- [ ] `PLAYER.getCrimeLevel`
+- [ ] `PLAYER.setCrimeLevel`
+- [ ] `PLAYER.isCharGenFinished`
+- [ ] `PLAYER.isTeleportingEnabled`
+- [ ] `PLAYER.setTeleportingEnabled`
+- [ ] `PLAYER.quests`
+- [ ] `PLAYER.addTopic`
+- [ ] `PLAYER.journal`
+- [ ] `PLAYERQuest.addJournalEntry`
+- [ ] `PLAYER.getControlSwitch`
+- [ ] `PLAYER.setControlSwitch`
+- [ ] `PLAYER.getBirthSign`
+- [ ] `PLAYER.setBirthSign`
+- [ ] `BirthSigns.record`
+- [ ] `PLAYER.sendMenuEvent`
+- [ ] `Armor.objectIsInstance`
+- [ ] `Armor.record`
+- [ ] `Armor.createRecordDraft`
+- [ ] `BodyPart.objectIsInstance`
+- [ ] `Book.objectIsInstance`
+- [ ] `Book.record`
+- [ ] `Book.createRecordDraft`
+- [ ] `Clothing.objectIsInstance`
+- [ ] `Clothing.record`
+- [ ] `Clothing.createRecordDraft`
+- [ ] `Ingredient.createRecordDraft`
+- [ ] `Ingredient.objectIsInstance`
+- [ ] `Ingredient.record`
+- [ ] `LOCKABLE.objectIsInstance`
+- [ ] `LOCKABLE.getKeyRecord`
+- [ ] `LOCKABLE.setKeyRecord`
+- [ ] `LOCKABLE.getTrapSpell`
+- [ ] `LOCKABLE.setTrapSpell`
+- [ ] `LOCKABLE.getLockLevel`
+- [ ] `LOCKABLE.isLocked`
+- [ ] `LOCKABLE.lock`
+- [ ] `LOCKABLE.unlock`
+- [ ] `Light.objectIsInstance`
+- [ ] `Light.createRecordDraft`
+- [ ] `Light.record`
+- [ ] `Miscellaneous.objectIsInstance`
+- [ ] `Miscellaneous.record`
+- [ ] `Miscellaneous.getSoul`
+- [ ] `Miscellaneous.createRecordDraft`
+- [ ] `Miscellaneous.setSoul`
+- [ ] `Potion.objectIsInstance`
+- [ ] `Potion.record`
+- [ ] `Potion.createRecordDraft`
+- [ ] `Weapon.objectIsInstance`
+- [ ] `Weapon.record`
+- [ ] `Weapon.createRecordDraft`
+- [ ] `Apparatus.objectIsInstance`
+- [ ] `Apparatus.record`
+- [ ] `Lockpick.objectIsInstance`
+- [ ] `Lockpick.record`
+- [ ] `Probe.createRecordDraft`
+- [ ] `Probe.objectIsInstance`
+- [ ] `Probe.record`
+- [ ] `Repair.objectIsInstance`
+- [ ] `Repair.record`
+- [ ] `Activator.objectIsInstance`
+- [ ] `Activator.record`
+- [ ] `Activator.createRecordDraft`
+- [ ] `Container.content`
+- [ ] `Container.createRecordDraft`
+- [ ] `Container.inventory`
+- [ ] `Container.objectIsInstance`
+- [ ] `Container.getEncumbrance`
+- [ ] `Container.getCapacity`
+- [ ] `Container.record`
+- [ ] `Door.createRecordDraft`
+- [ ] `Door.objectIsInstance`
+- [ ] `Door.isTeleport`
+- [ ] `Door.destPosition`
+- [ ] `Door.destRotation`
+- [ ] `Door.destCell`
+- [ ] `Door.record`
+- [ ] `Door.getDoorState`
+- [ ] `Door.isOpen`
+- [ ] `Door.isClosed`
+- [ ] `Door.activateDoor`
+- [ ] `Static.createRecordDraft`
+- [ ] `Static.objectIsInstance`
+- [ ] `Static.record`
+- [ ] `CreatureLevelledList.objectIsInstance`
+- [ ] `CreatureLevelledList.record`
+- [ ] `CreatureLevelledListRecord.getRandomId`
+- [ ] `ESM4Terminal.objectIsInstance`
+- [ ] `ESM4Terminal.record`
+- [ ] `ESM4Door.objectIsInstance`
+- [ ] `ESM4Door.isTeleport`
+- [ ] `ESM4Door.destPosition`
+- [ ] `ESM4Door.destRotation`
+- [ ] `ESM4Door.destCell`
+- [ ] `ESM4Door.record`
+
+Types: `Activator`, `ActivatorRecord`, `Actor`, `ActorActiveEffects`, `ActorActiveSpells`, `ActorSpells`, `ActorStats`, `AIStat`, `AIStats`, `Apparatus`, `ApparatusRecord`, `ApparatusTYPE`, `Armor`, `ArmorRecord`, `ArmorTYPE`, `AttributeStat`, `AttributeStats`, `BirthSignRecord`, `BodyPart`, `BodyPartRecord`, `Book`, `BookRecord`, `BookSKILL`, `ClassRecord`, `Clothing`, `ClothingRecord`, `ClothingTYPE`, `Container`, `ContainerRecord`, `CONTROL_SWITCH`, `ControlSwitch`, `Creature`, `CreatureAttack`, `CreatureLevelledList`, `CreatureLevelledListRecord`, `CreatureRecord`, `CreatureTYPE`, `Door`, `DoorRecord`, `DoorSTATE`, `DynamicStat`, `DynamicStats`, `EQUIPMENT_SLOT`, `EquipmentTable`, `ESM4Door`, `ESM4DoorRecord`, `ESM4Terminal`, `ESM4TerminalRecord`, `GenderedNumber`, `Ingredient`, `IngredientRecord`, `Item`, `ItemData`, `LevelledListItem`, `LevelStat`, `Light`, `LightRecord`, `Lockpick`, `LockpickRecord`, `Miscellaneous`, `MiscellaneousRecord`, `NPC`, `NpcRecord`, `NpcStats`, `OFFENSE_TYPE_IDS`, `PLAYER`, `PlayerJournalTextEntry`, `PlayerJournalTopic`, `PlayerJournalTopicEntry`, `PLAYERQuest`, `Potion`, `PotionRecord`, `Probe`, `ProbeRecord`, `RaceRecord`, `Repair`, `RepairRecord`, `ReputationStat`, `SkillIncreasesForAttributeStats`, `SkillIncreasesForSpecializationStats`, `SkillStat`, `SkillStats`, `STANCE`, `Static`, `StaticRecord`, `TravelDestination`, `Weapon`, `WeaponRecord`, `WeaponTYPE`.
+
+### `openmw.ui`
+
+- [ ] `ui.showMessage`
+- [ ] `ui.printToConsole`
+- [ ] `ui.setConsoleMode`
+- [ ] `ui.setConsoleSelectedObject`
+- [ ] `ui.screenSize`
+- [ ] `ui.content`
+- [ ] `ui.create`
+- [ ] `ui.registerSettingsPage`
+- [ ] `ui.removeSettingsPage`
+- [ ] `ui.updateAll`
+- [ ] `Layers.indexOf`
+- [ ] `Layers.insertAfter`
+- [ ] `Layers.insertBefore`
+- [ ] `Content.__index`
+- [ ] `Content.insert`
+- [ ] `Content.add`
+- [ ] `Content.indexOf`
+- [ ] `Element.update`
+- [ ] `Element.destroy`
+- [ ] `ui.texture`
+
+Types: `ALIGNMENT`, `CONSOLE_COLOR`, `Content`, `Element`, `Layer`, `Layers`, `Layout`, `MouseEvent`, `SettingsPageOptions`, `Template`, `TextureResource`, `TextureResourceOptions`, `TYPE`.
+
+### `openmw.util`
+
+- [ ] `util.round`
+- [ ] `util.remap`
+- [ ] `util.clamp`
+- [ ] `util.normalizeAngle`
+- [ ] `util.makeReadOnly`
+- [ ] `util.makeStrictReadOnly`
+- [ ] `util.loadCode`
+- [ ] `util.bitAnd`
+- [ ] `util.bitOr`
+- [ ] `util.bitXor`
+- [ ] `util.bitNot`
+- [ ] `util.vector2`
+- [ ] `Vector2.__add`
+- [ ] `Vector2.__sub`
+- [ ] `Vector2.__mul`
+- [ ] `Vector2.__div`
+- [ ] `Vector2.length`
+- [ ] `Vector2.length2`
+- [ ] `Vector2.normalize`
+- [ ] `Vector2.rotate`
+- [ ] `Vector2.dot`
+- [ ] `Vector2.emul`
+- [ ] `Vector2.ediv`
+- [ ] `util.vector3`
+- [ ] `Vector3.__add`
+- [ ] `Vector3.__sub`
+- [ ] `Vector3.__mul`
+- [ ] `Vector3.__div`
+- [ ] `Vector3.__tostring`
+- [ ] `Vector3.length`
+- [ ] `Vector3.length2`
+- [ ] `Vector3.normalize`
+- [ ] `Vector3.dot`
+- [ ] `Vector3.cross`
+- [ ] `Vector3.emul`
+- [ ] `Vector3.ediv`
+- [ ] `util.vector4`
+- [ ] `Vector4.__add`
+- [ ] `Vector4.__sub`
+- [ ] `Vector4.__mul`
+- [ ] `Vector4.__div`
+- [ ] `Vector4.__tostring`
+- [ ] `Vector4.length`
+- [ ] `Vector4.length2`
+- [ ] `Vector4.normalize`
+- [ ] `Vector4.dot`
+- [ ] `Vector4.emul`
+- [ ] `Vector4.ediv`
+- [ ] `util.box` overloads
+- [ ] `Color.asRgba`
+- [ ] `Color.asRgb`
+- [ ] `Color.asHex`
+- [ ] `COLOR.rgba`
+- [ ] `COLOR.commaString`
+- [ ] `COLOR.rgb`
+- [ ] `COLOR.hex`
+- [ ] `Transform.__mul`
+- [ ] `Transform.inverse`
+- [ ] `Transform.apply`
+- [ ] `Transform.getYaw`
+- [ ] `Transform.getPitch`
+- [ ] `Transform.getAnglesXZ`
+- [ ] `Transform.getAnglesZYX`
+- [ ] `TRANSFORM.move`
+- [ ] `TRANSFORM.scale`
+- [ ] `TRANSFORM.rotate`
+- [ ] `TRANSFORM.rotateX`
+- [ ] `TRANSFORM.rotateY`
+- [ ] `TRANSFORM.rotateZ`
+
+Types: `Box`, `COLOR`, `Transform`, `Vector2`, `Vector3`, `Vector4`.
+
+### `openmw.vfs`
+
+- [ ] `FileHandle.close`
+- [ ] `FileHandle.lines`
+- [ ] `FileHandle.seek`
+- [ ] `FileHandle.read`
+- [ ] `vfs.fileExists`
+- [ ] `vfs.open`
+- [ ] `vfs.lines`
+- [ ] `vfs.pathsWithPrefix`
+- [ ] `vfs.type`
+
+Types: `FileHandle`.
+
+### `openmw.world`
+
+- [ ] `MWScriptFunctions.getLocalScript`
+- [ ] `MWScriptFunctions.getGlobalVariables`
+- [ ] `MWScriptFunctions.getGlobalScript`
+- [ ] `world.getCellByName`
+- [ ] `world.getCellById`
+- [ ] `world.getExteriorCell`
+- [ ] `world.getSimulationTime`
+- [ ] `world.getSimulationTimeScale`
+- [ ] `world.setSimulationTimeScale`
+- [ ] `world.getGameTime`
+- [ ] `world.getGameTimeScale`
+- [ ] `world.setGameTimeScale`
+- [ ] `world.isWorldPaused`
+- [ ] `world.pause`
+- [ ] `world.unpause`
+- [ ] `world.getPausedTags`
+- [ ] `world.getObjectByFormId`
+- [ ] `world.createObject`
+- [ ] `world.createRecord`
+- [ ] `VFX.spawn`
+- [ ] `VFX.remove`
+- [ ] `world.advanceTime`
+
+Types: `MWScript`, `MWScriptFunctions`, `MWScriptVariables`.
+
+### Package/type completion checklist
+
+This checklist covers non-callable package fields, constants, enum values, record collections, type properties, mutability, and index behavior. The source contains approximately 1,512 documented field declarations; listing each field separately here would make the project plan unusable. Agents implement and test those fields as part of the owning type, and check the type only after all Morrowind-relevant documented fields are implemented or explicitly classified.
+
+- [ ] `openmw.ambient` package fields and constants
+- [ ] `openmw.animation`: `BlendMask`, `BoneGroup`, `Priority`
+- [ ] `openmw.async` package fields and constants
+- [ ] `openmw.camera`: `MODE`
+- [ ] `openmw.content` package fields and constants
+- [ ] `openmw.core` types and fields listed above
+- [ ] `openmw.debug`: `NAV_MESH_RENDER_MODE`, `RENDER_MODE`
+- [ ] `openmw.input` types and fields listed above
+- [ ] `openmw.interfaces` lookup and read-only behavior
+- [ ] `openmw.markup` package fields and constants
+- [ ] `openmw.menu`: `SaveInfo`, `STATE`
+- [ ] `openmw.nearby` types and fields listed above
+- [ ] `openmw.postprocessing`: `Shader`
+- [ ] `openmw.self`: `ActorControls`, `ATTACK_TYPE`, contextual `self`
+- [ ] `openmw.storage`: `LifeTime`, `StorageSection`
+- [ ] `openmw.types` types and fields listed above
+- [ ] `openmw.ui` types and fields listed above
+- [ ] `openmw.util`: `Box`, `COLOR`, `Transform`, `Vector2`, `Vector3`, `Vector4`
+- [ ] `openmw.vfs`: `FileHandle`
+- [ ] `openmw.world`: `MWScript`, `MWScriptFunctions`, `MWScriptVariables`
+
+### Built-in interface tracking
+
+These are not all part of the native `openmw.*` package surface, but third-party mods commonly obtain them through `openmw.interfaces`. Implement only the portions justified by the compatibility corpus, with absence preserved for optional third-party interfaces.
+
+- [ ] `Activation`
+- [ ] `AI`
+- [ ] `AnimationController`
+- [ ] `Camera`
+- [ ] `Combat`
+- [ ] `Constants`
+- [ ] `Controls`
+- [ ] `MWUI`
+- [ ] `Settings`
+- [ ] `SkillProgression`
+- [ ] `StatsWindow`
+- [ ] `Templates`
+- [ ] `TooltipBuilders`
+- [ ] NCG helper methods `addLineToSection`, `getLine`, and `modifyLine`
+
+Optional external interfaces observed in NCG and expected to remain absent unless their providing mods are loaded:
+
+- `MarksmansEye`
+- `SkillFramework`
+
+## Open questions requiring harness evidence
+
+1. Can native `GameFile` loading accept an `.omwaddon` filename directly once it is present in the active-file list, or is a cached `.esp` alias required?
+2. Which loader paths assume a four-character extension or explicit master/plugin suffix?
+3. What stable identity is sufficient for dynamic and inventory references across a full save/restart/load cycle?
+4. Is reference Lua data large and early enough for all compatibility state, or should a dedicated save record be introduced?
+5. At what lifecycle point can menu scripts safely initialize without delaying normal MWSE startup?
+6. Which NCG UI elements can map directly to `tes3ui`, and which require a small retained/declarative compatibility layer?
+7. Which OpenMW API revision should be the first declared baseline? NCG requires at least revision 70.
+8. Can LuaJIT be packaged inside the support DLL without dependency or allocator conflicts in the 32-bit process?
+
+Resolve these questions with recorded harness probes. Do not settle them by assumption alone.
