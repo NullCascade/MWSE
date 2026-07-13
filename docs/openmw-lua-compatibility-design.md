@@ -186,13 +186,13 @@ Goal: agents can build, launch, command, observe, and terminate Morrowind withou
 
 ### M1.1 Harness protocol
 
-- [ ] Define a versioned JSON request/response protocol.
-- [ ] Assign each run and request a unique ID.
-- [ ] Define `ready`, `heartbeat`, `response`, `assertion`, `log`, `fatal`, and `shutdown` messages.
-- [ ] Use append-only JSON Lines for process output so partial writes are detectable.
-- [ ] Write commands atomically through a temporary file followed by rename.
-- [ ] Include game state in relevant messages: main menu, loading, in game, paused, current cell, player validity.
-- [ ] Bound every request with a timeout and return a diagnostic snapshot on timeout.
+- [x] Define a versioned JSON request/response protocol.
+- [x] Assign each run and request a unique ID.
+- [x] Define `ready`, `heartbeat`, `response`, `assertion`, `log`, `fatal`, and `shutdown` messages.
+- [x] Use append-only JSON Lines for process output so partial writes are detectable.
+- [x] Write commands atomically through a temporary file followed by rename.
+- [x] Include game state in relevant messages: main menu, loading, in game, paused, current cell, player validity.
+- [x] Bound every request with a timeout and return a diagnostic snapshot on timeout.
 
 Proposed runtime directory:
 
@@ -207,35 +207,35 @@ Data Files\MWSE\tmp\openmw-compat-harness\
 
 ### M1.2 MWSE Lua harness mod
 
-- [ ] Add a packaged MWSE Lua test mod at `misc\package\Data Files\MWSE\mods\openmw_compat_harness\main.lua` dedicated to external automation.
-- [ ] Poll for commands without blocking the simulation thread.
-- [ ] Implement `ping`, `getState`, `evalNamedProbe`, `loadGame`, `newGame`, `teleport`, `waitForEvent`, `screenshot`, and `shutdown` commands.
-- [ ] Implement named probes rather than unrestricted Lua evaluation for normal tests.
-- [ ] Catch errors and return traceback, current game state, and recent MWSE log lines.
-- [ ] Emit heartbeat messages while Morrowind remains responsive.
-- [ ] Disable the harness by default outside explicit test launches.
+- [x] Add a packaged MWSE Lua test mod at `misc\package\Data Files\MWSE\mods\openmw_compat_harness\main.lua` dedicated to external automation.
+- [x] Poll for commands without blocking the simulation thread.
+- [x] Implement `ping`, `getState`, `evalNamedProbe`, `loadGame`, `newGame`, `teleport`, `waitForEvent`, `screenshot`, and `shutdown` commands.
+- [x] Implement named probes rather than unrestricted Lua evaluation for normal tests.
+- [x] Catch errors and return traceback, current game state, and recent MWSE log lines.
+- [x] Emit heartbeat messages while Morrowind remains responsive.
+- [x] Disable the harness by default outside explicit test launches.
 
 ### M1.3 Command-line launcher
 
-- [ ] Add a repository PowerShell launcher under `tools/openmw-compat/`.
-- [ ] Locate MSBuild with `vswhere` and build the requested x86 configuration.
-- [ ] Stage only the required build outputs and harness files.
-- [ ] Create a fresh run directory and configuration.
-- [ ] Launch `Morrowind.exe` with the Morrowind directory as its working directory.
-- [ ] Wait for the ready handshake and fail clearly if MWSE or the harness did not initialize.
-- [ ] Send a selected test suite and stream structured results.
-- [ ] Request graceful shutdown, then report process exit code and retained artifacts.
-- [ ] Never edit the user's normal load order permanently; back up and restore any temporary configuration.
+- [x] Add a repository PowerShell launcher under `tools/openmw-compat/`.
+- [x] Locate MSBuild with `vswhere` and build the requested x86 configuration.
+- [x] Stage only the required build outputs and harness files.
+- [x] Create a fresh run directory and configuration.
+- [x] Launch `Morrowind.exe` with the Morrowind directory as its working directory.
+- [x] Wait for the ready handshake and fail clearly if MWSE or the harness did not initialize.
+- [x] Send a selected test suite and stream structured results.
+- [x] Request graceful shutdown, then report process exit code and retained artifacts.
+- [x] Never edit the user's normal load order permanently; back up and restore any temporary configuration.
 
 ### M1.4 Harness smoke suite
 
-- [ ] Verify MWSE initialization.
-- [ ] Verify main-menu detection.
-- [ ] Start or load a deterministic game fixture.
-- [ ] Verify player and current-cell access.
-- [ ] Trigger and observe one native event.
-- [ ] Write and read one reference-persistent value across save/load.
-- [ ] Shut down without leaving Morrowind running.
+- [x] Verify MWSE initialization.
+- [x] Verify main-menu detection.
+- [x] Start or load a deterministic game fixture.
+- [x] Verify player and current-cell access.
+- [x] Trigger and observe one native event.
+- [x] Write and read one reference-persistent value across save/load.
+- [x] Shut down without leaving Morrowind running.
 
 Milestone gate:
 
@@ -243,6 +243,20 @@ Milestone gate:
 One command builds MWSE, launches Morrowind, reaches a known game state,
 executes named probes, captures structured logs, and exits with a machine-readable result.
 ```
+
+### Milestone 1 implementation record
+
+Milestone 1 passed on 2026-07-12 with protocol version 1 and run ID `20260713T020725Z-df8fb192c8f540bbbeb03a35abe724d2`. The retained `result.json` reports `passed: true`, process exit code 0, seven passing launcher assertions, and ten passing in-game assertions. The run used `C:\Games\Morrowind`, x86 Debug, and the configurable `TestMWSE0000.ess` fixture.
+
+Implementation decisions and observed limitations:
+
+- Runtime files live in a unique child of `Data Files\MWSE\tmp\openmw-compat-harness`; the parent is stable while every run remains append-only and independently inspectable.
+- MWSE discovers the staged `mods\openmw_compat_harness\main.lua` without an INI or load-order edit. A temporary config containing `enabled = true` and the run identity is the only enable switch. The launcher restores all staged files in `finally` and moves its generated save out of the normal `Saves` directory.
+- `tes3.loadGame` does not consistently return its documented boolean in this build. The version-1 protocol treats the native `loaded` event as authoritative completion evidence.
+- `paused` reports native Morrowind menu mode. It is a stable automation signal, but it does not distinguish every engine-level simulation pause reason.
+- MGE can own the top-level window, making `tes3.game.windowHandle` unsuitable for `WM_CLOSE`. Lua flushes the response and shutdown record first; the launcher then calls `CloseMainWindow` on the exact process it started. The verified process exit code was 0.
+- Screenshot capture is implemented as a bounded MGE request. On D3D8/MGE configurations where framebuffer capture does not materialize a file, the command returns `screenshot_timeout` with a diagnostic instead of claiming success. Screenshot capture is not part of the Milestone 1 smoke gate.
+- The harness intentionally leaves ordinary Lua mods enabled because changing the user's load order would violate isolation. Errors from unrelated installed mods can therefore appear in retained `MWSE.log`; harness assertions and protocol failures remain independently structured.
 
 ## Milestone 2: `.omwaddon` loading
 
