@@ -119,6 +119,9 @@ namespace se::cs {
 		void setToLoadFlag(bool state);
 
 		int sortAgainst(const GameFile* other) const;
+
+		bool getOpenMWAddonSourceName(std::string& sourceName) const;
+		bool isOpenMWAddonAlias() const;
 	};
 	static_assert(sizeof(GameFile) == 0x4F4, "GameFile failed size validation");
 }

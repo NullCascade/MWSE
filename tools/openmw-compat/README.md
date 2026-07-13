@@ -52,4 +52,29 @@ For a normal user session, copy `openmw-addon-loader.example.json` to `Data File
 
 Explicit `-AddonPath` values override the config list. The wrapper waits for the game to exit and restores the original INI and any pre-existing alias files. Prepared aliases and machine-readable reports remain under `Data Files\MWSE\tmp\openmw-addon-cache`; session results remain under `Data Files\MWSE\tmp\openmw-addon-sessions`.
 
+For Construction Set editing, use the equivalent session wrapper:
+
+```powershell
+.\tools\openmw-compat\Start-ConstructionSetWithOpenMWAddons.ps1 `
+    -MorrowindDirectory 'C:\Games\Morrowind' `
+    -AddonPath 'C:\Games\Morrowind\Data Files\ncg.omwaddon'
+```
+
+CSSE displays the prepared identity-preserving alias as the original `.omwaddon` filename. Addon inputs are read-only: they cannot be set active, their author/summary fields are disabled, and attempted activation explains that edits must be saved to an ESP to avoid losing OpenMW-specific data. The wrapper restores every staged alias after the Construction Set exits.
+
+The CSSE-specific offline and native-loader gates are:
+
+```powershell
+.\tools\openmw-compat\tests\Test-CSSEOpenMWAddon.ps1 `
+    -FixturePath 'C:\Games\Morrowind\Data Files\ncg.omwaddon' `
+    -CSSEDllPath 'build\Debug\CSSE.dll'
+
+.\tools\openmw-compat\Invoke-CSSEAddonHarness.ps1 `
+    -MorrowindDirectory 'C:\Games\Morrowind' `
+    -FixturePath 'C:\Games\Morrowind\Data Files\ncg.omwaddon' `
+    -CSSEDllPath 'build\Debug\CSSE.dll'
+```
+
+The native gate uses CSSE QuickStart in an isolated, test-only session. It launches the Construction Set hidden, proves the alias and masters reached the native active-file list, exits from the test hook, and restores `CSSE.dll`, `CSSE.pdb`, `csse.toml`, and the temporary alias byte-for-byte.
+
 To extend the harness, add a narrowly named function to `probes` in `misc\package\Data Files\MWSE\mods\openmw_compat_harness\main.lua`, emit at least one `assertion`, then call it through `evalNamedProbe`. Add orchestration to the launcher or a future suite file. Do not add unrestricted evaluation: probe names and event names are explicit allowlists. See [protocol.md](protocol.md) for envelope and timeout rules.

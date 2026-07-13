@@ -6,6 +6,7 @@
 #include "StringUtil.h"
 
 #include "CSPhysicalObject.h"
+#include "CSGameFile.h"
 
 namespace se::cs {
 	size_t RecordHandler::getCellCount() const {
@@ -117,5 +118,40 @@ namespace se::cs {
 	BaseObject* RecordHandler::getObjectByID(const char* id) const {
 		const auto RecordHandler_getObjectByID = reinterpret_cast<BaseObject*(__thiscall*)(const RecordHandler*, const char*)>(0x4015D7);
 		return RecordHandler_getObjectByID(this, id);
+	}
+
+	std::optional<bool> RecordHandler::writeOpenMWAddonTestResult() const {
+		char resultPath[MAX_PATH * 4] = {};
+		if (GetEnvironmentVariableA("MWSE_CSSE_OPENMW_ADDON_TEST_RESULT", resultPath, sizeof(resultPath)) == 0) {
+			return {};
+		}
+
+		std::vector<std::string> activeFiles;
+		std::string addonSource;
+		for (auto i = 0; i < activeModCount; ++i) {
+			const auto gameFile = activeGameFiles[i];
+			if (gameFile == nullptr) {
+				continue;
+			}
+			activeFiles.emplace_back(gameFile->fileName);
+			gameFile->getOpenMWAddonSourceName(addonSource);
+		}
+
+		const auto passed = !addonSource.empty();
+		std::ofstream output(resultPath, std::ios::binary | std::ios::trunc);
+		if (!output) {
+			return false;
+		}
+		output << "{\"schemaVersion\":1,\"passed\":" << (passed ? "true" : "false")
+			<< ",\"addonSource\":\"" << addonSource << "\",\"activeFiles\":[";
+		for (auto i = 0u; i < activeFiles.size(); ++i) {
+			if (i > 0) {
+				output << ',';
+			}
+			output << "\"" << activeFiles[i] << "\"";
+		}
+		output << "]}";
+		output.flush();
+		return output.good() && passed;
 	}
 }

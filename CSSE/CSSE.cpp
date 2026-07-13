@@ -20,6 +20,7 @@
 
 #include "DialogActorAIWindow.h"
 #include "DialogCellWindow.h"
+#include "DialogDataFilesWindow.h"
 #include "DialogLayersWindow.h"
 #include "DialogDialogueWindow.h"
 #include "DialogEditObjectWindow.h"
@@ -509,6 +510,9 @@ namespace se::cs {
 		const auto CS_RecordHandler_LoadFiles = reinterpret_cast<void(__thiscall*)(RecordHandler*)>(0x501500);
 		void __fastcall PatchOnLoadFiles(RecordHandler* recordHandler) {
 			CS_RecordHandler_LoadFiles(recordHandler);
+			if (const auto testResult = recordHandler->writeOpenMWAddonTestResult()) {
+				ExitProcess(testResult.value() ? 0 : 1);
+			}
 			metadata::reloadModMetadata();
 			se::cs::dialog::layer_window::loadOrCreateLayers();
 		}
@@ -743,6 +747,7 @@ namespace se::cs {
 		window::main::installPatches();
 		dialog::actor_ai_window::installPatches();
 		dialog::cell_window::installPatches();
+		dialog::data_files_window::installPatches();
 		dialog::dialogue_window::installPatches();
 		dialog::edit_object_window::installPatches();
 		dialog::landscape_edit_settings_window::installPatches();

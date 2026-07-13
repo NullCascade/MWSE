@@ -1,9 +1,22 @@
 #pragma once
 
+#include "CSDefines.h"
+
 namespace se::cs::dialog::data_files_window {
 	struct DataFilesData {
-
+		int result;
+		RecordHandler* recordHandler;
+		GameFile* selectedFile;
+		void* listController;
+		char selectedPath[MAX_PATH];
+		int metadataChanged;
+		GameFile* currentActiveFile;
+		GameFile* originalActiveFile;
+		BYTE mergeCompleted;
+		BYTE canMerge;
+		BYTE padding[2];
 	};
+	static_assert(sizeof(DataFilesData) == 0x124, "DataFilesData failed size validation");
 
 	constexpr UINT DIALOG_ID = 162;
 

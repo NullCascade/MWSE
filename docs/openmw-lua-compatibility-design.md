@@ -322,13 +322,26 @@ Evidence-backed decisions and limitations:
 
 ### M2.5 Construction Set follow-up
 
-- [ ] Reuse the inspector and transformation policy in CSSE.
-- [ ] Display `.omwaddon` files in the Data Files dialog.
-- [ ] Initially treat addon inputs as read-only and save edits to an ESP.
-- [ ] Warn before operations that would discard unsupported OpenMW records.
-- [ ] Add a CSSE-specific headless or harness-assisted loading test.
+- [x] Reuse the inspector and transformation policy in CSSE.
+- [x] Display `.omwaddon` files in the Data Files dialog.
+- [x] Initially treat addon inputs as read-only and save edits to an ESP.
+- [x] Warn before operations that would discard unsupported OpenMW records.
+- [x] Add a CSSE-specific headless or harness-assisted loading test.
 
 This follow-up is not a dependency for the OpenMW Lua runtime.
+
+### Milestone 2.5 implementation record
+
+Milestone 2.5 passed on 2026-07-12 under native Construction Set harness run ID `20260713T024258Z-068fa508c174427d8730bc181cbc7d24`. The machine-readable result reports `passed: true`, process exit code 0, and native active files `Morrowind.esm`, `Bloodmoon.esm`, `Tribunal.esm`, and `ncg.omwaddon-c67a7850d2c89833.esp`. CSSE recovered the original source identity as `ncg.omwaddon`. The harness restored the pre-existing `csse.toml` and `CSSE.dll` to their exact SHA-256 hashes and left zero temporary aliases.
+
+Implementation decisions and evidence:
+
+- CSSE sessions reuse `OpenMWAddon.psm1` for the same bounded inspection, dependency resolution, format-1 transformation, rejection policy, cache identity, and compatibility report used by the Morrowind harness. `Start-ConstructionSetWithOpenMWAddons.ps1` stages only accepted native aliases for the editor session and restores them on exit.
+- The Data Files dialog hook recognizes the identity-preserving `<source>.omwaddon-<hash>.esp` cache name and displays the exact original `.omwaddon` source name. Ordinary ESM/ESP rows remain unchanged.
+- An addon row cannot be set active or merged to masters, and its author and summary fields are disabled. Attempted activation explains that the input is read-only, writing back could discard OpenMW-specific data, and edits must use an ESP.
+- The test-only native hook is enabled only through `MWSE_CSSE_OPENMW_ADDON_TEST_RESULT`. After the normal Construction Set loader finishes, it records the active native files and source identity, then exits. It is inert in ordinary sessions.
+- Offline CSSE run `20260713T023804Z-29c05edb500841228786aa97fb236732` additionally verified the NCG inventory (three masters, eight GMST, twenty-seven SKIL), unchanged source/native hashes for format 0, exact display identity, read-only policy, compiled dialog warning, and built Debug CSSE DLL.
+- The final targeted x86 Debug CSSE build completed with zero warnings and zero errors using post-build deployment disabled. No OpenMW Lua runtime work was started.
 
 ## Milestone 3: OpenMW Lua DLL and host skeleton
 

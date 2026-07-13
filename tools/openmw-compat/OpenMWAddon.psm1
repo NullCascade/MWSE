@@ -403,9 +403,19 @@ function New-OpenMWAddonNativeFile {
         masters = $Inspection.masters; recordCounts = $Inspection.recordCounts
         openMWOnlyRecords = $Inspection.openMWOnlyRecords; unknownRecords = $Inspection.unknownRecords
         transformations = @($transformations); ignoredFeatures = @(); nativeInspection = $nativeInspection
+        csse = [ordered]@{ displayFilename = $Inspection.source.filename; readOnly = $true; saveEditsAs = '.esp' }
     }
     [IO.File]::WriteAllText($reportPath, ($report | ConvertTo-Json -Depth 30), [Text.UTF8Encoding]::new($false))
     return [pscustomobject][ordered]@{ aliasName = $aliasName; nativePath = $nativePath; reportPath = $reportPath; cacheKey = $cacheKey; report = [pscustomobject]$report }
 }
 
-Export-ModuleMember -Function Read-OpenMWAddonContent, Resolve-OpenMWAddonDependencies, Get-OpenMWAddonDiscovery, New-OpenMWAddonNativeFile
+function Get-OpenMWAddonAliasSourceName {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$AliasName)
+
+    $match = [regex]::Match($AliasName, '^(?<source>.+\.omwaddon)-[0-9a-f]{16}\.esp$', [Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    if (-not $match.Success) { return $null }
+    return $match.Groups['source'].Value
+}
+
+Export-ModuleMember -Function Read-OpenMWAddonContent, Resolve-OpenMWAddonDependencies, Get-OpenMWAddonDiscovery, New-OpenMWAddonNativeFile, Get-OpenMWAddonAliasSourceName
