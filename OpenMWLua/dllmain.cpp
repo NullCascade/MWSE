@@ -44,7 +44,9 @@ extern "C" __declspec(dllexport) Status __cdecl OpenMWLua_QueryApi(
 		BridgeVersion,
 		OpenMWApiRevision,
 		CapabilityIsolatedLuaState | CapabilitySandboxedSourceModules | CapabilityMenuContainer
-			| CapabilityGlobalContainer | CapabilityPlayerContainer | CapabilityDelayedEvents | CapabilityReload,
+			| CapabilityGlobalContainer | CapabilityPlayerContainer | CapabilityDelayedEvents | CapabilityReload
+			| CapabilityFoundationUtil | CapabilityFoundationInterfaces | CapabilityFoundationAsync
+			| CapabilityFoundationStorage | CapabilityFoundationCore | CapabilityFoundationSelf,
 		{ RuntimeVersion, sizeof(RuntimeVersion) - 1 },
 		&initializeHost,
 		&shutdownHost,

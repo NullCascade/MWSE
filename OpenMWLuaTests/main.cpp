@@ -1,6 +1,7 @@
 #include "../SharedSE/OpenMWLuaBridge.h"
 
 #include <algorithm>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -27,6 +28,17 @@ namespace {
 	}
 
 	void __cdecl logCallback(void*, const LogMessage*) {}
+	Status __cdecl gameSettingCallback(void*, StringView name, BridgeValue* value) {
+		if(value==nullptr||value->structureSize!=sizeof(BridgeValue)||value->abiVersion!=BridgeAbiVersion)return Status::InvalidArgument;
+		const std::string key(name.data,name.size);value->string={};value->number=0.0;
+		if(key=="sHealth"){static constexpr char Health[]="Health";value->type=ValueType::String;value->string={Health,sizeof(Health)-1};}
+		else if(key=="iLevelupMajorMult"){value->type=ValueType::Number;value->number=0.0;}else value->type=ValueType::None;
+		return Status::Ok;
+	}
+	std::uint32_t __cdecl contentFileCountCallback(void*) { return 2; }
+	Status __cdecl contentFileCallback(void*, std::uint32_t index, StringView* value) {
+		static constexpr char Files[][16]={"Morrowind.esm","ncg.omwaddon"};if(value==nullptr||index>=2)return Status::InvalidArgument;*value={Files[index],static_cast<std::uint32_t>(std::strlen(Files[index]))};return Status::Ok;
+	}
 
 	StringView view(const std::string& value) {
 		return { value.data(), static_cast<std::uint32_t>(value.size()) };
@@ -41,7 +53,8 @@ namespace {
 		config.structureSize = sizeof(config);
 		config.abiVersion = BridgeAbiVersion;
 		config.flags = flags;
-		config.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, &logCallback, nullptr };
+		config.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, &logCallback, nullptr,
+			&gameSettingCallback, &contentFileCountCallback, &contentFileCallback, nullptr };
 		config.vfsRoot = view(rootString);
 		config.scriptsFile = view(scripts);
 		config.contentFile = view(content);
@@ -86,7 +99,7 @@ int main(int argc, char** argv) {
 		InitializationConfig missingCallbacks{};
 		missingCallbacks.structureSize = sizeof(missingCallbacks);
 		missingCallbacks.abiVersion = BridgeAbiVersion;
-		missingCallbacks.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, nullptr, nullptr };
+		missingCallbacks.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 		require(api.initialize(&missingCallbacks) == Status::MissingCallback, "missing-callback-rejected");
 
 		temporary = std::filesystem::temp_directory_path() / ("openmw-lua-tests-" + std::to_string(GetCurrentProcessId()));
@@ -121,7 +134,7 @@ return { interfaceName='PlayerInterface', interface={},
 		auto config = configFor(temporary, scripts, content, InitializationEnabled | InitializationHarnessMode, temporary / "reports");
 		require(api.initialize(&config) == Status::Ok, "runtime-initialize");
 		require(api.getLifecycleState() == LifecycleState::Running, "runtime-running");
-		FrameUpdate frame{ sizeof(FrameUpdate), BridgeAbiVersion, 1, 0.016, 1.0, 0.0, 0, 0 };
+		FrameUpdate frame{ sizeof(FrameUpdate), BridgeAbiVersion, 1, 0.016, 1.0, 1.0, 1.0, 30.0, 0, 0 };
 		require(api.update(&frame) == Status::Ok, "first-frame-update");
 		frame.frameNumber = 2;
 		require(api.update(&frame) == Status::Ok, "second-frame-update");
@@ -151,6 +164,83 @@ return { interfaceName='PlayerInterface', interface={},
 		require(reloadReport.find("\"reloadCount\":1") != std::string::npos
 			&& reloadReport.find("\"runtimeGeneration\":2") != std::string::npos, "reload-recreated-runtime");
 		require(api.shutdown() == Status::Ok && api.getLifecycleState() == LifecycleState::Stopped, "clean-shutdown");
+
+		writeFile(temporary / "foundation_provider.lua", R"(
+local async=require('openmw.async')
+local compat=require('openmw.compatibility')
+local core=require('openmw.core')
+local storage=require('openmw.storage')
+local section=storage.globalSection('FoundationGlobal')
+local original={value=1}
+section:set('copy',original)
+original.value=99
+assert(section:getCopy('copy').value==1)
+section:subscribe(async:callback(function(name,key) compat.recordFoundationProbe('storage-global-subscription',name=='FoundationGlobal' and key=='changed') end))
+section:set('changed',7)
+local registered=async:registerTimerCallback('registered',function(value) compat.recordFoundationProbe('async-registered-simulation',value==9) end)
+async:newSimulationTimer(0,registered,9)
+async:newUnsavableGameTimer(0,function() compat.recordFoundationProbe('async-unsavable-game',true) end)
+core.sendGlobalEvent('FoundationGlobalEvent',{value=7})
+return {interfaceName='FoundationInterface',interface={answer=42}}
+)");
+		writeFile(temporary / "foundation_consumer.lua", R"(
+local async=require('openmw.async')
+local compat=require('openmw.compatibility')
+local core=require('openmw.core')
+local I=require('openmw.interfaces')
+local storage=require('openmw.storage')
+local util=require('openmw.util')
+assert(core.API_REVISION==70 and core.getGMST('sHealth')=='Health')
+assert(core.contentFiles.has('mOrRoWiNd.EsM') and core.contentFiles.indexOf('ncg.omwaddon')==2)
+local v=util.vector2(3,4)
+local normalized,length=v:normalize()
+local color=util.color.rgb(.8,.3,.4)
+assert(v:length()==5 and v:length2()==25 and (v*2).x==6 and normalized:length()>0.999 and length==5 and color.a==1)
+local mutable=pcall(function() v.x=10 end)
+compat.recordFoundationProbe('util-vector-color',not mutable and util.round(-1.5)==-2)
+assert(I.FoundationInterface.answer==42)
+local writable=pcall(function() I.FoundationInterface.answer=0 end)
+compat.recordFoundationProbe('interfaces-lookup-readonly',not writable)
+assert(storage.globalSection('FoundationGlobal'):get('changed')==7)
+local callback=async:callback(function(value) return value+1 end)
+compat.recordFoundationProbe('async-callback-callable',callback(4)==5)
+local selfAvailable=pcall(function() return require('openmw.self') end)
+compat.recordFoundationProbe('self-context-rejected-global',not selfAvailable)
+compat.recordFoundationProbe('core-time-content-gmst',type(core.getSimulationTime())=='number' and core.contentFiles.list[1]=='morrowind.esm')
+return {eventHandlers={FoundationGlobalEvent=function(data) compat.recordFoundationProbe('core-delayed-global-event',data.value==7) end}}
+)");
+		writeFile(temporary / "foundation_player.lua", R"(
+local async=require('openmw.async')
+local compat=require('openmw.compatibility')
+local self=require('openmw.self')
+local storage=require('openmw.storage')
+assert(self._mwseFoundationAvailable==true)
+local section=storage.playerSection('FoundationPlayer')
+section:subscribe(async:callback(function(name,key) compat.recordFoundationProbe('storage-player-subscription',name=='FoundationPlayer' and key=='value') end))
+section:set('value',11)
+local globalWritable=pcall(function() storage.globalSection('FoundationGlobal'):set('bad',1) end)
+compat.recordFoundationProbe('storage-context-permissions',not globalWritable and section:get('value')==11)
+compat.recordFoundationProbe('self-player-context',true)
+return {}
+)");
+		writeFile(temporary / "foundation_menu.lua", R"(
+local compat=require('openmw.compatibility')
+local storage=require('openmw.storage')
+local selfAvailable=pcall(function() return require('openmw.self') end)
+storage.playerSection('FoundationMenu'):set('value',3)
+compat.recordFoundationProbe('self-context-rejected-menu',not selfAvailable)
+compat.recordFoundationProbe('storage-menu-player-scope',storage.playerSection('FoundationMenu'):get('value')==3)
+return {}
+)");
+		writeFile(temporary / "foundation.omwscripts", "GLOBAL: foundation_provider.lua\nGLOBAL: foundation_consumer.lua\nPLAYER: foundation_player.lua\nMENU: foundation_menu.lua\n");
+		scripts="foundation.omwscripts";content=scripts;auto foundationConfig=configFor(temporary,scripts,content,InitializationEnabled|InitializationHarnessMode,temporary/"foundation-reports");
+		require(api.initialize(&foundationConfig)==Status::Ok,"foundation-runtime-initialize");
+		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.016,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"foundation-first-update");frame.frameNumber=2;frame.simulationTimeSeconds=2.0;require(api.update(&frame)==Status::Ok,"foundation-second-update");
+		const std::string foundationReport=report(api);
+		for(const char* probe:{"util-vector-color","interfaces-lookup-readonly","async-registered-simulation","async-unsavable-game","async-callback-callable","storage-global-subscription","storage-player-subscription","storage-context-permissions","storage-menu-player-scope","core-time-content-gmst","core-delayed-global-event","self-player-context","self-context-rejected-global","self-context-rejected-menu"})require(foundationReport.find(std::string("\"")+probe+"\":true")!=std::string::npos,std::string("foundation-probe-")+probe);
+		require(foundationReport.find("\"fired\":2")!=std::string::npos,"foundation-timer-count");
+		require(foundationReport.find("\"globalSections\":1")!=std::string::npos&&foundationReport.find("\"playerSections\":2")!=std::string::npos,"foundation-storage-scope-counts");
+		require(api.shutdown()==Status::Ok,"foundation-clean-shutdown");
 
 		writeFile(temporary / "multi.lua", "return {}\n");
 		writeFile(temporary / "valid.omwscripts", "# comment\nPLAYER, CUSTOM, NPC : multi.lua\n");

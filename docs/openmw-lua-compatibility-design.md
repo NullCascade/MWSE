@@ -414,12 +414,27 @@ Goal: all three NCG scripts load and reach their initialization handlers without
 
 ### M4.1 Foundation packages
 
-- [ ] Implement the NCG-required subset of `openmw.util`.
-- [ ] Implement `openmw.interfaces` and mod-defined interface registration/lookup.
-- [ ] Implement simulation and game-time `openmw.async` timers plus `async.callback`.
-- [ ] Implement global and player `openmw.storage` sections and subscriptions.
-- [ ] Implement the NCG-required subset of `openmw.core`.
-- [ ] Implement `openmw.self` for the player container.
+- [x] Implement the NCG-required subset of `openmw.util`.
+- [x] Implement `openmw.interfaces` and mod-defined interface registration/lookup.
+- [x] Implement simulation and game-time `openmw.async` timers plus `async.callback`.
+- [x] Implement global and player `openmw.storage` sections and subscriptions.
+- [x] Implement the NCG-required subset of `openmw.core`.
+- [x] Implement `openmw.self` for the player container.
+
+### Milestone 4.1 implementation record
+
+Milestone 4.1 passed the x86 Debug in-process gate on 2026-07-13 under run ID `20260713T083113Z-56f79b98fcf94a8ba1e1f68f79c399ec`. Its retained `result.json` reports `passed: true`, process exit code 0, graceful shutdown, zero failed launcher or game assertions, no remaining Morrowind process, and exact restoration of all staged files. The preserved Milestone 3 suite then passed under run ID `20260713T083153Z-c109365e918c47d180b0952a9f284936`; the exact Milestone 1 regression command passed under run ID `20260713T083229Z-62dd301ee89d479e8e04ceef22663268`.
+
+Evidence-backed implementation decisions and limitations:
+
+- Bridge ABI/version 2 extends the fixed-width POD boundary with a bounded tagged scalar value and native callbacks for GMST lookup and active-content enumeration. The accepted report records ABI 2, bridge version 2, `HostApi` size 64, initialization size 88, API revision 70, LuaJIT `2.1.ROLLING`, both callbacks present, a host-owned allocator, and no MWSE Lua imports. MWSE loads and negotiates the DLL after MWSE Lua startup, then starts scripts on the first update for which Morrowind's content and GMST data are valid. This preserves real loaded values without fabricating defaults during early startup.
+- LuaJIT remains compiled from the isolated intermediate source copy and statically linked with the `/MT` runtime into `openmw-lua.dll`, including in the x86 Debug configuration. PE inspection found only `KERNEL32.dll` imported and only `OpenMWLua_QueryApi` exported; no `lua_*`, `luaL_*`, LuaJIT, MWSE Lua, allocator, or registry symbol crosses the DLL boundary.
+- `openmw.util` implements the NCG foundation math helpers, immutable `Vector2`, and immutable RGB/RGBA colors. `openmw.interfaces` resolves the most recently registered same-container interface and exposes it read-only. `openmw.async` provides registered and unsavable simulation/game timers plus callable protected callbacks with deterministic sequence ordering. Timer and callback failures are diagnosed without stopping other safe work.
+- `openmw.storage` provides context-gated global/player sections, snapshots, mutation, reset, enumeration, lifetime selection, and protected subscriptions. Values are deep-copied with cycle, alias, function, userdata, and unsupported-key rejection. Storage and saveable-timer persistence across game save/load or host reload remain Milestone 5; the current implementation is deliberately in-memory.
+- `openmw.core` exposes native simulation/game/real timing, pause/scales, active content order and case-insensitive lookup, real loaded GMST values, delayed global events, API revision, and a bounded localization fallback with token substitution. VFS locale-resource loading remains Milestone 4.4. The contextual `openmw.self` package exists only for PLAYER containers; stable gameplay-object fields and methods remain Milestone 4.2 and are not given plausible stand-ins.
+- The retained foundation report contains all 14 required probes, two scheduled/two fired timers, one global and two player storage sections, two subscription notifications, and two interface lookups. Its parsed-container report records two GLOBAL, one PLAYER, and one MENU definition with four distinct generation-scoped environments and `mwseGlobalVisible: false`. Explicit reload recreated all four environments and repeated the probes while normal MWSE Lua remained `Lua 5.1-DW` before and after reload and shutdown.
+- Native tests cover ABI/layout/callback failures, all parser rejection cases, source-only sandboxing, returned-table validation, independent environments, handler/event order and failure isolation, delayed events, reload/shutdown, and every foundation package probe. The harness now exits nonzero whenever its machine-readable result is false, not only when a launcher exception occurs.
+- Milestone 4.1 does not execute NCG end to end and does not implement records, stats, UI, input, settings, gameplay objects, save persistence, or NCG behavior. The next unblocked task is Milestone 4.2 player and record/stat bindings.
 
 ### M4.2 Player and record/stat bindings
 
@@ -626,12 +641,12 @@ Types and public fields are tracked after the callable-member list. A type is no
 
 ### `openmw.async`
 
-- [ ] `async.registerTimerCallback`
-- [ ] `async.newSimulationTimer`
-- [ ] `async.newGameTimer`
-- [ ] `async.newUnsavableSimulationTimer`
-- [ ] `async.newUnsavableGameTimer`
-- [ ] `async.callback`
+- [x] `async.registerTimerCallback`
+- [x] `async.newSimulationTimer`
+- [x] `async.newGameTimer`
+- [x] `async.newUnsavableSimulationTimer`
+- [x] `async.newUnsavableGameTimer`
+- [x] `async.callback`
 
 ### `openmw.camera`
 
@@ -687,19 +702,19 @@ Types: `MODE`.
 ### `openmw.core`
 
 - [ ] `core.quit`
-- [ ] `core.sendGlobalEvent`
-- [ ] `core.getSimulationTime`
-- [ ] `core.getSimulationTimeScale`
-- [ ] `core.getGameTime`
-- [ ] `core.getGameTimeScale`
-- [ ] `core.isWorldPaused`
-- [ ] `core.getRealTime`
-- [ ] `core.getRealFrameDuration`
-- [ ] `core.getGMST`
+- [x] `core.sendGlobalEvent`
+- [x] `core.getSimulationTime`
+- [x] `core.getSimulationTimeScale`
+- [x] `core.getGameTime`
+- [x] `core.getGameTimeScale`
+- [x] `core.isWorldPaused`
+- [x] `core.getRealTime`
+- [x] `core.getRealFrameDuration`
+- [x] `core.getGMST`
 - [ ] `core.getGameDifficulty`
-- [ ] `core.l10n`
-- [ ] `ContentFiles.indexOf`
-- [ ] `ContentFiles.has`
+- [x] `core.l10n`
+- [x] `ContentFiles.indexOf`
+- [x] `ContentFiles.has`
 - [ ] `core.getFormId`
 - [ ] `GameObject.isValid`
 - [ ] `GameObject.sendEvent`
@@ -802,7 +817,7 @@ Types: `ACTION`, `ACTION_TYPE`, `ActionInfo`, `ActionType`, `CONTROL_SWITCH`, `C
 
 ### `openmw.interfaces`
 
-- [ ] `interfaces.__index`
+- [x] `interfaces.__index`
 
 ### `openmw.markup`
 
@@ -866,18 +881,18 @@ Types: `ActorControls`, `ATTACK_TYPE`.
 
 ### `openmw.storage`
 
-- [ ] `storage.globalSection`
-- [ ] `storage.playerSection`
-- [ ] `storage.allGlobalSections`
-- [ ] `storage.allPlayerSections`
-- [ ] `StorageSection.get`
-- [ ] `StorageSection.getCopy`
-- [ ] `StorageSection.subscribe`
-- [ ] `StorageSection.asTable`
-- [ ] `StorageSection.reset`
-- [ ] `StorageSection.removeOnExit`
-- [ ] `StorageSection.setLifeTime`
-- [ ] `StorageSection.set`
+- [x] `storage.globalSection`
+- [x] `storage.playerSection`
+- [x] `storage.allGlobalSections`
+- [x] `storage.allPlayerSections`
+- [x] `StorageSection.get`
+- [x] `StorageSection.getCopy`
+- [x] `StorageSection.subscribe`
+- [x] `StorageSection.asTable`
+- [x] `StorageSection.reset`
+- [x] `StorageSection.removeOnExit`
+- [x] `StorageSection.setLifeTime`
+- [x] `StorageSection.set`
 
 Types: `LifeTime`, `StorageSection`.
 
@@ -1128,10 +1143,10 @@ Types: `ALIGNMENT`, `CONSOLE_COLOR`, `Content`, `Element`, `Layer`, `Layers`, `L
 
 ### `openmw.util`
 
-- [ ] `util.round`
-- [ ] `util.remap`
-- [ ] `util.clamp`
-- [ ] `util.normalizeAngle`
+- [x] `util.round`
+- [x] `util.remap`
+- [x] `util.clamp`
+- [x] `util.normalizeAngle`
 - [ ] `util.makeReadOnly`
 - [ ] `util.makeStrictReadOnly`
 - [ ] `util.loadCode`
@@ -1139,18 +1154,18 @@ Types: `ALIGNMENT`, `CONSOLE_COLOR`, `Content`, `Element`, `Layer`, `Layers`, `L
 - [ ] `util.bitOr`
 - [ ] `util.bitXor`
 - [ ] `util.bitNot`
-- [ ] `util.vector2`
-- [ ] `Vector2.__add`
-- [ ] `Vector2.__sub`
-- [ ] `Vector2.__mul`
-- [ ] `Vector2.__div`
-- [ ] `Vector2.length`
-- [ ] `Vector2.length2`
-- [ ] `Vector2.normalize`
-- [ ] `Vector2.rotate`
-- [ ] `Vector2.dot`
-- [ ] `Vector2.emul`
-- [ ] `Vector2.ediv`
+- [x] `util.vector2`
+- [x] `Vector2.__add`
+- [x] `Vector2.__sub`
+- [x] `Vector2.__mul`
+- [x] `Vector2.__div`
+- [x] `Vector2.length`
+- [x] `Vector2.length2`
+- [x] `Vector2.normalize`
+- [x] `Vector2.rotate`
+- [x] `Vector2.dot`
+- [x] `Vector2.emul`
+- [x] `Vector2.ediv`
 - [ ] `util.vector3`
 - [ ] `Vector3.__add`
 - [ ] `Vector3.__sub`
@@ -1177,12 +1192,12 @@ Types: `ALIGNMENT`, `CONSOLE_COLOR`, `Content`, `Element`, `Layer`, `Layers`, `L
 - [ ] `Vector4.emul`
 - [ ] `Vector4.ediv`
 - [ ] `util.box` overloads
-- [ ] `Color.asRgba`
-- [ ] `Color.asRgb`
-- [ ] `Color.asHex`
-- [ ] `COLOR.rgba`
+- [x] `Color.asRgba`
+- [x] `Color.asRgb`
+- [x] `Color.asHex`
+- [x] `COLOR.rgba`
 - [ ] `COLOR.commaString`
-- [ ] `COLOR.rgb`
+- [x] `COLOR.rgb`
 - [ ] `COLOR.hex`
 - [ ] `Transform.__mul`
 - [ ] `Transform.inverse`
@@ -1247,19 +1262,19 @@ This checklist covers non-callable package fields, constants, enum values, recor
 
 - [ ] `openmw.ambient` package fields and constants
 - [ ] `openmw.animation`: `BlendMask`, `BoneGroup`, `Priority`
-- [ ] `openmw.async` package fields and constants
+- [x] `openmw.async` package fields and constants
 - [ ] `openmw.camera`: `MODE`
 - [ ] `openmw.content` package fields and constants
 - [ ] `openmw.core` types and fields listed above
 - [ ] `openmw.debug`: `NAV_MESH_RENDER_MODE`, `RENDER_MODE`
 - [ ] `openmw.input` types and fields listed above
-- [ ] `openmw.interfaces` lookup and read-only behavior
+- [x] `openmw.interfaces` lookup and read-only behavior
 - [ ] `openmw.markup` package fields and constants
 - [ ] `openmw.menu`: `SaveInfo`, `STATE`
 - [ ] `openmw.nearby` types and fields listed above
 - [ ] `openmw.postprocessing`: `Shader`
 - [ ] `openmw.self`: `ActorControls`, `ATTACK_TYPE`, contextual `self`
-- [ ] `openmw.storage`: `LifeTime`, `StorageSection`
+- [x] `openmw.storage`: `LifeTime`, `StorageSection`
 - [ ] `openmw.types` types and fields listed above
 - [ ] `openmw.ui` types and fields listed above
 - [ ] `openmw.util`: `Box`, `COLOR`, `Transform`, `Vector2`, `Vector3`, `Vector4`

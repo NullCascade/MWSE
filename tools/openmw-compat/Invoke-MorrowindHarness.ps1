@@ -4,7 +4,7 @@ param(
     [string]$MorrowindDirectory = 'C:\Games\Morrowind',
     [string]$FixtureSave = 'TestMWSE0000.ess',
     [string]$TeleportCell = 'Balmora, Guild of Mages',
-    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost')][string]$Suite = 'Smoke',
+    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost', 'OpenMWLuaFoundation')][string]$Suite = 'Smoke',
     [string]$OpenMWAddonPath = 'C:\Games\Morrowind\Data Files\ncg.omwaddon',
     [switch]$ProbeNativeAddonExtension,
     [int]$ReadyTimeoutSeconds = 45,
@@ -14,6 +14,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+$isOpenMWLuaSuite = $Suite -in @('OpenMWLuaHost', 'OpenMWLuaFoundation')
+$openMWLuaScriptsName = if ($Suite -eq 'OpenMWLuaFoundation') { 'milestone4-foundation.omwscripts' } else { 'milestone3.omwscripts' }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 Import-Module (Join-Path $PSScriptRoot 'HarnessProtocol.psm1') -Force
@@ -261,7 +263,7 @@ try {
 
     [IO.Directory]::CreateDirectory($runDirectory) | Out-Null
     [IO.Directory]::CreateDirectory((Join-Path $runDirectory 'screenshots')) | Out-Null
-    if ($Suite -eq 'OpenMWLuaHost') {
+    if ($isOpenMWLuaSuite) {
         [IO.Directory]::CreateDirectory((Join-Path $syntheticVfs 'fixture')) | Out-Null
         $utf8NoBom = [Text.UTF8Encoding]::new($false)
         [IO.File]::WriteAllText((Join-Path $syntheticVfs 'fixture\shared.lua'), 'return { value = 42 }' + "`n", $utf8NoBom)
@@ -302,11 +304,94 @@ MENU: menu.lua
 GLOBAL: global.lua
 PLAYER: player.lua
 '@, $utf8NoBom)
+        if ($Suite -eq 'OpenMWLuaFoundation') {
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'foundation_provider.lua'), @'
+local async = require('openmw.async')
+local compat = require('openmw.compatibility')
+local core = require('openmw.core')
+local storage = require('openmw.storage')
+local section = storage.globalSection('FoundationGlobal')
+local original = { value = 1 }
+section:set('copy', original)
+original.value = 99
+assert(section:getCopy('copy').value == 1)
+section:subscribe(async:callback(function(name, key)
+    compat.recordFoundationProbe('storage-global-subscription', name == 'FoundationGlobal' and key == 'changed')
+end))
+section:set('changed', 7)
+local registered = async:registerTimerCallback('registered', function(value)
+    compat.recordFoundationProbe('async-registered-simulation', value == 9)
+end)
+async:newSimulationTimer(0, registered, 9)
+async:newUnsavableGameTimer(0, function()
+    compat.recordFoundationProbe('async-unsavable-game', true)
+end)
+core.sendGlobalEvent('FoundationGlobalEvent', { value = 7 })
+return { interfaceName = 'FoundationInterface', interface = { answer = 42 } }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'foundation_consumer.lua'), @'
+local async = require('openmw.async')
+local compat = require('openmw.compatibility')
+local core = require('openmw.core')
+local I = require('openmw.interfaces')
+local storage = require('openmw.storage')
+local util = require('openmw.util')
+assert(core.API_REVISION == 70 and type(core.getGMST('sHealth')) == 'string')
+assert(core.contentFiles.has('mOrRoWiNd.EsM') and core.contentFiles.indexOf('Morrowind.esm') == 1)
+local vector = util.vector2(3, 4)
+local normalized, length = vector:normalize()
+local color = util.color.rgb(.8, .3, .4)
+assert(vector:length() == 5 and vector:length2() == 25 and (vector * 2).x == 6)
+assert(normalized:length() > .999 and length == 5 and color.a == 1)
+compat.recordFoundationProbe('util-vector-color', not pcall(function() vector.x = 10 end) and util.round(-1.5) == -2)
+assert(I.FoundationInterface.answer == 42)
+compat.recordFoundationProbe('interfaces-lookup-readonly', not pcall(function() I.FoundationInterface.answer = 0 end))
+assert(storage.globalSection('FoundationGlobal'):get('changed') == 7)
+local callback = async:callback(function(value) return value + 1 end)
+compat.recordFoundationProbe('async-callback-callable', callback(4) == 5)
+compat.recordFoundationProbe('self-context-rejected-global', not pcall(function() return require('openmw.self') end))
+compat.recordFoundationProbe('core-time-content-gmst', type(core.getSimulationTime()) == 'number' and core.contentFiles.list[1] == 'morrowind.esm')
+return { eventHandlers = { FoundationGlobalEvent = function(data)
+    compat.recordFoundationProbe('core-delayed-global-event', data.value == 7)
+end } }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'foundation_player.lua'), @'
+local async = require('openmw.async')
+local compat = require('openmw.compatibility')
+local self = require('openmw.self')
+local storage = require('openmw.storage')
+assert(self._mwseFoundationAvailable == true)
+local section = storage.playerSection('FoundationPlayer')
+section:subscribe(async:callback(function(name, key)
+    compat.recordFoundationProbe('storage-player-subscription', name == 'FoundationPlayer' and key == 'value')
+end))
+section:set('value', 11)
+local globalWritable = pcall(function() storage.globalSection('FoundationGlobal'):set('bad', 1) end)
+compat.recordFoundationProbe('storage-context-permissions', not globalWritable and section:get('value') == 11)
+compat.recordFoundationProbe('self-player-context', true)
+return {}
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'foundation_menu.lua'), @'
+local compat = require('openmw.compatibility')
+local storage = require('openmw.storage')
+storage.playerSection('FoundationMenu'):set('value', 3)
+compat.recordFoundationProbe('self-context-rejected-menu', not pcall(function() return require('openmw.self') end))
+compat.recordFoundationProbe('storage-menu-player-scope', storage.playerSection('FoundationMenu'):get('value') == 3)
+return {}
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'milestone4-foundation.omwscripts'), @'
+# Milestone 4.1 foundation package live fixture. Ordering is significant.
+GLOBAL: foundation_provider.lua
+GLOBAL: foundation_consumer.lua
+PLAYER: foundation_player.lua
+MENU: foundation_menu.lua
+'@, $utf8NoBom)
+        }
     }
     Write-OwchAtomicJson -Path (Join-Path $runDirectory 'run.json') -Value ([ordered]@{
         protocolVersion = 1; runId = $runId; suite = $Suite; configuration = $Configuration
         repository = $repoRoot; morrowindDirectory = $morrowindRoot; fixtureSave = $FixtureSave; openMWAddonPath = if ($Suite -eq 'OpenMWAddon') { $OpenMWAddonPath } else { $null }
-        openMWLuaScripts = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $syntheticVfs 'milestone3.omwscripts' } else { $null }
+        openMWLuaScripts = if ($isOpenMWLuaSuite) { Join-Path $syntheticVfs $openMWLuaScriptsName } else { $null }
         startedAt = $startedAt.ToString('o')
     })
 
@@ -354,7 +439,7 @@ PLAYER: player.lua
         $buildStage = Join-Path $runDirectory 'build-stage'
         [IO.Directory]::CreateDirectory($buildStage) | Out-Null
         $buildLog = Join-Path $runDirectory 'build.log'
-        if ($Suite -eq 'OpenMWLuaHost') {
+        if ($isOpenMWLuaSuite) {
             $hostBuildArguments = @(
                 (Join-Path $repoRoot 'OpenMWLuaTests\OpenMWLuaTests.vcxproj'), '/t:Build', "/p:Configuration=$Configuration", '/p:Platform=Win32',
                 "/p:SolutionDir=$repoRoot/", '/nr:false'
@@ -380,13 +465,13 @@ PLAYER: player.lua
     if (Test-Path -LiteralPath (Join-Path $buildOutput 'lua51.dll')) {
         Stage-File (Join-Path $buildOutput 'lua51.dll') (Join-Path $morrowindRoot 'lua51.dll')
     }
-    if ($Suite -eq 'OpenMWLuaHost') {
+    if ($isOpenMWLuaSuite) {
         Stage-File (Join-Path $buildOutput 'openmw-lua.dll') (Join-Path $morrowindRoot 'Data Files\MWSE\core\lib\openmw-lua.dll')
         Stage-File (Join-Path $repoRoot 'misc\package\Data Files\MWSE\core\lib\openmw-lua-LICENSE.txt') (Join-Path $morrowindRoot 'Data Files\MWSE\core\lib\openmw-lua-LICENSE.txt')
         foreach ($name in $openMWEnvironmentNames) { $originalOpenMWEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
         [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_VFS_ROOT', $syntheticVfs, 'Process')
-        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_SCRIPTS_FILE', 'milestone3.omwscripts', 'Process')
-        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_CONTENT_FILE', 'milestone3.omwscripts', 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_SCRIPTS_FILE', $openMWLuaScriptsName, 'Process')
+        [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_CONTENT_FILE', $openMWLuaScriptsName, 'Process')
         [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_REPORT_DIRECTORY', $runDirectory, 'Process')
         [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_HARNESS', '1', 'Process')
         [Environment]::SetEnvironmentVariable('MWSE_OPENMW_LUA_DISABLED', $null, 'Process')
@@ -431,6 +516,15 @@ PLAYER: player.lua
         Send-HarnessCommand 'ping' | Out-Null
         Invoke-NamedProbe 'openMWLuaHostReport' | Out-Null
     }
+    elseif ($Suite -eq 'OpenMWLuaFoundation') {
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaFoundationReport' | Out-Null
+        Invoke-NamedProbe 'reloadOpenMWLuaHost' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaFoundationReport' | Out-Null
+    }
 
     $loadedRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'loaded' } -TimeoutSeconds $ReadyTimeoutSeconds -NoWait
     Send-HarnessCommand 'loadGame' @{ filename = $FixtureSave } -TimeoutSeconds $ReadyTimeoutSeconds | Out-Null
@@ -467,7 +561,7 @@ PLAYER: player.lua
         Add-SmokeAssertion 'ncg-content-live-after-reload' ($reloadedAddonProbe.result.value.aliasActive -and $reloadedAddonProbe.result.value.gmst.value -eq 0) $reloadedAddonProbe.result.value $true
     }
 
-    if ($Suite -eq 'OpenMWLuaHost') {
+    if ($isOpenMWLuaSuite) {
         Invoke-NamedProbe 'shutdownOpenMWLuaHost' | Out-Null
     }
     Send-HarnessCommand 'shutdown' -TimeoutSeconds 10 | Out-Null
@@ -522,7 +616,7 @@ finally {
         loadOrderRestored = $loadOrderRestored; temporaryAliasesRemaining = if ($null -ne $originalIniHash) { $remainingAliases } else { @() }
         harnessConfigurationRestored = -not (Test-Path -LiteralPath (Join-Path $morrowindRoot 'Data Files\MWSE\config\openmw_compat_harness.json'))
         stagedFiles = $restoredStagedFiles; stagedFilesRestored = $stagingRestored
-        syntheticFixtureRetained = if ($Suite -eq 'OpenMWLuaHost') { Test-Path -LiteralPath (Join-Path $syntheticVfs 'milestone3.omwscripts') } else { $null }
+        syntheticFixtureRetained = if ($isOpenMWLuaSuite) { Test-Path -LiteralPath (Join-Path $syntheticVfs $openMWLuaScriptsName) } else { $null }
         remainingMorrowindProcesses = $remainingMorrowindProcesses
     })
     if (-not $stagingRestored -or $remainingMorrowindProcesses.Count -gt 0) {
@@ -548,13 +642,14 @@ finally {
             addonPlan = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'addon-plan.json' } else { $null }
             compatibilityReports = if ($Suite -eq 'OpenMWAddon') { Join-Path $runDirectory 'compatibility-reports' } else { $null }
             restoration = Join-Path $runDirectory 'restoration.json'
-            nativeTests = if ($Suite -eq 'OpenMWLuaHost') { $nativeTestPath } else { $null }
-            bridgeRuntimeReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'bridge-runtime-report.json' } else { $null }
-            parsedContainerReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'parsed-container-report.json' } else { $null }
-            handlerOrderReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'handler-order-report.json' } else { $null }
-            reloadShutdownReport = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'reload-shutdown-report.json' } else { $null }
-            hostEvents = if ($Suite -eq 'OpenMWLuaHost') { Join-Path $runDirectory 'openmw-host-events.jsonl' } else { $null }
-            syntheticFixture = if ($Suite -eq 'OpenMWLuaHost') { $syntheticVfs } else { $null }
+            nativeTests = if ($isOpenMWLuaSuite) { $nativeTestPath } else { $null }
+            bridgeRuntimeReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'bridge-runtime-report.json' } else { $null }
+            parsedContainerReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'parsed-container-report.json' } else { $null }
+            handlerOrderReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'handler-order-report.json' } else { $null }
+            foundationPackageReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'foundation-package-report.json' } else { $null }
+            reloadShutdownReport = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'reload-shutdown-report.json' } else { $null }
+            hostEvents = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'openmw-host-events.jsonl' } else { $null }
+            syntheticFixture = if ($isOpenMWLuaSuite) { $syntheticVfs } else { $null }
             save = if (Test-Path -LiteralPath (Join-Path $runDirectory ($smokeSaveBase + '.ess'))) { Join-Path $runDirectory ($smokeSaveBase + '.ess') } else { $null }
         }
     }
@@ -562,5 +657,5 @@ finally {
     Write-Output ($result | ConvertTo-Json -Depth 30)
 }
 
-if ($failure) { exit 1 }
+if (-not $passed) { exit 1 }
 exit 0

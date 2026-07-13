@@ -2,6 +2,12 @@
 
 #include "Log.h"
 
+#include "TES3DataHandler.h"
+#include "TES3GameFile.h"
+#include "TES3GameSetting.h"
+#include "TES3GlobalVariable.h"
+#include "TES3WorldController.h"
+
 namespace mwse::openmw {
 
 	HostController& HostController::getInstance() {
@@ -17,6 +23,13 @@ namespace mwse::openmw {
 	bool HostController::environmentEnabled(const char* name) {
 		const std::string value = getEnvironment(name);
 		return value == "1" || value == "true" || value == "TRUE";
+	}
+
+	bool HostController::isGameDataReady() const {
+		auto* dataHandler = TES3::DataHandler::get();
+		return dataHandler != nullptr && dataHandler->nonDynamicData != nullptr
+			&& dataHandler->nonDynamicData->GMSTs != nullptr
+			&& dataHandler->nonDynamicData->GMSTs[TES3::GMST::sHealth] != nullptr;
 	}
 
 	std::string HostController::copyLogString(StringView value) {
@@ -35,6 +48,85 @@ namespace mwse::openmw {
 			<< " script=\"" << copyLogString(message->scriptPath) << "\""
 			<< " container=\"" << copyLogString(message->container) << "\" "
 			<< copyLogString(message->message) << std::endl;
+	}
+
+	Status __cdecl HostController::getGameSetting(void*, StringView name, BridgeValue* value) {
+		if (value == nullptr || value->structureSize != sizeof(BridgeValue) || value->abiVersion != BridgeAbiVersion
+			|| name.size == 0 || name.size > MaxBridgeStringLength || name.data == nullptr) {
+			return Status::InvalidArgument;
+		}
+		const std::string settingName(name.data, name.size);
+		auto* dataHandler = TES3::DataHandler::get();
+		if (dataHandler == nullptr || dataHandler->nonDynamicData == nullptr) return Status::InvalidState;
+		for (int index = TES3::GMST::sMonthMorningstar; index <= TES3::GMST::sWitchhunter; ++index) {
+			auto* info = TES3::GameSettingInfo::get(index);
+			if (info == nullptr || info->name == nullptr || _stricmp(info->name, settingName.c_str()) != 0) continue;
+			auto* setting = dataHandler->nonDynamicData->GMSTs[index];
+			if (setting == nullptr) return Status::InvalidState;
+			value->string = {};
+			switch (setting->getType()) {
+			case 'i': value->type = ValueType::Number; value->number = setting->value.asLong; return Status::Ok;
+			case 'f': value->type = ValueType::Number; value->number = setting->value.asFloat; return Status::Ok;
+			case 's': {
+				const char* text = setting->value.asString;
+				if (text == nullptr) return Status::InvalidState;
+				const std::size_t size = strnlen(text, MaxBridgeStringLength + 1);
+				if (size > MaxBridgeStringLength) return Status::InvalidArgument;
+				value->type = ValueType::String;
+				value->string = { text, static_cast<std::uint32_t>(size) };
+				return Status::Ok;
+			}
+			default: return Status::Unsupported;
+			}
+		}
+		value->type = ValueType::None;
+		value->string = {};
+		value->number = 0.0;
+		return Status::Ok;
+	}
+
+	std::uint32_t __cdecl HostController::getContentFileCount(void*) {
+		auto* dataHandler = TES3::DataHandler::get();
+		if (dataHandler == nullptr || dataHandler->nonDynamicData == nullptr) return 0;
+		return static_cast<std::uint32_t>(dataHandler->nonDynamicData->getActiveMods().size());
+	}
+
+	Status __cdecl HostController::getContentFile(void*, std::uint32_t index, StringView* contentFile) {
+		if (contentFile == nullptr) return Status::InvalidArgument;
+		auto* dataHandler = TES3::DataHandler::get();
+		if (dataHandler == nullptr || dataHandler->nonDynamicData == nullptr) return Status::InvalidState;
+		const auto activeMods = dataHandler->nonDynamicData->getActiveMods();
+		if (index >= activeMods.size() || activeMods[index] == nullptr) return Status::InvalidArgument;
+		auto* selected = activeMods[index];
+		const std::size_t size = strnlen(selected->filename, sizeof(selected->filename));
+		if (size == sizeof(selected->filename) || size > MaxBridgeStringLength) return Status::InvalidArgument;
+		*contentFile = { selected->filename, static_cast<std::uint32_t>(size) };
+		return Status::Ok;
+	}
+
+	Status HostController::startRuntime() {
+		InitializationConfig config{};
+		config.structureSize = sizeof(config);
+		config.abiVersion = BridgeAbiVersion;
+		config.flags = initializationFlags;
+		config.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, &receiveLog, this,
+			&getGameSetting, &getContentFileCount, &getContentFile, this };
+		config.vfsRoot = { vfsRoot.data(), static_cast<std::uint32_t>(vfsRoot.size()) };
+		config.scriptsFile = { scriptsFile.data(), static_cast<std::uint32_t>(scriptsFile.size()) };
+		config.contentFile = { contentFile.data(), static_cast<std::uint32_t>(contentFile.size()) };
+		config.auxiliaryRoot = { auxiliaryRoot.data(), static_cast<std::uint32_t>(auxiliaryRoot.size()) };
+		config.reportDirectory = { reportDirectory.data(), static_cast<std::uint32_t>(reportDirectory.size()) };
+		const Status status = api.initialize(&config);
+		runtimeStarted = true;
+		state = api.getLifecycleState();
+		log::getLog() << "[OpenMW Lua] runtime=\"" << copyLogString(api.runtimeVersion) << "\" apiRevision="
+			<< api.apiRevision << " bridgeVersion=" << api.bridgeVersion << " abiVersion=" << api.abiVersion
+			<< " capabilities=0x" << std::hex << api.capabilities << std::dec << " state="
+			<< static_cast<std::uint32_t>(state) << " status=" << static_cast<std::uint32_t>(status) << std::endl;
+		if (status != Status::Ok) {
+			log::getLog() << "[OpenMW Lua] Host initialization failed safely. MWSE Lua remains active." << std::endl;
+		}
+		return status;
 	}
 
 	void HostController::initialize() {
@@ -65,54 +157,48 @@ namespace mwse::openmw {
 			return;
 		}
 
-		std::string vfsRoot = getEnvironment("MWSE_OPENMW_LUA_VFS_ROOT");
+		vfsRoot = getEnvironment("MWSE_OPENMW_LUA_VFS_ROOT");
 		if (vfsRoot.empty()) vfsRoot = (std::filesystem::current_path() / "Data Files").string();
-		std::string scriptsFile = getEnvironment("MWSE_OPENMW_LUA_SCRIPTS_FILE");
-		std::string contentFile = getEnvironment("MWSE_OPENMW_LUA_CONTENT_FILE");
+		scriptsFile = getEnvironment("MWSE_OPENMW_LUA_SCRIPTS_FILE");
+		contentFile = getEnvironment("MWSE_OPENMW_LUA_CONTENT_FILE");
 		if (contentFile.empty() && !scriptsFile.empty()) contentFile = std::filesystem::path(scriptsFile).filename().string();
-		std::string auxiliaryRoot = (std::filesystem::current_path() / "Data Files" / "MWSE" / "core" / "openmw").string();
-		std::string reportDirectory = getEnvironment("MWSE_OPENMW_LUA_REPORT_DIRECTORY");
-		std::uint32_t flags = environmentEnabled("MWSE_OPENMW_LUA_DISABLED") ? 0 : InitializationEnabled;
-		if (environmentEnabled("MWSE_OPENMW_LUA_HARNESS")) flags |= InitializationHarnessMode;
-
-		InitializationConfig config{};
-		config.structureSize = sizeof(config);
-		config.abiVersion = BridgeAbiVersion;
-		config.flags = flags;
-		config.callbacks = { sizeof(BridgeCallbacks), BridgeAbiVersion, &receiveLog, this };
-		config.vfsRoot = { vfsRoot.data(), static_cast<std::uint32_t>(vfsRoot.size()) };
-		config.scriptsFile = { scriptsFile.data(), static_cast<std::uint32_t>(scriptsFile.size()) };
-		config.contentFile = { contentFile.data(), static_cast<std::uint32_t>(contentFile.size()) };
-		config.auxiliaryRoot = { auxiliaryRoot.data(), static_cast<std::uint32_t>(auxiliaryRoot.size()) };
-		config.reportDirectory = { reportDirectory.data(), static_cast<std::uint32_t>(reportDirectory.size()) };
-		status = api.initialize(&config);
-		state = api.getLifecycleState();
-		log::getLog() << "[OpenMW Lua] runtime=\"" << copyLogString(api.runtimeVersion) << "\" apiRevision="
-			<< api.apiRevision << " bridgeVersion=" << api.bridgeVersion << " abiVersion=" << api.abiVersion
-			<< " capabilities=0x" << std::hex << api.capabilities << std::dec << " state="
-			<< static_cast<std::uint32_t>(state) << " status=" << static_cast<std::uint32_t>(status) << std::endl;
-		if (status != Status::Ok) {
-			log::getLog() << "[OpenMW Lua] Host initialization failed safely. MWSE Lua remains active." << std::endl;
-		}
+		auxiliaryRoot = (std::filesystem::current_path() / "Data Files" / "MWSE" / "core" / "openmw").string();
+		reportDirectory = getEnvironment("MWSE_OPENMW_LUA_REPORT_DIRECTORY");
+		initializationFlags = environmentEnabled("MWSE_OPENMW_LUA_DISABLED") ? 0 : InitializationEnabled;
+		if (environmentEnabled("MWSE_OPENMW_LUA_HARNESS")) initializationFlags |= InitializationHarnessMode;
+		state = LifecycleState::Initializing;
+		log::getLog() << "[OpenMW Lua] Support DLL loaded and bridge ABI accepted; runtime startup is waiting for game data." << std::endl;
 	}
 
 	void HostController::shutdown() {
 		if (module == nullptr || api.shutdown == nullptr) return;
-		api.shutdown();
+		if (runtimeStarted) api.shutdown();
+		runtimeStarted = false;
 		state = LifecycleState::Stopped;
 	}
 
 	void HostController::update(double deltaSeconds, double simulationTimeSeconds, bool paused) {
 		if (module == nullptr || api.update == nullptr || api.getLifecycleState == nullptr) return;
+		if (!runtimeStarted) {
+			if ((initializationFlags & InitializationEnabled) != 0 && !isGameDataReady()) return;
+			if (startRuntime() != Status::Ok) return;
+		}
 		state = api.getLifecycleState();
 		if (state != LifecycleState::Running) return;
-		FrameUpdate updateData{ sizeof(FrameUpdate), BridgeAbiVersion, ++frameNumber, deltaSeconds,
-			simulationTimeSeconds, 0.0, paused ? 1u : 0u, 0 };
+		const double realDeltaSeconds = TES3::WorldController::realDeltaTime;
+		if (!paused) this->simulationTimeSeconds += deltaSeconds;
+		auto* worldController = TES3::WorldController::get();
+		const double gameTimeScale = worldController != nullptr && worldController->gvarTimescale != nullptr
+			? worldController->gvarTimescale->value : 0.0;
+		const double simulationTimeScale = realDeltaSeconds > 0.0 ? deltaSeconds / realDeltaSeconds : 0.0;
+		FrameUpdate updateData{ sizeof(FrameUpdate), BridgeAbiVersion, ++frameNumber, realDeltaSeconds,
+			this->simulationTimeSeconds, simulationTimeSeconds, simulationTimeScale, gameTimeScale,
+			paused ? 1u : 0u, 0 };
 		api.update(&updateData);
 	}
 
 	bool HostController::reload() {
-		if (module == nullptr || api.reload == nullptr) return false;
+		if (module == nullptr || api.reload == nullptr || !runtimeStarted) return false;
 		const Status status = api.reload();
 		state = api.getLifecycleState();
 		return status == Status::Ok && state == LifecycleState::Running;

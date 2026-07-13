@@ -163,8 +163,8 @@ function probes.openMWLuaHostReport(request)
 
 	emitAssertion(request, "openmw-support-dll-loaded", mwse.openmwCompatibility.isLoaded() == true,
 		mwse.openmwCompatibility.isLoaded(), true)
-	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 1,
-		bridge, { abiAccepted = true, abiVersion = 1 })
+	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 2,
+		bridge, { abiAccepted = true, abiVersion = 2 })
 	emitAssertion(request, "openmw-runtime-independent", bridge.runtimeOwnedAllocator == true
 		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
 		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
@@ -208,6 +208,62 @@ function probes.openMWLuaHostReport(request)
 		{ diagnostics = handlers.diagnostics, handlersAfterFailure = events[3] },
 		"structured failure plus continued handler delivery")
 	emitAssertion(request, "mwse-lua-functional-with-openmw-host", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return report
+end
+
+function probes.openMWLuaFoundationReport(request)
+	local report = decodeOpenMWHostReport()
+	local bridge = report.bridge or {}
+	local containers = report.containers or {}
+	local foundation = report.foundation or {}
+	local probesReport = foundation.probes or {}
+	local required = {
+		"util-vector-color",
+		"interfaces-lookup-readonly",
+		"async-registered-simulation",
+		"async-unsavable-game",
+		"async-callback-callable",
+		"storage-global-subscription",
+		"storage-player-subscription",
+		"storage-context-permissions",
+		"storage-menu-player-scope",
+		"core-time-content-gmst",
+		"core-delayed-global-event",
+		"self-player-context",
+		"self-context-rejected-global",
+		"self-context-rejected-menu",
+	}
+	local missing = {}
+	for _, name in ipairs(required) do
+		if probesReport[name] ~= true then
+			missing[#missing + 1] = name
+		end
+	end
+	emitAssertion(request, "openmw-foundation-bridge-v2", bridge.abiAccepted == true and bridge.abiVersion == 2
+		and bridge.bridgeVersion == 2 and bridge.gmstCallbackAvailable == true
+		and bridge.contentFilesCallbackAvailable == true,
+		bridge, { abiVersion = 2, bridgeVersion = 2, gmstCallbackAvailable = true, contentFilesCallbackAvailable = true })
+	emitAssertion(request, "openmw-foundation-container-counts", containers.menuDefinitions == 1
+		and containers.globalDefinitions == 2 and containers.playerDefinitions == 1,
+		{ menu = containers.menuDefinitions, global = containers.globalDefinitions, player = containers.playerDefinitions },
+		{ menu = 1, global = 2, player = 1 })
+	emitAssertion(request, "openmw-foundation-package-probes", #missing == 0,
+		{ missing = missing, probes = probesReport }, "all required foundation probes true")
+	emitAssertion(request, "openmw-foundation-timers", foundation.timers and foundation.timers.scheduled == 2
+		and foundation.timers.fired == 2 and foundation.timers.pending == 0,
+		foundation.timers, { scheduled = 2, fired = 2, pending = 0 })
+	emitAssertion(request, "openmw-foundation-storage", foundation.storage and foundation.storage.globalSections == 1
+		and foundation.storage.playerSections == 2 and foundation.storage.notifications == 2,
+		foundation.storage, { globalSections = 1, playerSections = 2, notifications = 2 })
+	emitAssertion(request, "openmw-foundation-interfaces", foundation.interfaces and foundation.interfaces.lookups >= 1,
+		foundation.interfaces, { lookups = ">=1" })
+	emitAssertion(request, "openmw-foundation-runtime-independent", bridge.runtimeOwnedAllocator == true
+		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
+		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
+			importsMwseLua = bridge.importsMwseLua }, "independent LuaJIT runtime")
+	emitAssertion(request, "mwse-lua-functional-with-foundation-host", type(mwse.buildNumber) == "number"
 		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
 		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
 	return report

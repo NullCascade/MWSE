@@ -4,8 +4,8 @@
 
 namespace mwse::openmw {
 
-	constexpr std::uint32_t BridgeAbiVersion = 1;
-	constexpr std::uint32_t BridgeVersion = 1;
+	constexpr std::uint32_t BridgeAbiVersion = 2;
+	constexpr std::uint32_t BridgeVersion = 2;
 	constexpr std::uint32_t OpenMWApiRevision = 70;
 	constexpr std::uint32_t MaxBridgeStringLength = 32 * 1024;
 
@@ -49,6 +49,12 @@ namespace mwse::openmw {
 		CapabilityPlayerContainer = 1ull << 4,
 		CapabilityDelayedEvents = 1ull << 5,
 		CapabilityReload = 1ull << 6,
+		CapabilityFoundationUtil = 1ull << 7,
+		CapabilityFoundationInterfaces = 1ull << 8,
+		CapabilityFoundationAsync = 1ull << 9,
+		CapabilityFoundationStorage = 1ull << 10,
+		CapabilityFoundationCore = 1ull << 11,
+		CapabilityFoundationSelf = 1ull << 12,
 	};
 
 	struct StringView {
@@ -76,11 +82,35 @@ namespace mwse::openmw {
 
 	using LogCallback = void(__cdecl*)(void* userData, const LogMessage* message);
 
+	enum class ValueType : std::uint32_t {
+		None = 0,
+		Number = 1,
+		String = 2,
+		Boolean = 3,
+	};
+
+	struct BridgeValue {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		ValueType type;
+		std::uint32_t reserved;
+		double number;
+		StringView string;
+	};
+
+	using GetGameSettingCallback = Status(__cdecl*)(void* userData, StringView name, BridgeValue* value);
+	using GetContentFileCountCallback = std::uint32_t(__cdecl*)(void* userData);
+	using GetContentFileCallback = Status(__cdecl*)(void* userData, std::uint32_t index, StringView* contentFile);
+
 	struct BridgeCallbacks {
 		std::uint32_t structureSize;
 		std::uint32_t abiVersion;
 		LogCallback log;
 		void* logUserData;
+		GetGameSettingCallback getGameSetting;
+		GetContentFileCountCallback getContentFileCount;
+		GetContentFileCallback getContentFile;
+		void* gameUserData;
 	};
 
 	enum InitializationFlag : std::uint32_t {
@@ -109,6 +139,8 @@ namespace mwse::openmw {
 		double realDeltaSeconds;
 		double simulationTimeSeconds;
 		double gameTimeHours;
+		double simulationTimeScale;
+		double gameTimeScale;
 		std::uint32_t paused;
 		std::uint32_t reserved;
 	};

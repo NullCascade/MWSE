@@ -4,12 +4,14 @@
 #include <atomic>
 #include <cctype>
 #include <cstdint>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <map>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <set>
@@ -29,4 +31,3 @@ extern "C" {
 #include <lualib.h>
 #include <luajit.h>
 }
-

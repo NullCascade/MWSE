@@ -35,7 +35,9 @@ namespace mwse::openmw::host {
 			std::string scriptPath;
 			std::string container;
 			int environmentReference = LUA_NOREF;
+			int interfaceReference = LUA_NOREF;
 			std::unordered_map<std::string, int> loadedModules;
+			std::unordered_map<std::string, int> timerCallbacks;
 			std::unordered_map<std::string, int> engineHandlers;
 			std::unordered_map<std::string, int> eventHandlers;
 			std::string interfaceName;
@@ -47,6 +49,31 @@ namespace mwse::openmw::host {
 			std::uint64_t sequence = 0;
 			std::string name;
 			std::string payload;
+			std::string targetContainer;
+			int payloadReference = LUA_NOREF;
+		};
+
+		struct Timer {
+			std::uint64_t sequence = 0;
+			std::uint32_t instanceId = 0;
+			double dueTime = 0.0;
+			bool gameTime = false;
+			bool serializable = false;
+			std::string callbackName;
+			int functionReference = LUA_NOREF;
+			int argumentReference = LUA_NOREF;
+		};
+
+		struct StorageSubscription {
+			std::uint32_t instanceId = 0;
+			int callbackReference = LUA_NOREF;
+		};
+
+		struct StorageSection {
+			std::map<std::string, int> values;
+			std::vector<StorageSubscription> subscriptions;
+			std::uint32_t lifeTime = 0;
+			bool notifying = false;
 		};
 
 		Status initializeRuntime();
@@ -58,7 +85,9 @@ namespace mwse::openmw::host {
 		void startInstance(const Definition& definition, std::string_view container);
 		void createSandbox(ScriptInstance& instance);
 		void registerScriptOutput(ScriptInstance& instance);
+		ScriptInstance* findInstance(std::uint32_t id) const;
 		void callEngineHandlers(std::string_view name, double argument);
+		void processTimers();
 		void deliverDelayedEvents();
 		void callEventHandlers(const DelayedEvent& eventData);
 		bool callHandler(ScriptInstance& instance, int functionReference, std::string_view diagnosticName,
@@ -66,7 +95,18 @@ namespace mwse::openmw::host {
 		int loadSourceModule(ScriptInstance& instance, std::string_view moduleName);
 		std::filesystem::path resolveModulePath(std::string_view moduleName) const;
 		void pushSafeLibraryClone(const char* name);
-		void pushBuiltinPackage(std::string_view name);
+		void pushBuiltinPackage(ScriptInstance& instance, std::string_view name);
+		void pushUtilPackage(ScriptInstance& instance);
+		void pushInterfacesPackage(ScriptInstance& instance);
+		void pushAsyncPackage(ScriptInstance& instance);
+		void pushStoragePackage(ScriptInstance& instance);
+		void pushCorePackage(ScriptInstance& instance);
+		void pushSelfPackage(ScriptInstance& instance);
+		void pushReadOnlyProxy(int valueIndex, bool strict);
+		void pushStorageSection(ScriptInstance& instance, bool player, std::string_view name, bool readOnly);
+		StorageSection& getStorageSection(bool player, std::string_view name);
+		void notifyStorage(StorageSection& section, std::string_view sectionName, std::optional<std::string_view> key);
+		void recordFoundationProbe(std::string_view name, bool passed);
 		void log(LogSeverity severity, std::string_view category, std::string_view message,
 			const ScriptInstance* instance = nullptr);
 		void writeReportArtifacts();
@@ -75,10 +115,35 @@ namespace mwse::openmw::host {
 		std::string buildHandlerReport() const;
 		std::string buildBridgeReport() const;
 		std::string buildReloadReport() const;
+		std::string buildFoundationReport() const;
 		std::string copyBridgeString(StringView value, std::string_view fieldName, bool allowEmpty) const;
 		static void* allocator(void* userData, void* pointer, std::size_t oldSize, std::size_t newSize);
 		static int requireThunk(lua_State* state);
 		static int unsupportedThunk(lua_State* state);
+		static int readOnlyNewIndexThunk(lua_State* state);
+		static int strictReadOnlyIndexThunk(lua_State* state);
+		static int interfaceIndexThunk(lua_State* state);
+		static int compatibilityRecordProbeThunk(lua_State* state);
+		static int asyncRegisterTimerCallbackThunk(lua_State* state);
+		static int asyncNewTimerThunk(lua_State* state);
+		static int asyncCallbackThunk(lua_State* state);
+		static int asyncCallbackCallThunk(lua_State* state);
+		static int storageSectionThunk(lua_State* state);
+		static int storageAllSectionsThunk(lua_State* state);
+		static int storageGetThunk(lua_State* state);
+		static int storageGetCopyThunk(lua_State* state);
+		static int storageAsTableThunk(lua_State* state);
+		static int storageSubscribeThunk(lua_State* state);
+		static int storageSetThunk(lua_State* state);
+		static int storageResetThunk(lua_State* state);
+		static int storageSetLifeTimeThunk(lua_State* state);
+		static int coreTimeThunk(lua_State* state);
+		static int coreGetGameSettingThunk(lua_State* state);
+		static int coreSendGlobalEventThunk(lua_State* state);
+		static int coreL10nThunk(lua_State* state);
+		static int coreL10nFormatThunk(lua_State* state);
+		static int contentFilesIndexOfThunk(lua_State* state);
+		static int contentFilesHasThunk(lua_State* state);
 
 		LifecycleState mState = LifecycleState::Stopped;
 		InitializationConfig mConfig{};
@@ -93,11 +158,27 @@ namespace mwse::openmw::host {
 		std::uint64_t mRuntimeGeneration = 0;
 		std::uint64_t mFrameNumber = 0;
 		std::uint64_t mNextEventSequence = 1;
+		std::uint64_t mNextTimerSequence = 1;
 		std::uint32_t mReloadCount = 0;
 		std::vector<Definition> mDefinitions;
 		std::vector<std::unique_ptr<ScriptInstance>> mInstances;
 		std::vector<DelayedEvent> mPendingEvents;
 		std::vector<DelayedEvent> mNextEvents;
+		std::vector<Timer> mTimers;
+		std::map<std::string, StorageSection> mGlobalStorage;
+		std::map<std::string, StorageSection> mPlayerStorage;
+		std::map<std::string, bool> mFoundationProbes;
+		double mSimulationTimeSeconds = 0.0;
+		double mGameTimeSeconds = 0.0;
+		double mRealTimeSeconds = 0.0;
+		double mRealFrameDuration = 0.0;
+		double mSimulationTimeScale = 1.0;
+		double mGameTimeScale = 30.0;
+		bool mWorldPaused = false;
+		std::uint32_t mTimersScheduled = 0;
+		std::uint32_t mTimersFired = 0;
+		std::uint32_t mStorageNotifications = 0;
+		std::uint32_t mInterfaceLookups = 0;
 		std::vector<std::string> mEngineHandlerOrder;
 		std::vector<std::string> mEventHandlerOrder;
 		std::vector<std::string> mDelayedDeliveries;
