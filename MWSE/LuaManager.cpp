@@ -459,6 +459,25 @@ namespace mwse::lua {
 			openmw::HostController::getInstance().shutdown();
 			return openmw::HostController::getInstance().getLifecycleState() == openmw::LifecycleState::Stopped;
 		};
+		openMWCompatibility["testUpdateBooleanAction"] = [](std::string_view key, bool value) {
+			auto& host = openmw::HostController::getInstance();
+			return host.isHarnessMode() && host.updateBooleanAction(key, value);
+		};
+		openMWCompatibility["testQueueUiModeChanged"] = [](std::string_view previous, std::string_view current) {
+			return openmw::HostController::getInstance().queueHarnessUiModeChanged(previous, current);
+		};
+		openMWCompatibility["testQueuePlayerDied"] = []() {
+			auto& host = openmw::HostController::getInstance();
+			if (!host.isHarnessMode()) return false;
+			host.notifyPlayerDied();
+			return true;
+		};
+		openMWCompatibility["testQueueSkillLevelUp"] = [](std::uint32_t skillIndex, double level, std::string_view source) {
+			auto& host = openmw::HostController::getInstance();
+			if (!host.isHarnessMode() || skillIndex >= 27 || source.size() > openmw::BridgeTextCapacity) return false;
+			host.notifySkillRaised(skillIndex, level, source);
+			return true;
+		};
 		luaState.create_named_table("mwscript");
 
 		// Bind config.
@@ -2619,6 +2638,7 @@ namespace mwse::lua {
 
 	void __cdecl OnSkillRaisedBook(int skillId, char* buffer) {
 		TES3_ShowSkillRaisedNotification(skillId, buffer);
+		openmw::HostController::getInstance().notifySkillRaised(skillId, TES3::WorldController::get()->getMobilePlayer()->skills[skillId].base, "book");
 
 		if (event::SkillRaisedEvent::getEventEnabled()) {
 			LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::SkillRaisedEvent(skillId, TES3::WorldController::get()->getMobilePlayer()->skills[skillId].base, "book"));
@@ -2627,6 +2647,7 @@ namespace mwse::lua {
 
 	void __cdecl OnSkillRaisedProgress(int skillId, char* buffer) {
 		TES3_ShowSkillRaisedNotification(skillId, buffer);
+		openmw::HostController::getInstance().notifySkillRaised(skillId, TES3::WorldController::get()->getMobilePlayer()->skills[skillId].base, "progress");
 
 		if (event::SkillRaisedEvent::getEventEnabled()) {
 			LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::SkillRaisedEvent(skillId, TES3::WorldController::get()->getMobilePlayer()->skills[skillId].base, "progress"));
@@ -2661,6 +2682,7 @@ namespace mwse::lua {
 		if (OnSkillTrained_SkillId == -1) {
 			return;
 		}
+		openmw::HostController::getInstance().notifySkillRaised(OnSkillTrained_SkillId, OnSkillTrained_Skill->base, "training");
 
 		if (event::SkillRaisedEvent::getEventEnabled()) {
 			LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::SkillRaisedEvent(OnSkillTrained_SkillId, OnSkillTrained_Skill->base, "training"));

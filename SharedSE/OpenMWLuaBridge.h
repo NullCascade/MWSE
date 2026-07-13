@@ -4,8 +4,8 @@
 
 namespace mwse::openmw {
 
-	constexpr std::uint32_t BridgeAbiVersion = 3;
-	constexpr std::uint32_t BridgeVersion = 3;
+	constexpr std::uint32_t BridgeAbiVersion = 4;
+	constexpr std::uint32_t BridgeVersion = 4;
 	constexpr std::uint32_t OpenMWApiRevision = 70;
 	constexpr std::uint32_t MaxBridgeStringLength = 32 * 1024;
 	constexpr std::uint32_t BridgeTextCapacity = 128;
@@ -67,6 +67,10 @@ namespace mwse::openmw {
 		CapabilityPlayerBindings = 1ull << 13,
 		CapabilityRecordBindings = 1ull << 14,
 		CapabilityMutableStats = 1ull << 15,
+		CapabilityInputActions = 1ull << 16,
+		CapabilityLifecycleHandlers = 1ull << 17,
+		CapabilityNativeEngineEvents = 1ull << 18,
+		CapabilityPlayerLocalEvents = 1ull << 19,
 	};
 
 	struct StringView {
@@ -312,12 +316,48 @@ namespace mwse::openmw {
 		std::uint32_t abiVersion;
 		std::uint64_t frameNumber;
 		double realDeltaSeconds;
+		double simulationDeltaSeconds;
 		double simulationTimeSeconds;
 		double gameTimeHours;
 		double simulationTimeScale;
 		double gameTimeScale;
 		std::uint32_t paused;
 		std::uint32_t reserved;
+	};
+
+	enum class NativeEventType : std::uint32_t {
+		UiModeChanged = 1,
+		PlayerDied = 2,
+		SkillLevelUp = 3,
+	};
+
+	struct NativeEvent {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		NativeEventType type;
+		std::uint32_t flags;
+		std::uint64_t sequence;
+		std::uint32_t index;
+		std::uint32_t reserved;
+		double value;
+		BridgeText name;
+		BridgeText previous;
+		BridgeText source;
+	};
+
+	enum class ActionType : std::uint32_t {
+		Boolean = 1,
+		Number = 2,
+		Range = 3,
+	};
+
+	struct ActionUpdate {
+		std::uint32_t structureSize;
+		std::uint32_t abiVersion;
+		ActionType type;
+		std::uint32_t reserved;
+		StringView key;
+		double value;
 	};
 
 	struct QueuedEvent {
@@ -331,6 +371,8 @@ namespace mwse::openmw {
 	using ShutdownFunction = Status(__cdecl*)();
 	using UpdateFunction = Status(__cdecl*)(const FrameUpdate* update);
 	using QueueEventFunction = Status(__cdecl*)(const QueuedEvent* eventData);
+	using QueueNativeEventFunction = Status(__cdecl*)(const NativeEvent* eventData);
+	using UpdateActionFunction = Status(__cdecl*)(const ActionUpdate* updateData);
 	using ReloadFunction = Status(__cdecl*)();
 	using GetLifecycleStateFunction = LifecycleState(__cdecl*)();
 	using GetReportFunction = Status(__cdecl*)(char* buffer, std::uint32_t capacity, std::uint32_t* requiredSize);
@@ -349,6 +391,8 @@ namespace mwse::openmw {
 		ReloadFunction reload;
 		GetLifecycleStateFunction getLifecycleState;
 		GetReportFunction getReport;
+		QueueNativeEventFunction queueNativeEvent;
+		UpdateActionFunction updateAction;
 	};
 
 	using QueryApiFunction = Status(__cdecl*)(std::uint32_t requestedAbiVersion,

@@ -12,6 +12,8 @@ namespace mwse::openmw::host {
 		Status shutdown();
 		Status update(const FrameUpdate* update);
 		Status queueEvent(const QueuedEvent* eventData);
+		Status queueNativeEvent(const NativeEvent* eventData);
+		Status updateAction(const ActionUpdate* updateData);
 		Status reload();
 		LifecycleState getLifecycleState() const;
 		Status getReport(char* buffer, std::uint32_t capacity, std::uint32_t* requiredSize);
@@ -53,6 +55,34 @@ namespace mwse::openmw::host {
 			int payloadReference = LUA_NOREF;
 		};
 
+		struct PendingNativeEvent {
+			std::uint64_t sequence = 0;
+			NativeEventType type = NativeEventType::UiModeChanged;
+			std::uint32_t index = 0;
+			double value = 0.0;
+			std::string name;
+			std::string previous;
+			std::string source;
+		};
+
+		struct CallbackReference {
+			std::uint32_t instanceId = 0;
+			int reference = LUA_NOREF;
+		};
+
+		struct InputAction {
+			ActionType type = ActionType::Boolean;
+			double defaultValue = 0.0;
+			double value = 0.0;
+			std::vector<CallbackReference> handlers;
+		};
+
+		struct PendingActionUpdate {
+			std::string key;
+			ActionType type = ActionType::Boolean;
+			double value = 0.0;
+		};
+
 		struct Timer {
 			std::uint64_t sequence = 0;
 			std::uint32_t instanceId = 0;
@@ -86,10 +116,16 @@ namespace mwse::openmw::host {
 		void createSandbox(ScriptInstance& instance);
 		void registerScriptOutput(ScriptInstance& instance);
 		ScriptInstance* findInstance(std::uint32_t id) const;
-		void callEngineHandlers(std::string_view name, double argument);
+		void callEngineHandlers(std::string_view name, double argument, std::string_view containerFilter = {});
+		void callSaveHandlers();
+		void callActiveHandlers();
 		void processTimers();
 		void deliverDelayedEvents();
+		void deliverNativeEvents();
+		void processActionUpdates();
 		void callEventHandlers(const DelayedEvent& eventData);
+		void callEventHandlersWithValue(std::string_view name, std::string_view targetContainer, int valueIndex);
+		void callSkillLevelUpHandlers(const PendingNativeEvent& eventData);
 		bool callHandler(ScriptInstance& instance, int functionReference, std::string_view diagnosticName,
 			std::optional<double> numberArgument, std::optional<std::string_view> stringArgument);
 		int loadSourceModule(ScriptInstance& instance, std::string_view moduleName);
@@ -103,6 +139,8 @@ namespace mwse::openmw::host {
 		void pushCorePackage(ScriptInstance& instance);
 		void pushSelfPackage(ScriptInstance& instance);
 		void pushTypesPackage(ScriptInstance& instance);
+		void pushInputPackage(ScriptInstance& instance);
+		void pushSkillProgressionInterface(std::uint32_t instanceId);
 		void pushPlayerObject();
 		void pushRecordCollection(RecordType type);
 		void pushRecord(const RecordSnapshot& snapshot);
@@ -124,6 +162,7 @@ namespace mwse::openmw::host {
 		std::string buildReloadReport() const;
 		std::string buildFoundationReport() const;
 		std::string buildGameplayReport() const;
+		std::string buildInputReport() const;
 		std::string copyBridgeString(StringView value, std::string_view fieldName, bool allowEmpty) const;
 		static void* allocator(void* userData, void* pointer, std::size_t oldSize, std::size_t newSize);
 		static int requireThunk(lua_State* state);
@@ -132,6 +171,8 @@ namespace mwse::openmw::host {
 		static int strictReadOnlyIndexThunk(lua_State* state);
 		static int interfaceIndexThunk(lua_State* state);
 		static int compatibilityRecordProbeThunk(lua_State* state);
+		static int compatibilityActionUpdateThunk(lua_State* state);
+		static int compatibilityNativeEventThunk(lua_State* state);
 		static int asyncRegisterTimerCallbackThunk(lua_State* state);
 		static int asyncNewTimerThunk(lua_State* state);
 		static int asyncCallbackThunk(lua_State* state);
@@ -152,6 +193,11 @@ namespace mwse::openmw::host {
 		static int coreL10nFormatThunk(lua_State* state);
 		static int contentFilesIndexOfThunk(lua_State* state);
 		static int contentFilesHasThunk(lua_State* state);
+		static int inputRegisterActionThunk(lua_State* state);
+		static int inputRegisterActionHandlerThunk(lua_State* state);
+		static int inputGetActionValueThunk(lua_State* state);
+		static int objectSendEventThunk(lua_State* state);
+		static int skillProgressionAddLevelUpHandlerThunk(lua_State* state);
 	public:
 		static int objectIndexThunk(lua_State* state);
 		static int objectNewIndexThunk(lua_State* state);
@@ -189,6 +235,11 @@ namespace mwse::openmw::host {
 		std::vector<std::unique_ptr<ScriptInstance>> mInstances;
 		std::vector<DelayedEvent> mPendingEvents;
 		std::vector<DelayedEvent> mNextEvents;
+		std::vector<PendingNativeEvent> mPendingNativeEvents;
+		std::vector<PendingNativeEvent> mNextNativeEvents;
+		std::map<std::string, InputAction> mInputActions;
+		std::vector<PendingActionUpdate> mPendingActionUpdates;
+		std::vector<CallbackReference> mSkillLevelUpHandlers;
 		std::vector<Timer> mTimers;
 		std::map<std::string, StorageSection> mGlobalStorage;
 		std::map<std::string, StorageSection> mPlayerStorage;
@@ -204,6 +255,14 @@ namespace mwse::openmw::host {
 		std::uint32_t mTimersFired = 0;
 		std::uint32_t mStorageNotifications = 0;
 		std::uint32_t mInterfaceLookups = 0;
+		std::uint32_t mActionsRegistered = 0;
+		std::uint32_t mActionTransitions = 0;
+		std::uint32_t mNativeEventsDelivered = 0;
+		std::uint32_t mLocalEventsQueued = 0;
+		std::uint32_t mSaveHandlerCalls = 0;
+		std::uint32_t mLoadHandlerCalls = 0;
+		std::uint32_t mInitHandlerCalls = 0;
+		std::uint32_t mActiveHandlerCalls = 0;
 		std::vector<std::string> mEngineHandlerOrder;
 		std::vector<std::string> mEventHandlerOrder;
 		std::vector<std::string> mDelayedDeliveries;
@@ -217,6 +276,7 @@ namespace mwse::openmw::host {
 		std::map<std::uint64_t, int> mCellReferences;
 		std::uint32_t mGameplayCalls = 0;
 		std::uint32_t mRejectedHandles = 0;
+		bool mLoadingSavedScripts = false;
 	};
 
 }

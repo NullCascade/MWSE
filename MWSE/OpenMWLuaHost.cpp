@@ -7,6 +7,8 @@
 #include "TES3GameSetting.h"
 #include "TES3GlobalVariable.h"
 #include "TES3MobilePlayer.h"
+#include "TES3UIElement.h"
+#include "TES3UIManager.h"
 #include "TES3WorldController.h"
 
 namespace mwse::openmw {
@@ -125,6 +127,7 @@ namespace mwse::openmw {
 		config.reportDirectory = { reportDirectory.data(), static_cast<std::uint32_t>(reportDirectory.size()) };
 		const Status status = api.initialize(&config);
 		runtimeStarted = true;
+		currentUiMode = getCurrentUiMode();
 		state = api.getLifecycleState();
 		log::getLog() << "[OpenMW Lua] runtime=\"" << copyLogString(api.runtimeVersion) << "\" apiRevision="
 			<< api.apiRevision << " bridgeVersion=" << api.bridgeVersion << " abiVersion=" << api.abiVersion
@@ -157,6 +160,7 @@ namespace mwse::openmw {
 		if (status != Status::Ok || api.structureSize != sizeof(HostApi) || api.abiVersion != BridgeAbiVersion
 			|| api.initialize == nullptr || api.shutdown == nullptr || api.update == nullptr || api.queueEvent == nullptr
 			|| api.reload == nullptr || api.getLifecycleState == nullptr || api.getReport == nullptr
+			|| api.queueNativeEvent == nullptr || api.updateAction == nullptr
 			|| api.runtimeVersion.size > MaxBridgeStringLength || (api.runtimeVersion.size != 0 && api.runtimeVersion.data == nullptr)) {
 			state = LifecycleState::Incompatible;
 			log::getLog() << "[OpenMW Lua] Bridge ABI or structure validation failed (status "
@@ -183,16 +187,88 @@ namespace mwse::openmw {
 		runtimeStarted = false;
 		resetHandles();
 		state = LifecycleState::Stopped;
+		currentUiMode.clear();
+	}
+
+	void HostController::queueNativeEvent(NativeEvent& eventData) {
+		if (!runtimeStarted || state != LifecycleState::Running || api.queueNativeEvent == nullptr) return;
+		eventData.structureSize = sizeof(eventData);
+		eventData.abiVersion = BridgeAbiVersion;
+		eventData.sequence = ++nativeEventSequence;
+		api.queueNativeEvent(&eventData);
+	}
+
+	std::string HostController::getCurrentUiMode() const {
+		auto* world = TES3::WorldController::get();
+		if (world == nullptr || !world->flagMenuMode) return {};
+		if (world->getMobilePlayer() == nullptr) return "MainMenu";
+		auto* menu = TES3::UI::getMenuOnTop();
+		if (menu == nullptr) return {};
+		const char* nativeName = TES3::UI::lookupID(static_cast<TES3::UI::UI_ID>(menu->id));
+		if (nativeName == nullptr) return {};
+		if (std::strcmp(nativeName, "MenuStatReview") == 0) return "ChargenClassReview";
+		if (std::strcmp(nativeName, "MenuOptions") == 0 && world->getMobilePlayer() == nullptr) return "MainMenu";
+		std::string result(nativeName);
+		if (result.starts_with("Menu")) result.erase(0, 4);
+		return result;
+	}
+
+	void HostController::updateUiMode() {
+		const std::string mode = getCurrentUiMode();
+		if (mode == currentUiMode) return;
+		NativeEvent eventData{};
+		eventData.type = NativeEventType::UiModeChanged;
+		eventData.name.size = static_cast<std::uint32_t>(std::min(mode.size(), static_cast<std::size_t>(BridgeTextCapacity)));
+		std::memcpy(eventData.name.data, mode.data(), eventData.name.size);
+		eventData.previous.size = static_cast<std::uint32_t>(std::min(currentUiMode.size(), static_cast<std::size_t>(BridgeTextCapacity)));
+		std::memcpy(eventData.previous.data, currentUiMode.data(), eventData.previous.size);
+		currentUiMode = mode;
+		queueNativeEvent(eventData);
+	}
+
+	void HostController::notifyPlayerDied() {
+		NativeEvent eventData{}; eventData.type = NativeEventType::PlayerDied; queueNativeEvent(eventData);
+	}
+
+	void HostController::notifySkillRaised(std::uint32_t skillIndex, double level, std::string_view source) {
+		if (skillIndex >= 27 || source.size() > BridgeTextCapacity) return;
+		NativeEvent eventData{}; eventData.type = NativeEventType::SkillLevelUp; eventData.index = skillIndex; eventData.value = level;
+		eventData.source.size = static_cast<std::uint32_t>(source.size()); std::memcpy(eventData.source.data, source.data(), source.size()); queueNativeEvent(eventData);
+	}
+
+	bool HostController::updateBooleanAction(std::string_view key, bool value) {
+		if (!runtimeStarted || state != LifecycleState::Running || api.updateAction == nullptr || key.empty() || key.size() > MaxBridgeStringLength) return false;
+		ActionUpdate updateData{ sizeof(ActionUpdate), BridgeAbiVersion, ActionType::Boolean, 0, { key.data(), static_cast<std::uint32_t>(key.size()) }, value ? 1.0 : 0.0 };
+		return api.updateAction(&updateData) == Status::Ok;
+	}
+
+	bool HostController::queueHarnessUiModeChanged(std::string_view previous, std::string_view current) {
+		if (!isHarnessMode() || previous.size() > BridgeTextCapacity || current.size() > BridgeTextCapacity) return false;
+		NativeEvent eventData{};
+		eventData.type = NativeEventType::UiModeChanged;
+		eventData.previous.size = static_cast<std::uint32_t>(previous.size());
+		std::memcpy(eventData.previous.data, previous.data(), previous.size());
+		eventData.name.size = static_cast<std::uint32_t>(current.size());
+		std::memcpy(eventData.name.data, current.data(), current.size());
+		queueNativeEvent(eventData);
+		return runtimeStarted && state == LifecycleState::Running;
+	}
+
+	bool HostController::isHarnessMode() const {
+		return (initializationFlags & InitializationHarnessMode) != 0;
 	}
 
 	void HostController::update(double deltaSeconds, double simulationTimeSeconds, bool paused) {
 		if (module == nullptr || api.update == nullptr || api.getLifecycleState == nullptr) return;
+		if (state == LifecycleState::Stopped || state == LifecycleState::Disabled
+			|| state == LifecycleState::Failed || state == LifecycleState::Incompatible) return;
 		if (!runtimeStarted) {
 			if ((initializationFlags & InitializationEnabled) != 0 && !isGameDataReady()) return;
 			if (startRuntime() != Status::Ok) return;
 		}
 		state = api.getLifecycleState();
 		if (state != LifecycleState::Running) return;
+		updateUiMode();
 		auto* currentPlayer = TES3::WorldController::get() ? TES3::WorldController::get()->getMobilePlayer() : nullptr;
 		if (currentPlayer != handledPlayer) {
 			resetHandles();
@@ -205,7 +281,7 @@ namespace mwse::openmw {
 			? worldController->gvarTimescale->value : 0.0;
 		const double simulationTimeScale = realDeltaSeconds > 0.0 ? deltaSeconds / realDeltaSeconds : 0.0;
 		FrameUpdate updateData{ sizeof(FrameUpdate), BridgeAbiVersion, ++frameNumber, realDeltaSeconds,
-			this->simulationTimeSeconds, simulationTimeSeconds, simulationTimeScale, gameTimeScale,
+			paused ? 0.0 : deltaSeconds, this->simulationTimeSeconds, simulationTimeSeconds, simulationTimeScale, gameTimeScale,
 			paused ? 1u : 0u, 0 };
 		api.update(&updateData);
 	}

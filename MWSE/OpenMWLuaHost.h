@@ -12,6 +12,11 @@ namespace mwse::openmw {
 		void shutdown();
 		void update(double deltaSeconds, double simulationTimeSeconds, bool paused);
 		bool reload();
+		void notifyPlayerDied();
+		void notifySkillRaised(std::uint32_t skillIndex, double level, std::string_view source);
+		bool updateBooleanAction(std::string_view key, bool value);
+		bool queueHarnessUiModeChanged(std::string_view previous, std::string_view current);
+		bool isHarnessMode() const;
 		std::string getReport() const;
 		LifecycleState getLifecycleState() const;
 		bool isLoaded() const;
@@ -44,6 +49,9 @@ namespace mwse::openmw {
 		static bool environmentEnabled(const char* name);
 		bool isGameDataReady() const;
 		Status startRuntime();
+		void updateUiMode();
+		void queueNativeEvent(NativeEvent& eventData);
+		std::string getCurrentUiMode() const;
 		void resetHandles();
 		void restoreHarnessMutations();
 		OpaqueHandle playerOpaqueHandle() const;
@@ -61,6 +69,7 @@ namespace mwse::openmw {
 		std::uint32_t initializationFlags = 0;
 		bool runtimeStarted = false;
 		std::uint64_t frameNumber = 0;
+		std::uint64_t nativeEventSequence = 0;
 		double simulationTimeSeconds = 0.0;
 		std::uint32_t handleGeneration = 0;
 		void* handledPlayer = nullptr;
@@ -68,6 +77,7 @@ namespace mwse::openmw {
 		struct HarnessMutation { StatKind kind; std::uint32_t index; StatField field; double originalValue; };
 		std::vector<HarnessMutation> harnessMutations;
 		bool restoringHarnessMutations = false;
+		std::string currentUiMode;
 	};
 
 }

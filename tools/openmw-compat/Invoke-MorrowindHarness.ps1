@@ -4,7 +4,7 @@ param(
     [string]$MorrowindDirectory = 'C:\Games\Morrowind',
     [string]$FixtureSave = 'TestMWSE0000.ess',
     [string]$TeleportCell = 'Balmora, Guild of Mages',
-    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings')][string]$Suite = 'Smoke',
+    [ValidateSet('Smoke', 'OpenMWAddon', 'OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings', 'OpenMWLuaInputHandlers')][string]$Suite = 'Smoke',
     [string]$OpenMWAddonPath = 'C:\Games\Morrowind\Data Files\ncg.omwaddon',
     [switch]$ProbeNativeAddonExtension,
     [int]$ReadyTimeoutSeconds = 45,
@@ -14,8 +14,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$isOpenMWLuaSuite = $Suite -in @('OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings')
-$openMWLuaScriptsName = if ($Suite -eq 'OpenMWLuaFoundation') { 'milestone4-foundation.omwscripts' } elseif ($Suite -eq 'OpenMWLuaPlayerBindings') { 'milestone4-player-bindings.omwscripts' } else { 'milestone3.omwscripts' }
+$isOpenMWLuaSuite = $Suite -in @('OpenMWLuaHost', 'OpenMWLuaFoundation', 'OpenMWLuaPlayerBindings', 'OpenMWLuaInputHandlers')
+$openMWLuaScriptsName = if ($Suite -eq 'OpenMWLuaFoundation') { 'milestone4-foundation.omwscripts' } elseif ($Suite -eq 'OpenMWLuaPlayerBindings') { 'milestone4-player-bindings.omwscripts' } elseif ($Suite -eq 'OpenMWLuaInputHandlers') { 'milestone4-input-handlers.omwscripts' } else { 'milestone3.omwscripts' }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 Import-Module (Join-Path $PSScriptRoot 'HarnessProtocol.psm1') -Force
@@ -453,6 +453,66 @@ PLAYER: player_bindings.lua
 PLAYER: player_bindings_safe.lua
 '@, $utf8NoBom)
         }
+        elseif ($Suite -eq 'OpenMWLuaInputHandlers') {
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'input_handlers.lua'), @'
+local async = require('openmw.async')
+local compat = require('openmw.compatibility')
+local core = require('openmw.core')
+local input = require('openmw.input')
+local I = require('openmw.interfaces')
+local self = require('openmw.self')
+
+compat.recordFoundationProbe('input-handlers-optional-interfaces', I.Activation == nil and I.Controls == nil
+    and I.MarksmansEye == nil and I.SkillFramework == nil)
+input.registerAction { key = 'M43_action', type = input.ACTION_TYPE.Boolean, l10n = 'M43', defaultValue = false }
+input.registerActionHandler('M43_action', async:callback(function(value)
+    compat.recordFoundationProbe('input-handlers-action', value == true and input.getBooleanActionValue('M43_action') == true)
+end))
+input.registerActionHandler('M43_action', async:callback(function()
+    error('intentional Milestone 4.3 action handler failure')
+end))
+input.registerActionHandler('M43_action', async:callback(function()
+    compat.recordFoundationProbe('input-handlers-failure-isolation', true)
+end))
+I.SkillProgression.addSkillLevelUpHandler(function(skillId, source, options)
+    compat.recordFoundationProbe('input-handlers-skill-interface', skillId == 'block' and source == 'usage'
+        and options.skillLevel == 51)
+    self:sendEvent('M43SkillLocal', { skillId = skillId, skillLevel = options.skillLevel })
+end)
+core.sendGlobalEvent('M43Global', { value = 7 })
+self:sendEvent('M43Local', { value = 9 })
+
+return { engineHandlers = {
+    onInit = function() compat.recordFoundationProbe('input-handlers-on-init', true) end,
+    onActive = function() compat.recordFoundationProbe('input-handlers-on-active', true) end,
+    onFrame = function(dt) compat.recordFoundationProbe('input-handlers-on-frame', type(dt) == 'number' and dt >= 0) end,
+    onUpdate = function(dt) compat.recordFoundationProbe('input-handlers-on-update', type(dt) == 'number' and dt >= 0) end,
+    onSave = function() return { marker = 43 } end,
+    onLoad = function(data) compat.recordFoundationProbe('input-handlers-on-load', data == nil) end,
+}, eventHandlers = {
+    UiModeChanged = function(data)
+        if data.oldMode == 'Inventory' and data.newMode == 'Journal' and data.arg == nil then
+            compat.recordFoundationProbe('input-handlers-ui-mode', true)
+        end
+    end,
+    Died = function() compat.recordFoundationProbe('input-handlers-died', true) end,
+    M43Local = function(data) compat.recordFoundationProbe('input-handlers-local-delay', data.value == 9) end,
+    M43SkillLocal = function(data) compat.recordFoundationProbe('input-handlers-skill-local-delay',
+        data.skillId == 'block' and data.skillLevel == 51) end,
+} }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'input_handlers_global.lua'), @'
+local compat = require('openmw.compatibility')
+return { eventHandlers = { M43Global = function(data)
+    compat.recordFoundationProbe('input-handlers-global-delay', data.value == 7)
+end } }
+'@, $utf8NoBom)
+            [IO.File]::WriteAllText((Join-Path $syntheticVfs 'milestone4-input-handlers.omwscripts'), @'
+# Milestone 4.3 input and engine-handler live fixture. Ordering is significant.
+PLAYER: input_handlers.lua
+GLOBAL: input_handlers_global.lua
+'@, $utf8NoBom)
+        }
     }
     Write-OwchAtomicJson -Path (Join-Path $runDirectory 'run.json') -Value ([ordered]@{
         protocolVersion = 1; runId = $runId; suite = $Suite; configuration = $Configuration
@@ -611,6 +671,22 @@ PLAYER: player_bindings_safe.lua
         Invoke-NamedProbe 'openMWLuaPlayerNativeState' @{ phase = 'restored' } | Out-Null
         Invoke-NamedProbe 'mwseInitialization' | Out-Null
     }
+    elseif ($Suite -eq 'OpenMWLuaInputHandlers') {
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'primeOpenMWLuaInputHandlers' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaInputHandlersReport' | Out-Null
+        Invoke-NamedProbe 'reloadOpenMWLuaHost' | Out-Null
+        Invoke-NamedProbe 'primeOpenMWLuaInputHandlers' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Send-HarnessCommand 'ping' | Out-Null
+        Invoke-NamedProbe 'openMWLuaInputHandlersReport' | Out-Null
+        Invoke-NamedProbe 'mwseInitialization' | Out-Null
+    }
 
     if ($Suite -eq 'OpenMWAddon') {
         $addonProbeArguments = @{ expectedAlias = $enabledNativeFiles[$enabledNativeFiles.Count - 1]; expectedOrdinaryFiles = @($originalGameFiles) }
@@ -618,7 +694,7 @@ PLAYER: player_bindings_safe.lua
         Add-SmokeAssertion 'ncg-content-live-before-save' ($addonProbe.result.value.aliasActive -and $addonProbe.result.value.ordinaryFilesUnchanged -and $addonProbe.result.value.gmst.value -eq 0) $addonProbe.result.value $true
     }
 
-    if ($Suite -ne 'OpenMWLuaPlayerBindings') {
+    if ($Suite -notin @('OpenMWLuaPlayerBindings', 'OpenMWLuaInputHandlers')) {
         $cellEventRequest = Send-HarnessCommand 'waitForEvent' @{ event = 'cellChanged' } -NoWait
         Send-HarnessCommand 'teleport' @{ cell = $TeleportCell; position = @(0, 0, 0); forceCellChange = $true } | Out-Null
         $cellEvent = Wait-HarnessResponse $cellEventRequest $RequestTimeoutSeconds 'native cellChanged event'
@@ -735,6 +811,7 @@ finally {
             playerTypeReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'player-type-report.json' } else { $null }
             recordsStatReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'records-stat-report.json' } else { $null }
             mutationRestorationReport = if ($Suite -eq 'OpenMWLuaPlayerBindings') { Join-Path $runDirectory 'mutation-restoration-report.json' } else { $null }
+            inputEngineReport = if ($Suite -eq 'OpenMWLuaInputHandlers') { Join-Path $runDirectory 'input-engine-report.json' } else { $null }
             hostEvents = if ($isOpenMWLuaSuite) { Join-Path $runDirectory 'openmw-host-events.jsonl' } else { $null }
             syntheticFixture = if ($isOpenMWLuaSuite) { $syntheticVfs } else { $null }
             save = if (Test-Path -LiteralPath (Join-Path $runDirectory ($smokeSaveBase + '.ess'))) { Join-Path $runDirectory ($smokeSaveBase + '.ess') } else { $null }

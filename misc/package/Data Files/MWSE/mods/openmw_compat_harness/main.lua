@@ -164,8 +164,8 @@ function probes.openMWLuaHostReport(request)
 
 	emitAssertion(request, "openmw-support-dll-loaded", mwse.openmwCompatibility.isLoaded() == true,
 		mwse.openmwCompatibility.isLoaded(), true)
-	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 3,
-		bridge, { abiAccepted = true, abiVersion = 3 })
+	emitAssertion(request, "openmw-bridge-abi-accepted", bridge.abiAccepted == true and bridge.abiVersion == 4,
+		bridge, { abiAccepted = true, abiVersion = 4 })
 	emitAssertion(request, "openmw-runtime-independent", bridge.runtimeOwnedAllocator == true
 		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
 		{ host = bridge.runtimeVersion, mwse = _VERSION, allocator = bridge.runtimeOwnedAllocator,
@@ -242,10 +242,10 @@ function probes.openMWLuaFoundationReport(request)
 			missing[#missing + 1] = name
 		end
 	end
-	emitAssertion(request, "openmw-foundation-bridge-v3", bridge.abiAccepted == true and bridge.abiVersion == 3
-		and bridge.bridgeVersion == 3 and bridge.gmstCallbackAvailable == true
+	emitAssertion(request, "openmw-foundation-bridge-v4", bridge.abiAccepted == true and bridge.abiVersion == 4
+		and bridge.bridgeVersion == 4 and bridge.gmstCallbackAvailable == true
 		and bridge.contentFilesCallbackAvailable == true,
-		bridge, { abiVersion = 3, bridgeVersion = 3, gmstCallbackAvailable = true, contentFilesCallbackAvailable = true })
+		bridge, { abiVersion = 4, bridgeVersion = 4, gmstCallbackAvailable = true, contentFilesCallbackAvailable = true })
 	emitAssertion(request, "openmw-foundation-container-counts", containers.menuDefinitions == 1
 		and containers.globalDefinitions == 2 and containers.playerDefinitions == 1,
 		{ menu = containers.menuDefinitions, global = containers.globalDefinitions, player = containers.playerDefinitions },
@@ -282,9 +282,9 @@ function probes.openMWLuaPlayerBindingsReport(request)
 	}
 	local missing = {}
 	for _, name in ipairs(required) do if probesReport[name] ~= true then missing[#missing + 1] = name end end
-	emitAssertion(request, "openmw-player-bridge-v3-layouts", bridge.abiVersion == 3 and bridge.bridgeVersion == 3
+	emitAssertion(request, "openmw-player-bridge-v4-layouts", bridge.abiVersion == 4 and bridge.bridgeVersion == 4
 		and bridge.gameplayCallbacksAvailable == true and bridge.objectSnapshotSize > 0 and bridge.recordSnapshotSize > 0,
-		bridge, { abiVersion = 3, bridgeVersion = 3, gameplayCallbacksAvailable = true })
+		bridge, { abiVersion = 4, bridgeVersion = 4, gameplayCallbacksAvailable = true })
 	emitAssertion(request, "openmw-player-binding-probes", #missing == 0,
 		{ missing = missing, probes = probesReport }, "all Milestone 4.2 player binding probes true")
 	emitAssertion(request, "openmw-player-stable-userdata", gameplay.stablePlayerUserdata == true
@@ -296,6 +296,76 @@ function probes.openMWLuaPlayerBindingsReport(request)
 		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
 		{ host = bridge.runtimeVersion, mwse = _VERSION }, "independent Lua states and allocators")
 	emitAssertion(request, "mwse-lua-functional-with-player-bindings", type(mwse.buildNumber) == "number"
+		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
+		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
+	return report
+end
+
+function probes.primeOpenMWLuaInputHandlers(request)
+	assert(mwse.openmwCompatibility, "MWSE OpenMW compatibility bridge is unavailable.")
+	local results = {
+		action = mwse.openmwCompatibility.testUpdateBooleanAction("M43_action", true),
+		uiMode = mwse.openmwCompatibility.testQueueUiModeChanged("Inventory", "Journal"),
+		died = mwse.openmwCompatibility.testQueuePlayerDied(),
+		skill = mwse.openmwCompatibility.testQueueSkillLevelUp(0, 51, "progress"),
+	}
+	local passed = results.action and results.uiMode and results.died and results.skill
+	emitAssertion(request, "openmw-input-native-injection-accepted", passed, results,
+		{ action = true, uiMode = true, died = true, skill = true })
+	return results
+end
+
+function probes.openMWLuaInputHandlersReport(request)
+	local report = decodeOpenMWHostReport()
+	local bridge = report.bridge or {}
+	local foundation = report.foundation or {}
+	local probesReport = foundation.probes or {}
+	local inputEngine = report.inputEngine or {}
+	local handlers = report.handlers or {}
+	local required = {
+		"input-handlers-optional-interfaces", "input-handlers-action",
+		"input-handlers-failure-isolation", "input-handlers-skill-interface",
+		"input-handlers-on-active", "input-handlers-on-frame", "input-handlers-on-update",
+		"input-handlers-ui-mode", "input-handlers-died", "input-handlers-local-delay",
+		"input-handlers-skill-local-delay", "input-handlers-global-delay",
+	}
+	if bridge.runtimeGeneration == 1 then
+		required[#required + 1] = "input-handlers-on-init"
+	else
+		required[#required + 1] = "input-handlers-on-load"
+	end
+	local missing = {}
+	for _, name in ipairs(required) do if probesReport[name] ~= true then missing[#missing + 1] = name end end
+	local diagnosticFound = false
+	for _, diagnostic in ipairs(handlers.diagnostics or {}) do
+		if string.find(diagnostic, "intentional Milestone 4.3 action handler failure", 1, true) then diagnosticFound = true end
+	end
+	emitAssertion(request, "openmw-input-bridge-v4-layouts", bridge.abiAccepted == true
+		and bridge.abiVersion == 4 and bridge.bridgeVersion == 4 and bridge.hostApiStructureSize == 72
+		and bridge.frameUpdateSize == 72 and bridge.nativeEventSize == 440 and bridge.actionUpdateSize == 32
+		and bridge.capabilities == 1048575,
+		bridge, { abiVersion = 4, bridgeVersion = 4, hostApiStructureSize = 72,
+			frameUpdateSize = 72, nativeEventSize = 440, actionUpdateSize = 32, capabilities = 1048575 })
+	emitAssertion(request, "openmw-input-handler-probes", #missing == 0,
+		{ missing = missing, probes = probesReport }, "all Milestone 4.3 input and handler probes true")
+	emitAssertion(request, "openmw-input-action-transition", inputEngine.actions
+		and inputEngine.actions.registered >= 1 and inputEngine.actions.transitions >= 1
+		and inputEngine.actions.live == 1,
+		inputEngine.actions, { registered = ">=1", transitions = ">=1", live = 1 })
+	emitAssertion(request, "openmw-input-native-and-local-events", inputEngine.events
+		and inputEngine.events.nativeDelivered >= 3 and inputEngine.events.localQueued >= 2
+		and inputEngine.oneFrameDelay == true,
+		inputEngine.events, { nativeDelivered = ">=3", localQueued = ">=2", oneFrameDelay = true })
+	emitAssertion(request, "openmw-input-lifecycle", inputEngine.lifecycle
+		and inputEngine.lifecycle.onInit == 1 and inputEngine.lifecycle.onActive >= 1
+		and (bridge.runtimeGeneration == 1 or (inputEngine.lifecycle.onSave >= 1 and inputEngine.lifecycle.onLoad >= 1)),
+		inputEngine.lifecycle, { onInit = 1, onActive = ">=1", onSave = "after reload >=1", onLoad = "after reload >=1" })
+	emitAssertion(request, "openmw-input-failure-isolated", diagnosticFound,
+		handlers.diagnostics, "structured action-handler failure diagnostic")
+	emitAssertion(request, "openmw-input-runtime-independent", bridge.runtimeOwnedAllocator == true
+		and bridge.importsMwseLua == false and bridge.runtimeVersion ~= _VERSION,
+		{ host = bridge.runtimeVersion, mwse = _VERSION }, "independent Lua states and allocators")
+	emitAssertion(request, "mwse-lua-functional-with-input-host", type(mwse.buildNumber) == "number"
 		and mwse.buildNumber > 0 and _VERSION == "Lua 5.1-DW",
 		{ buildNumber = mwse.buildNumber, luaVersion = _VERSION }, "normal MWSE Lua state")
 	return report

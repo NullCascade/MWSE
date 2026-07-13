@@ -179,7 +179,7 @@ return { interfaceName='PlayerInterface', interface={},
 		auto config = configFor(temporary, scripts, content, InitializationEnabled | InitializationHarnessMode, temporary / "reports");
 		require(api.initialize(&config) == Status::Ok, "runtime-initialize");
 		require(api.getLifecycleState() == LifecycleState::Running, "runtime-running");
-		FrameUpdate frame{ sizeof(FrameUpdate), BridgeAbiVersion, 1, 0.016, 1.0, 1.0, 1.0, 30.0, 0, 0 };
+		FrameUpdate frame{ sizeof(FrameUpdate), BridgeAbiVersion, 1, 0.016, 0.016, 1.0, 1.0, 1.0, 30.0, 0, 0 };
 		require(api.update(&frame) == Status::Ok, "first-frame-update");
 		frame.frameNumber = 2;
 		require(api.update(&frame) == Status::Ok, "second-frame-update");
@@ -280,7 +280,7 @@ return {}
 		writeFile(temporary / "foundation.omwscripts", "GLOBAL: foundation_provider.lua\nGLOBAL: foundation_consumer.lua\nPLAYER: foundation_player.lua\nMENU: foundation_menu.lua\n");
 		scripts="foundation.omwscripts";content=scripts;auto foundationConfig=configFor(temporary,scripts,content,InitializationEnabled|InitializationHarnessMode,temporary/"foundation-reports");
 		require(api.initialize(&foundationConfig)==Status::Ok,"foundation-runtime-initialize");
-		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.016,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"foundation-first-update");frame.frameNumber=2;frame.simulationTimeSeconds=2.0;require(api.update(&frame)==Status::Ok,"foundation-second-update");
+		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.016,0.016,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"foundation-first-update");frame.frameNumber=2;frame.simulationTimeSeconds=2.0;require(api.update(&frame)==Status::Ok,"foundation-second-update");
 		const std::string foundationReport=report(api);
 		for(const char* probe:{"util-vector-color","interfaces-lookup-readonly","async-registered-simulation","async-unsavable-game","async-callback-callable","storage-global-subscription","storage-player-subscription","storage-context-permissions","storage-menu-player-scope","core-time-content-gmst","core-delayed-global-event","self-player-context","self-context-rejected-global","self-context-rejected-menu"})require(foundationReport.find(std::string("\"")+probe+"\":true")!=std::string::npos,std::string("foundation-probe-")+probe);
 		require(foundationReport.find("\"fired\":2")!=std::string::npos,"foundation-timer-count");
@@ -318,11 +318,76 @@ return {}
 		writeFile(temporary / "gameplay.omwscripts", "PLAYER: gameplay.lua\n");
 		scripts="gameplay.omwscripts";content=scripts;auto gameplayConfig=configFor(temporary,scripts,content,InitializationEnabled|InitializationHarnessMode,temporary/"gameplay-reports");
 		require(api.initialize(&gameplayConfig)==Status::Ok,"gameplay-runtime-initialize");
-		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.016,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"gameplay-first-update");
+		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.016,0.016,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"gameplay-first-update");
 		require(validateGameplayHandle(&gameplay,{1,gameplay.generation,static_cast<std::uint32_t>(HandleType::Cell)},HandleType::Player)==Status::WrongHandleType,"wrong-handle-type-rejected");
 		const auto oldGeneration=gameplay.generation++;require(validateGameplayHandle(&gameplay,{1,oldGeneration,static_cast<std::uint32_t>(HandleType::Player)},HandleType::Player)==Status::StaleHandle,"stale-handle-rejected");
 		require(api.reload()==Status::Ok,"gameplay-reload-new-generation");frame.frameNumber=2;require(api.update(&frame)==Status::Ok,"gameplay-update-after-reload");
 		require(api.shutdown()==Status::Ok,"gameplay-clean-shutdown");
+
+		writeFile(temporary / "handlers.lua", R"(
+local async=require('openmw.async')
+local compat=require('openmw.compatibility')
+local core=require('openmw.core')
+local input=require('openmw.input')
+local I=require('openmw.interfaces')
+local self=require('openmw.self')
+assert(I.SkillFramework==nil and I.MarksmansEye==nil and I.Controls==nil and I.Activation==nil)
+local function step(name,fn) local ok,err=pcall(fn);if not ok then error(name..': '..tostring(err)) end end
+step('registerAction',function() input.registerAction{key='NCG_show_logs',type=input.ACTION_TYPE.Boolean,l10n='NCG',defaultValue=false} end)
+step('registerActionHandler1',function() input.registerActionHandler('NCG_show_logs',async:callback(function(value) compat.recordFoundationProbe('m43-action-handler',value==true) end)) end)
+step('registerActionHandler2',function() input.registerActionHandler('NCG_show_logs',async:callback(function() error('intentional action failure') end)) end)
+step('registerActionHandler3',function() input.registerActionHandler('NCG_show_logs',async:callback(function() compat.recordFoundationProbe('m43-action-failure-isolation',true) end)) end)
+step('SkillProgression',function() I.SkillProgression.addSkillLevelUpHandler(function(skillId,source,options)
+  compat.recordFoundationProbe('m43-skill-interface',skillId=='block' and source=='usage' and options.skillLevel==51)
+  self:sendEvent('NCG_on_skill_level_up',{skillId=skillId,skillLevel=options.skillLevel})
+end) end)
+step('sendGlobal',function() core.sendGlobalEvent('M43Global',{value=7}) end)
+step('sendLocal',function() self:sendEvent('M43Local',{value=9}) end)
+return {engineHandlers={
+  onInit=function() compat.recordFoundationProbe('m43-on-init',true) end,
+  onActive=function() compat.recordFoundationProbe('m43-on-active',true) end,
+  onFrame=function(dt) compat.recordFoundationProbe('m43-on-frame',dt==0.25) end,
+  onUpdate=function(dt) compat.recordFoundationProbe('m43-on-update',dt==0.25) end,
+  onSave=function() return {marker=42} end,
+  onLoad=function(data) compat.recordFoundationProbe('m43-on-load',data==nil) end,
+},eventHandlers={
+  UiModeChanged=function(data) compat.recordFoundationProbe('m43-ui-mode',data.oldMode=='' and data.newMode=='Inventory' and data.arg==nil) end,
+  Died=function() compat.recordFoundationProbe('m43-died',true) end,
+  M43Local=function(data) compat.recordFoundationProbe('m43-local-delay',data.value==9) end,
+  NCG_on_skill_level_up=function(data) compat.recordFoundationProbe('m43-skill-local-delay',data.skillId=='block' and data.skillLevel==51) end,
+}}
+)");
+		writeFile(temporary / "handlers_global.lua", R"(
+local compat=require('openmw.compatibility')
+return {eventHandlers={M43Global=function(data) compat.recordFoundationProbe('m43-global-delay',data.value==7) end}}
+)");
+		writeFile(temporary / "handlers.omwscripts", "PLAYER: handlers.lua\nGLOBAL: handlers_global.lua\n");
+		scripts="handlers.omwscripts";content=scripts;auto handlersConfig=configFor(temporary,scripts,content,InitializationEnabled|InitializationHarnessMode,temporary/"handlers-reports");
+		const auto handlersStatus=api.initialize(&handlersConfig);
+		if(handlersStatus!=Status::Ok)throw std::runtime_error(std::string("m43-runtime-initialize: ")+report(api));
+		require(true,"m43-runtime-initialize");
+		require(api.queueNativeEvent!=nullptr&&api.updateAction!=nullptr,"m43-abi-entrypoints");
+		ActionUpdate action{sizeof(ActionUpdate),BridgeAbiVersion,ActionType::Boolean,0,{"NCG_show_logs",13},1.0};
+		ActionUpdate badAction=action;badAction.structureSize--;require(api.updateAction(&badAction)==Status::StructureSizeMismatch,"m43-action-layout-rejected");
+		badAction=action;badAction.abiVersion++;require(api.updateAction(&badAction)==Status::AbiMismatch,"m43-action-abi-rejected");
+		ActionUpdate missingAction=action;missingAction.key={"missing",7};require(api.updateAction(&missingAction)==Status::NotFound,"m43-action-missing-rejected");
+		require(api.updateAction(&action)==Status::Ok,"m43-action-update-queued");
+		NativeEvent uiEvent{};uiEvent.structureSize=sizeof(uiEvent);uiEvent.abiVersion=BridgeAbiVersion;uiEvent.type=NativeEventType::UiModeChanged;textValue(uiEvent.name,"Inventory");
+		NativeEvent badEvent=uiEvent;badEvent.structureSize--;require(api.queueNativeEvent(&badEvent)==Status::StructureSizeMismatch,"m43-native-event-layout-rejected");
+		badEvent=uiEvent;badEvent.abiVersion++;require(api.queueNativeEvent(&badEvent)==Status::AbiMismatch,"m43-native-event-abi-rejected");
+		require(api.queueNativeEvent(&uiEvent)==Status::Ok,"m43-ui-event-queued");
+		NativeEvent diedEvent{};diedEvent.structureSize=sizeof(diedEvent);diedEvent.abiVersion=BridgeAbiVersion;diedEvent.type=NativeEventType::PlayerDied;require(api.queueNativeEvent(&diedEvent)==Status::Ok,"m43-died-event-queued");
+		NativeEvent skillEvent{};skillEvent.structureSize=sizeof(skillEvent);skillEvent.abiVersion=BridgeAbiVersion;skillEvent.type=NativeEventType::SkillLevelUp;skillEvent.index=0;skillEvent.value=51;textValue(skillEvent.source,"progress");require(api.queueNativeEvent(&skillEvent)==Status::Ok,"m43-skill-event-queued");
+		NativeEvent badSkill=skillEvent;badSkill.index=27;require(api.queueNativeEvent(&badSkill)==Status::OutOfRange,"m43-skill-bounds-rejected");
+		frame={sizeof(FrameUpdate),BridgeAbiVersion,1,0.25,0.25,1.0,1.0,1.0,30.0,0,0};require(api.update(&frame)==Status::Ok,"m43-first-update");
+		std::string firstHandlersReport=report(api);require(firstHandlersReport.find("\"m43-ui-mode\":true")==std::string::npos,"m43-native-one-frame-delay");
+		frame.frameNumber=2;require(api.update(&frame)==Status::Ok,"m43-second-update");frame.frameNumber=3;require(api.update(&frame)==Status::Ok,"m43-third-update");
+		std::string handlersReport=report(api);
+		for(const char* probe:{"m43-action-handler","m43-action-failure-isolation","m43-skill-interface","m43-on-init","m43-on-active","m43-on-frame","m43-on-update","m43-ui-mode","m43-died","m43-local-delay","m43-skill-local-delay","m43-global-delay"})require(handlersReport.find(std::string("\"")+probe+"\":true")!=std::string::npos,std::string("m43-probe-")+probe);
+		require(handlersReport.find("intentional action failure")!=std::string::npos,"m43-action-diagnostic");
+		require(api.reload()==Status::Ok,"m43-lifecycle-reload");frame.frameNumber=4;require(api.update(&frame)==Status::Ok,"m43-update-after-reload");
+		std::string handlersReloadReport=report(api);require(handlersReloadReport.find("\"m43-on-load\":true")!=std::string::npos&&handlersReloadReport.find("\"onSave\":1")!=std::string::npos&&handlersReloadReport.find("\"onLoad\":1")!=std::string::npos,"m43-on-save-load-mapped");
+		require(api.shutdown()==Status::Ok,"m43-clean-shutdown");
 
 		writeFile(temporary / "multi.lua", "return {}\n");
 		writeFile(temporary / "valid.omwscripts", "# comment\nPLAYER, CUSTOM, NPC : multi.lua\n");

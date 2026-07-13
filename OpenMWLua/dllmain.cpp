@@ -19,6 +19,14 @@ namespace {
 		return host::Host::getInstance().queueEvent(eventData);
 	}
 
+	Status __cdecl queueNativeHostEvent(const NativeEvent* eventData) {
+		return host::Host::getInstance().queueNativeEvent(eventData);
+	}
+
+	Status __cdecl updateHostAction(const ActionUpdate* updateData) {
+		return host::Host::getInstance().updateAction(updateData);
+	}
+
 	Status __cdecl reloadHost() {
 		return host::Host::getInstance().reload();
 	}
@@ -47,7 +55,9 @@ extern "C" __declspec(dllexport) Status __cdecl OpenMWLua_QueryApi(
 			| CapabilityGlobalContainer | CapabilityPlayerContainer | CapabilityDelayedEvents | CapabilityReload
 			| CapabilityFoundationUtil | CapabilityFoundationInterfaces | CapabilityFoundationAsync
 			| CapabilityFoundationStorage | CapabilityFoundationCore | CapabilityFoundationSelf
-			| CapabilityPlayerBindings | CapabilityRecordBindings | CapabilityMutableStats,
+			| CapabilityPlayerBindings | CapabilityRecordBindings | CapabilityMutableStats
+			| CapabilityInputActions | CapabilityLifecycleHandlers | CapabilityNativeEngineEvents
+			| CapabilityPlayerLocalEvents,
 		{ RuntimeVersion, sizeof(RuntimeVersion) - 1 },
 		&initializeHost,
 		&shutdownHost,
@@ -56,6 +66,8 @@ extern "C" __declspec(dllexport) Status __cdecl OpenMWLua_QueryApi(
 		&reloadHost,
 		&getHostLifecycleState,
 		&getHostReport,
+		&queueNativeHostEvent,
+		&updateHostAction,
 	};
 	return Status::Ok;
 }

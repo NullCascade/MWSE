@@ -466,11 +466,29 @@ Evidence-backed implementation decisions and limitations:
 
 ### M4.3 Input and engine handlers
 
-- [ ] Implement action registration and action handlers used by NCG.
-- [ ] Map `onFrame`, `onUpdate`, `onInit`, `onActive`, `onLoad`, and `onSave`.
-- [ ] Map NCG-relevant `UiModeChanged`, `Died`, and skill-level events.
-- [ ] Implement global events and player-local events with OpenMW ordering and one-frame delay.
-- [ ] Confirm optional third-party interfaces remain safely detectable as absent.
+- [x] Implement action registration and action handlers used by NCG.
+- [x] Map `onFrame`, `onUpdate`, `onInit`, `onActive`, `onLoad`, and `onSave`.
+- [x] Map NCG-relevant `UiModeChanged`, `Died`, and skill-level events.
+- [x] Implement global events and player-local events with OpenMW ordering and one-frame delay.
+- [x] Confirm optional third-party interfaces remain safely detectable as absent.
+
+### Milestone 4.3 implementation record
+
+Milestone 4.3 passed the build-enabled x86 Debug in-process gate on 2026-07-13 under run ID `20260713T102429Z-814df4934fd84852bc5449fc2ded94b5`. Evidence is retained at `C:\Games\Morrowind\Data Files\MWSE\tmp\openmw-compat-harness\20260713T102429Z-814df4934fd84852bc5449fc2ded94b5`. Its `result.json` reports `passed: true`, process exit code 0, graceful shutdown, all launcher assertions and all 26 in-game assertions passing, exact restoration of every staged file, and no remaining Morrowind process. The directory retains the build log, native-test result, events JSONL, MWSE log, structured host events, bridge/runtime, input/engine, reload/shutdown, and restoration reports, plus the exact synthetic Lua and `.omwscripts` fixture.
+
+Evidence-backed implementation decisions and limitations:
+
+- Bridge ABI/version 4 preserves all ABI v3 layouts and appends a simulation delta to `FrameUpdate` plus two fixed-width support-DLL entrypoints. `NativeEvent` is a bounded 440-byte POD carrying a type, sequence, skill index/value, and bounded mode/source text; `ActionUpdate` is a 32-byte POD carrying an action type, bounded borrowed key view, and scalar value. The accepted x86 report records `HostApi` 72, initialization 136, callbacks 80, `FrameUpdate` 72, `NativeEvent` 440, and `ActionUpdate` 32 bytes, with capability mask 1,048,575. Structure size, ABI version, reserved fields, strings, finite numeric values, event type, action type, range, skill index, and registered action identity are validated before use. No Lua value, registry reference, allocator, native pointer, or C++ object crosses the boundary.
+- `openmw.input` implements `ACTION_TYPE.Boolean`, `Number`, and `Range`; `registerAction`; `registerActionHandler`; and the three typed action-value getters. Registrations and handler references belong to one Lua runtime generation and are rebuilt by script startup after reload. Native input adapters submit only POD action updates; transitions are applied at the next host update, unchanged values do not retrigger handlers, and one failing handler produces a structured diagnostic without preventing later handlers.
+- `onInit` runs for new GLOBAL and PLAYER instances, `onActive` runs when PLAYER instances become active, `onFrame` receives native simulation delta for MENU and PLAYER instances, and the preserved direct-order `onUpdate` path receives that delta for the existing containers. Explicit host reload invokes non-MENU `onSave`, destroys the Lua state and generation-scoped references, recreates instances, invokes non-MENU `onLoad(nil, nil)`, and invokes PLAYER `onActive`. The live report records lifecycle counts `onInit: 1`, `onActive: 2`, `onSave: 1`, and `onLoad: 1` across one reload.
+- `UiModeChanged` is generated from native Morrowind menu-state transitions and carries `{ oldMode, newMode, arg = nil }`; the NCG-relevant main-menu and character-class-review names are mapped explicitly. The native player death path queues `Died`. Book, use/progress, and trainer skill raises queue typed skill-level events after the native value changes. The exact NCG-used `SkillProgression` subset exposes version 2, `SKILL_INCREASE_SOURCES`, and `addSkillLevelUpHandler`; Morrowind progress notifications map to OpenMW's `usage` source and pass the lowercase skill ID plus `options.skillLevel`.
+- `core.sendGlobalEvent` and validated player `GameObject:sendEvent` clone only supported scalar/table/player-object payload shapes into generation-owned registry references. Cycles, shared tables, unsupported key/value types, excessive nesting, invalid objects, and stale or wrong player handles fail explicitly. Events are queued for the next frame, global handlers retain reverse script order, local events target only PLAYER instances, and a skill callback that sends a local event therefore demonstrates the expected second delayed stage.
+- Harness-only MWSE probes submit action, UI-mode, death, and skill events through the production ABI entrypoints; they are unavailable as unrestricted OpenMW Lua evaluation and refuse use unless `InitializationHarnessMode` is set. The retained input report records two action registrations, two transitions, one live action after reload, six delivered native events, four queued local events, one live skill handler, and one-frame delay. Its intentional action-handler failure is retained in the structured diagnostics while every safe probe after it passes.
+- `MarksmansEye` and `SkillFramework` remain absent and safe to feature-detect. `Activation` and `Controls` are also absent rather than supplied as plausible placeholders before Milestone 4.4. Settings, activation/control behavior, UI, input-device bindings, localization resources, and NCG gameplay behavior are not implemented here.
+- `onSave` return values are intentionally discarded and `onLoad` receives nil until the Milestone 5 serializer and persistence work. Ordinary Morrowind save/load is not claimed as OpenMW script-state persistence. The preexisting Milestone 3 MENU `onUpdate` behavior is retained for regression compatibility even though the new NCG-facing lifecycle work does not depend on it.
+- Native tests pass ABI/layout mismatch, missing-entrypoint/callback, malformed event/action, bounds/type/range/not-found, action transition/getter, handler failure isolation, lifecycle, native UI/death/skill dispatch, source mapping, global/local one-frame delay, two-stage skill-local delay, reload, shutdown, native-DLL rejection, and Lua-bytecode rejection cases, together with all earlier milestone tests. The harness protocol test, addon transformation unit suite, and CSSE offline regression also pass; the latter is retained under run `20260713T101652Z-bfd27e769737409b93287072a9c680e8` with the NCG source hash unchanged.
+- Preserved live regressions passed against the final shutdown-safe binaries under Foundation run `20260713T102059Z-e2204aa94a0247bd9a719c0136eaa535`, Player Bindings run `20260713T102136Z-f931e32b39f14b51a67dd171fec4d92c`, Host run `20260713T102206Z-87f869f546bf40348f46e35a367e2ddd`, and exact Milestone 1 run `20260713T102242Z-2082dfe073e84f829215c8f17ace5e5f`. Every result is true, every process exits, and staging/restoration succeeds. The dedicated final bridge report remains at runtime generation 2, state 6, `cleanShutdown: true`, and zero allocated bytes; terminal controller states cannot auto-start a later generation. Final PE inspection still finds exactly `OpenMWLua_QueryApi` exported and only `KERNEL32.dll` imported, proving the Lua states and allocators remain independent.
+- Milestone 4.3 implements the exact NCG action/event/lifecycle subset, not general input or engine-event emulation. The next unblocked milestone is 4.4 settings and UI baseline.
 
 ### M4.4 NCG settings and UI baseline
 
@@ -735,7 +753,7 @@ Types: `MODE`.
 - [x] `ContentFiles.has`
 - [ ] `core.getFormId`
 - [ ] `GameObject.isValid`
-- [ ] `GameObject.sendEvent`
+- [x] `GameObject.sendEvent`
 - [ ] `GameObject.activateBy`
 - [ ] `GameObject.addScript`
 - [ ] `GameObject.hasScript`
@@ -821,17 +839,17 @@ Types: `NAV_MESH_RENDER_MODE`, `RENDER_MODE`.
 - [ ] `input.getKeyName`
 - [ ] `input.getControlSwitch`
 - [ ] `input.setControlSwitch`
-- [ ] `input.registerAction`
+- [x] `input.registerAction`
 - [ ] `input.bindAction`
-- [ ] `input.registerActionHandler`
-- [ ] `input.getBooleanActionValue`
-- [ ] `input.getNumberActionValue`
-- [ ] `input.getRangeActionValue`
+- [x] `input.registerActionHandler`
+- [x] `input.getBooleanActionValue`
+- [x] `input.getNumberActionValue`
+- [x] `input.getRangeActionValue`
 - [ ] `input.registerTrigger`
 - [ ] `input.registerTriggerHandler`
 - [ ] `input.activateTrigger`
 
-Types: `ACTION`, `ACTION_TYPE`, `ActionInfo`, `ActionType`, `CONTROL_SWITCH`, `CONTROLLER_AXIS`, `CONTROLLER_BUTTON`, `ControlSwitch`, `KEY`, `KeyboardEvent`, `KeyCode`, `TouchEvent`, `TriggerInfo`.
+Types: `ACTION`, `ACTION_TYPE` (implemented for `Boolean`, `Number`, and `Range`), `ActionInfo`, `ActionType`, `CONTROL_SWITCH`, `CONTROLLER_AXIS`, `CONTROLLER_BUTTON`, `ControlSwitch`, `KEY`, `KeyboardEvent`, `KeyCode`, `TouchEvent`, `TriggerInfo`.
 
 ### `openmw.interfaces`
 
@@ -1312,7 +1330,7 @@ These are not all part of the native `openmw.*` package surface, but third-party
 - [ ] `Controls`
 - [ ] `MWUI`
 - [ ] `Settings`
-- [ ] `SkillProgression`
+- [x] `SkillProgression` (NCG-used version, sources, and level-up handler subset)
 - [ ] `StatsWindow`
 - [ ] `Templates`
 - [ ] `TooltipBuilders`

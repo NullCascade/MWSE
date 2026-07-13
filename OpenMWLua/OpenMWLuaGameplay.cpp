@@ -102,6 +102,7 @@ namespace mwse::openmw::host {
 		if (validation != Status::Ok) { ++host->mRejectedHandles; return statusError(state, validation, "player handle validation"); }
 		const char* key = lua_tostring(state, 2);
 		if (std::strcmp(key, "_mwseFoundationAvailable") == 0 || std::strcmp(key, "isValid") == 0) { lua_pushboolean(state, 1); return 1; }
+		if (std::strcmp(key, "sendEvent") == 0) { lua_pushlightuserdata(state, host); lua_pushcclosure(state, &objectSendEventThunk, 1); return 1; }
 		ObjectSnapshot snapshot{}; snapshot.structureSize=sizeof(snapshot);snapshot.abiVersion=BridgeAbiVersion;
 		const Status status=host->mCallbacks.getPlayerObject(host->mCallbacks.gameUserData,&snapshot);if(status!=Status::Ok)return statusError(state,status,"player snapshot");
 		if (std::strcmp(key, "recordId") == 0) { pushText(state, snapshot.recordId); return 1; }

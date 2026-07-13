@@ -1,5 +1,7 @@
 #include "TES3MobilePlayer.h"
 
+#include "OpenMWLuaHost.h"
+
 #include "LuaManager.h"
 #include "LuaUtil.h"
 
@@ -96,6 +98,7 @@ namespace TES3 {
 	const auto TES3_MobilePlayer_onDeath = reinterpret_cast<void(__thiscall*)(MobileActor*)>(0x56A120);
 	void MobilePlayer::onDeath() {
 		TES3_MobilePlayer_onDeath(this);
+		mwse::openmw::HostController::getInstance().notifyPlayerDied();
 
 		// Trigger death event.
 		if (mwse::lua::event::DeathEvent::getEventEnabled()) {

@@ -128,6 +128,9 @@ namespace mwse::openmw::host {
 			|| config->callbacks.setActorSpell == nullptr || config->callbacks.getActiveSpellCount == nullptr
 			|| config->callbacks.getActiveSpell == nullptr) return Status::MissingCallback;
 		if (mState == LifecycleState::Running || mState == LifecycleState::Initializing) return Status::InvalidState;
+		mActionsRegistered = mActionTransitions = mNativeEventsDelivered = mLocalEventsQueued = 0;
+		mSaveHandlerCalls = mLoadHandlerCalls = mInitHandlerCalls = mActiveHandlerCalls = 0;
+		mLoadingSavedScripts = false;
 
 		mConfig = *config;
 		mCallbacks = config->callbacks;
@@ -160,6 +163,11 @@ namespace mwse::openmw::host {
 		mInstances.clear();
 		mPendingEvents.clear();
 		mNextEvents.clear();
+		mPendingNativeEvents.clear();
+		mNextNativeEvents.clear();
+		mPendingActionUpdates.clear();
+		mInputActions.clear();
+		mSkillLevelUpHandlers.clear();
 		mTimers.clear();
 		mGlobalStorage.clear();
 		mPlayerStorage.clear();
@@ -209,7 +217,9 @@ namespace mwse::openmw::host {
 					| CapabilityGlobalContainer | CapabilityPlayerContainer | CapabilityDelayedEvents | CapabilityReload
 					| CapabilityFoundationUtil | CapabilityFoundationInterfaces | CapabilityFoundationAsync
 					| CapabilityFoundationStorage | CapabilityFoundationCore | CapabilityFoundationSelf
-					| CapabilityPlayerBindings | CapabilityRecordBindings | CapabilityMutableStats);
+					| CapabilityPlayerBindings | CapabilityRecordBindings | CapabilityMutableStats
+					| CapabilityInputActions | CapabilityLifecycleHandlers | CapabilityNativeEngineEvents
+					| CapabilityPlayerLocalEvents);
 			log(LogSeverity::Info, "startup", startup.str());
 			if ((mConfig.flags & InitializationHarnessMode) != 0 && (mConfig.flags & InitializationParseOnly) == 0) {
 				QueuedEvent eventData{ sizeof(QueuedEvent), BridgeAbiVersion, asBridgeString("Milestone3Event"), {} };
@@ -254,6 +264,11 @@ namespace mwse::openmw::host {
 		mInstances.clear();
 		mPendingEvents.clear();
 		mNextEvents.clear();
+		mPendingNativeEvents.clear();
+		mNextNativeEvents.clear();
+		mPendingActionUpdates.clear();
+		mInputActions.clear();
+		mSkillLevelUpHandlers.clear();
 		if (mLua != nullptr) {
 			lua_close(mLua);
 			mLua = nullptr;
@@ -362,6 +377,7 @@ namespace mwse::openmw::host {
 			if (containsFlag(definition, "GLOBAL")) startInstance(definition, "GLOBAL");
 			if (containsFlag(definition, "PLAYER")) startInstance(definition, "PLAYER");
 		}
+		callActiveHandlers();
 	}
 
 	void Host::startInstance(const Definition& definition, std::string_view container) {
@@ -399,7 +415,16 @@ namespace mwse::openmw::host {
 		lua_getfield(mLua, -1, "mwse");
 		script.mwseGlobalVisible = !lua_isnil(mLua, -1);
 		lua_pop(mLua, 2);
-		if (auto it = script.engineHandlers.find("onInit"); it != script.engineHandlers.end()) callHandler(script, it->second, "engineHandlers.onInit", std::nullopt, std::nullopt);
+		if (script.container != "MENU") {
+			if (mLoadingSavedScripts) {
+				if (auto it = script.engineHandlers.find("onLoad"); it != script.engineHandlers.end()) {
+					lua_rawgeti(mLua, LUA_REGISTRYINDEX, it->second); lua_pushnil(mLua); lua_pushnil(mLua);
+					if (lua_pcall(mLua, 2, 0, 0) != 0) { std::string message=lua_tostring(mLua,-1);lua_pop(mLua,1);mDiagnostics.push_back(script.contentFile+"|"+script.container+"|"+script.scriptPath+"|engineHandlers.onLoad|"+message); }
+					++mLoadHandlerCalls;
+				}
+			}
+			else if (auto it = script.engineHandlers.find("onInit"); it != script.engineHandlers.end()) { callHandler(script, it->second, "engineHandlers.onInit", std::nullopt, std::nullopt); ++mInitHandlerCalls; }
+		}
 		log(LogSeverity::Info, "script", "started isolated script environment", &script);
 	}
 
@@ -478,7 +503,7 @@ namespace mwse::openmw::host {
 			if (name == "coroutine" || name == "math" || name == "string" || name == "table") self->pushSafeLibraryClone(name.c_str());
 			else if (name == "openmw.compatibility" || name == "openmw.util" || name == "openmw.interfaces"
 				|| name == "openmw.async" || name == "openmw.storage" || name == "openmw.core" || name == "openmw.self"
-				|| name == "openmw.types") self->pushBuiltinPackage(*instance, name);
+				|| name == "openmw.types" || name == "openmw.input") self->pushBuiltinPackage(*instance, name);
 			else { int reference = self->loadSourceModule(*instance, name); lua_rawgeti(state, LUA_REGISTRYINDEX, reference); return 1; }
 			lua_pushvalue(state, -1);
 			instance->loadedModules[name] = luaL_ref(state, LUA_REGISTRYINDEX);
@@ -533,9 +558,13 @@ namespace mwse::openmw::host {
 		mGameTimeScale = updateData->gameTimeScale;
 		mWorldPaused = updateData->paused != 0;
 		deliverDelayedEvents();
+		deliverNativeEvents();
+		processActionUpdates();
 		processTimers();
-		callEngineHandlers("onUpdate", updateData->realDeltaSeconds);
+		callEngineHandlers("onFrame", updateData->simulationDeltaSeconds, "FRAME");
+		callEngineHandlers("onUpdate", updateData->simulationDeltaSeconds);
 		mPendingEvents.swap(mNextEvents); mNextEvents.clear();
+		mPendingNativeEvents.swap(mNextNativeEvents); mNextNativeEvents.clear();
 		writeReportArtifacts();
 		return Status::Ok;
 	}
@@ -559,8 +588,27 @@ namespace mwse::openmw::host {
 		mPendingEvents.clear();
 	}
 
-	void Host::callEngineHandlers(std::string_view name, double argument) {
-		for (auto& item : mInstances) if (auto it = item->engineHandlers.find(std::string(name)); it != item->engineHandlers.end()) { if (mEngineHandlerOrder.size() < 128) mEngineHandlerOrder.push_back(item->container + ":" + item->scriptPath + ":" + std::string(name)); callHandler(*item, it->second, "engineHandlers." + std::string(name), argument, std::nullopt); }
+	void Host::callEngineHandlers(std::string_view name, double argument, std::string_view containerFilter) {
+		for (auto& item : mInstances) {
+			if (containerFilter == "FRAME" && item->container != "MENU" && item->container != "PLAYER") continue;
+			if (containerFilter == "UPDATE" && item->container == "MENU") continue;
+			if (auto it = item->engineHandlers.find(std::string(name)); it != item->engineHandlers.end()) { if (mEngineHandlerOrder.size() < 128) mEngineHandlerOrder.push_back(item->container + ":" + item->scriptPath + ":" + std::string(name)); callHandler(*item, it->second, "engineHandlers." + std::string(name), argument, std::nullopt); }
+		}
+	}
+
+	void Host::callSaveHandlers() {
+		for (auto& item : mInstances) {
+			if (item->container == "MENU") continue;
+			auto it = item->engineHandlers.find("onSave"); if (it == item->engineHandlers.end()) continue;
+			lua_rawgeti(mLua, LUA_REGISTRYINDEX, it->second);
+			if (lua_pcall(mLua, 0, 1, 0) != 0) { std::string message=lua_tostring(mLua,-1);lua_pop(mLua,1);const std::string diagnostic=item->contentFile+"|"+item->container+"|"+item->scriptPath+"|engineHandlers.onSave|"+message;if(mDiagnostics.size()<128)mDiagnostics.push_back(diagnostic);log(LogSeverity::Error,"handler",diagnostic,item.get()); }
+			else lua_pop(mLua, 1);
+			++mSaveHandlerCalls;
+		}
+	}
+
+	void Host::callActiveHandlers() {
+		for (auto& item : mInstances) if (item->container == "PLAYER") if (auto it=item->engineHandlers.find("onActive");it!=item->engineHandlers.end()) { callHandler(*item,it->second,"engineHandlers.onActive",std::nullopt,std::nullopt);++mActiveHandlerCalls; }
 	}
 
 	void Host::callEventHandlers(const DelayedEvent& eventData) {
@@ -580,8 +628,9 @@ namespace mwse::openmw::host {
 	Status Host::reload() {
 		if (mState != LifecycleState::Running) return Status::InvalidState;
 		log(LogSeverity::Info, "reload", "explicit runtime reload requested");
-		destroyRuntime(); ++mReloadCount;
-		Status result = initializeRuntime();
+		callSaveHandlers();
+		destroyRuntime(); ++mReloadCount; mLoadingSavedScripts = true;
+		Status result = initializeRuntime(); mLoadingSavedScripts = false;
 		writeReportArtifacts(); return result;
 	}
 
@@ -606,15 +655,16 @@ namespace mwse::openmw::host {
 	}
 
 	std::string Host::buildHandlerReport() const { std::ostringstream s; s << "{\"engineHandlerOrder\":" << jsonStringArray(mEngineHandlerOrder) << ",\"eventHandlerOrder\":" << jsonStringArray(mEventHandlerOrder) << ",\"delayedDeliveries\":" << jsonStringArray(mDelayedDeliveries) << ",\"diagnostics\":" << jsonStringArray(mDiagnostics) << '}'; return s.str(); }
-	std::string Host::buildBridgeReport() const { std::ostringstream s; s << "{\"abiAccepted\":true,\"abiVersion\":" << BridgeAbiVersion << ",\"hostApiStructureSize\":" << sizeof(HostApi) << ",\"initializationStructureSize\":" << sizeof(InitializationConfig) << ",\"callbacksStructureSize\":" << sizeof(BridgeCallbacks) << ",\"objectSnapshotSize\":" << sizeof(ObjectSnapshot) << ",\"cellSnapshotSize\":" << sizeof(CellSnapshot) << ",\"statSnapshotSize\":" << sizeof(StatSnapshot) << ",\"recordSnapshotSize\":" << sizeof(RecordSnapshot) << ",\"runtimeVersion\":\"" << LUAJIT_VERSION << "\",\"apiRevision\":" << OpenMWApiRevision << ",\"bridgeVersion\":" << BridgeVersion << ",\"capabilities\":" << (CapabilityIsolatedLuaState|CapabilitySandboxedSourceModules|CapabilityMenuContainer|CapabilityGlobalContainer|CapabilityPlayerContainer|CapabilityDelayedEvents|CapabilityReload|CapabilityFoundationUtil|CapabilityFoundationInterfaces|CapabilityFoundationAsync|CapabilityFoundationStorage|CapabilityFoundationCore|CapabilityFoundationSelf|CapabilityPlayerBindings|CapabilityRecordBindings|CapabilityMutableStats) << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"runtimeOwnedAllocator\":true,\"importsMwseLua\":false,\"allocatedBytes\":" << mAllocatedBytes << ",\"gmstCallbackAvailable\":" << (mCallbacks.getGameSetting?"true":"false") << ",\"contentFilesCallbackAvailable\":" << (mCallbacks.getContentFileCount&&mCallbacks.getContentFile?"true":"false") << ",\"gameplayCallbacksAvailable\":" << (mCallbacks.getPlayerObject&&mCallbacks.validateHandle&&mCallbacks.getCell&&mCallbacks.getStat&&mCallbacks.setStat&&mCallbacks.getRecord?"true":"false") << '}'; return s.str(); }
+	std::string Host::buildBridgeReport() const { std::ostringstream s; s << "{\"abiAccepted\":true,\"abiVersion\":" << BridgeAbiVersion << ",\"hostApiStructureSize\":" << sizeof(HostApi) << ",\"initializationStructureSize\":" << sizeof(InitializationConfig) << ",\"callbacksStructureSize\":" << sizeof(BridgeCallbacks) << ",\"frameUpdateSize\":" << sizeof(FrameUpdate) << ",\"nativeEventSize\":" << sizeof(NativeEvent) << ",\"actionUpdateSize\":" << sizeof(ActionUpdate) << ",\"objectSnapshotSize\":" << sizeof(ObjectSnapshot) << ",\"cellSnapshotSize\":" << sizeof(CellSnapshot) << ",\"statSnapshotSize\":" << sizeof(StatSnapshot) << ",\"recordSnapshotSize\":" << sizeof(RecordSnapshot) << ",\"runtimeVersion\":\"" << LUAJIT_VERSION << "\",\"apiRevision\":" << OpenMWApiRevision << ",\"bridgeVersion\":" << BridgeVersion << ",\"capabilities\":" << (CapabilityIsolatedLuaState|CapabilitySandboxedSourceModules|CapabilityMenuContainer|CapabilityGlobalContainer|CapabilityPlayerContainer|CapabilityDelayedEvents|CapabilityReload|CapabilityFoundationUtil|CapabilityFoundationInterfaces|CapabilityFoundationAsync|CapabilityFoundationStorage|CapabilityFoundationCore|CapabilityFoundationSelf|CapabilityPlayerBindings|CapabilityRecordBindings|CapabilityMutableStats|CapabilityInputActions|CapabilityLifecycleHandlers|CapabilityNativeEngineEvents|CapabilityPlayerLocalEvents) << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"runtimeOwnedAllocator\":true,\"importsMwseLua\":false,\"allocatedBytes\":" << mAllocatedBytes << ",\"gmstCallbackAvailable\":" << (mCallbacks.getGameSetting?"true":"false") << ",\"contentFilesCallbackAvailable\":" << (mCallbacks.getContentFileCount&&mCallbacks.getContentFile?"true":"false") << ",\"gameplayCallbacksAvailable\":" << (mCallbacks.getPlayerObject&&mCallbacks.validateHandle&&mCallbacks.getCell&&mCallbacks.getStat&&mCallbacks.setStat&&mCallbacks.getRecord?"true":"false") << '}'; return s.str(); }
 	std::string Host::buildReloadReport() const { std::ostringstream s; s << "{\"reloadCount\":" << mReloadCount << ",\"runtimeGeneration\":" << mRuntimeGeneration << ",\"state\":" << static_cast<std::uint32_t>(mState) << ",\"cleanShutdown\":" << (mState==LifecycleState::Stopped?"true":"false") << '}'; return s.str(); }
 	std::string Host::buildFoundationReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"packages\":{\"util\":\"partial-ncg\",\"interfaces\":\"implemented\",\"async\":\"partial-no-persistence\",\"storage\":\"partial-in-memory\",\"core\":\"player-record-stat-subset\",\"self\":\"validated-player-gameobject\"},\"probes\":{";bool first=true;for(const auto& [name,passed]:mFoundationProbes){if(!first)s<<',';first=false;s<<'\"'<<jsonEscape(name)<<"\":"<<(passed?"true":"false");}s<<"},\"timers\":{\"scheduled\":"<<mTimersScheduled<<",\"fired\":"<<mTimersFired<<",\"pending\":"<<mTimers.size()<<"},\"storage\":{\"globalSections\":"<<mGlobalStorage.size()<<",\"playerSections\":"<<mPlayerStorage.size()<<",\"notifications\":"<<mStorageNotifications<<"},\"interfaces\":{\"lookups\":"<<mInterfaceLookups<<"},\"time\":{\"simulationSeconds\":"<<mSimulationTimeSeconds<<",\"gameSeconds\":"<<mGameTimeSeconds<<",\"worldPaused\":"<<(mWorldPaused?"true":"false")<<"},\"limitations\":[\"timers and storage are not persisted across save/load or host reload until Milestone 5\",\"native Morrowind statistics expose a net modifier/damage decomposition\",\"l10n currently provides key fallback and simple token substitution; VFS locale loading remains Milestone 4.4\"]}";return s.str(); }
 	std::string Host::buildGameplayReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"runtimeGeneration\":"<<mRuntimeGeneration<<",\"gameplayCalls\":"<<mGameplayCalls<<",\"rejectedHandles\":"<<mRejectedHandles<<",\"stablePlayerUserdata\":"<<(mPlayerObjectReference!=LUA_NOREF?"true":"false")<<",\"cellIdentityCount\":"<<mCellReferences.size()<<",\"playerOnlySelf\":true,\"handleModel\":{\"opaque\":true,\"typeTagged\":true,\"generationScoped\":true},\"surfaces\":[\"GameObject\",\"Cell\",\"Actor\",\"NPC\",\"Player\",\"attributes\",\"skills\",\"level\",\"health\",\"spells\",\"classes\",\"races\",\"birthSigns\"],\"probes\":{";bool first=true;for(const auto& [name,passed]:mFoundationProbes){if(name.rfind("player-bindings-",0)!=0)continue;if(!first)s<<',';first=false;s<<'\"'<<jsonEscape(name)<<"\":"<<(passed?"true":"false");}s<<"}}";return s.str();}
-	std::string Host::buildReport() const { std::ostringstream s; s << "{\"schemaVersion\":3,\"state\":" << static_cast<std::uint32_t>(mState) << ",\"lastError\":\"" << jsonEscape(mLastError) << "\",\"bridge\":" << buildBridgeReport() << ",\"containers\":" << buildContainerReport() << ",\"handlers\":" << buildHandlerReport() << ",\"foundation\":" << buildFoundationReport() << ",\"gameplay\":" << buildGameplayReport() << ",\"reload\":" << buildReloadReport() << '}'; return s.str(); }
+	std::string Host::buildInputReport() const { std::ostringstream s;s<<"{\"schemaVersion\":1,\"actions\":{\"registered\":"<<mActionsRegistered<<",\"transitions\":"<<mActionTransitions<<",\"live\":"<<mInputActions.size()<<"},\"events\":{\"nativeDelivered\":"<<mNativeEventsDelivered<<",\"localQueued\":"<<mLocalEventsQueued<<"},\"lifecycle\":{\"onInit\":"<<mInitHandlerCalls<<",\"onActive\":"<<mActiveHandlerCalls<<",\"onSave\":"<<mSaveHandlerCalls<<",\"onLoad\":"<<mLoadHandlerCalls<<"},\"skillLevelHandlers\":"<<mSkillLevelUpHandlers.size()<<",\"oneFrameDelay\":true,\"optionalInterfacesAbsent\":[\"Activation\",\"Controls\",\"MarksmansEye\",\"SkillFramework\"],\"limitations\":[\"onSave return data is not persisted or passed to onLoad until Milestone 5\",\"Settings, Controls, UI, and localization remain Milestone 4.4\"]}";return s.str();}
+	std::string Host::buildReport() const { std::ostringstream s; s << "{\"schemaVersion\":4,\"state\":" << static_cast<std::uint32_t>(mState) << ",\"lastError\":\"" << jsonEscape(mLastError) << "\",\"bridge\":" << buildBridgeReport() << ",\"containers\":" << buildContainerReport() << ",\"handlers\":" << buildHandlerReport() << ",\"foundation\":" << buildFoundationReport() << ",\"gameplay\":" << buildGameplayReport() << ",\"inputEngine\":" << buildInputReport() << ",\"reload\":" << buildReloadReport() << '}'; return s.str(); }
 
 	void Host::writeReportArtifacts() {
 		if (mReportDirectory.empty()) return;
-		try { auto root=std::filesystem::path(mReportDirectory); const auto gameplay=buildGameplayReport(); writeAtomic(root/"bridge-runtime-report.json", buildBridgeReport()); writeAtomic(root/"parsed-container-report.json", buildContainerReport()); writeAtomic(root/"handler-order-report.json", buildHandlerReport()); writeAtomic(root/"foundation-package-report.json", buildFoundationReport()); writeAtomic(root/"handle-generation-report.json",gameplay);writeAtomic(root/"player-type-report.json",gameplay);writeAtomic(root/"records-stat-report.json",gameplay);writeAtomic(root/"mutation-restoration-report.json",gameplay); writeAtomic(root/"reload-shutdown-report.json", buildReloadReport()); writeAtomic(root/"openmw-host-report.json", buildReport()); } catch (const std::exception& error) { if (mCallbacks.log) { LogMessage message{sizeof(LogMessage),BridgeAbiVersion,LogSeverity::Error,0,asBridgeString("report"),asBridgeString(mContentFile),{}, {},asBridgeString(error.what())}; mCallbacks.log(mCallbacks.logUserData,&message); } }
+		try { auto root=std::filesystem::path(mReportDirectory); const auto gameplay=buildGameplayReport(); writeAtomic(root/"bridge-runtime-report.json", buildBridgeReport()); writeAtomic(root/"parsed-container-report.json", buildContainerReport()); writeAtomic(root/"handler-order-report.json", buildHandlerReport()); writeAtomic(root/"foundation-package-report.json", buildFoundationReport()); writeAtomic(root/"handle-generation-report.json",gameplay);writeAtomic(root/"player-type-report.json",gameplay);writeAtomic(root/"records-stat-report.json",gameplay);writeAtomic(root/"mutation-restoration-report.json",gameplay);writeAtomic(root/"input-engine-report.json",buildInputReport()); writeAtomic(root/"reload-shutdown-report.json", buildReloadReport()); writeAtomic(root/"openmw-host-report.json", buildReport()); } catch (const std::exception& error) { if (mCallbacks.log) { LogMessage message{sizeof(LogMessage),BridgeAbiVersion,LogSeverity::Error,0,asBridgeString("report"),asBridgeString(mContentFile),{}, {},asBridgeString(error.what())}; mCallbacks.log(mCallbacks.logUserData,&message); } }
 	}
 
 	Status Host::getReport(char* buffer, std::uint32_t capacity, std::uint32_t* requiredSize) {
